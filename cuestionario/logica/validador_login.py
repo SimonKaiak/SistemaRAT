@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from cuestionario.models import Trabajador
+from django.contrib.auth.models import User
 
 def login_view(request):
     """
@@ -15,7 +16,11 @@ def login_view(request):
         correo = request.POST.get('username')
         clave = request.POST.get('password')
         
-        user = authenticate(request, username=correo, password=clave)
+        try:
+            user_obj = User.objects.get(email=correo)
+            user = authenticate(request, username=user_obj.username, password=clave)
+        except User.DoesNotExist:
+            user = None
         
         if user is not None:
             login(request, user)
