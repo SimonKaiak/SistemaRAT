@@ -6,7 +6,8 @@ from .models import (
     Competencia, TextosEvaluacion, Autoevaluacion, 
     EvaluacionJefatura, ResultadoConsolidado, Escala,
     PromptGemini, ReporteGlobal,
-    Biblioteca, Empresa, CodigoEvaluacion
+    Biblioteca, Empresa, CodigoEvaluacion,
+    RATPreguntas, RATRespuestas, RegistroVersiones
 )
 from django.utils.html import format_html
 from django import forms
@@ -167,3 +168,7 @@ class BibliotecaAdmin(admin.ModelAdmin):
 admin.site.register(Dimension)
 admin.site.register(Departamento)
 admin.site.register(NivelJerarquico)
+# --- RAT ---
+admin.site.register(RATPreguntas)
+admin.site.register(RATRespuestas)
+admin.site.register(RegistroVersiones)

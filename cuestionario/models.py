@@ -504,3 +504,102 @@ def crear_usuario_automatico(sender, instance, created, **kwargs):
         )
         instance.user = nuevo_user
         instance.save()
+
+
+# =========================
+# Tabla Registro Versiones
+# =========================
+class RegistroVersiones(models.Model):
+    id_registro_version = models.AutoField(primary_key=True)
+    version = models.CharField(max_length=20)
+    fecha_modificacion = models.DateField(auto_now_add=True)
+    motivo_modificacion = models.TextField()
+
+    empresa = models.ForeignKey(
+        'Empresa',
+        on_delete=models.DO_NOTHING,
+        db_column='empresa_id_empresa'
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'REGISTRO_VERSIONES'
+
+    def __str__(self):
+        return f"v{self.version} - {self.fecha_modificacion}"
+
+
+# =========================
+# Tabla RAT Preguntas
+# =========================
+class RATPreguntas(models.Model):
+    BASE_LEGITIMIDAD_CHOICES = [
+        ('consentimiento', 'Consentimiento'),
+        ('contrato', 'Contrato'),
+        ('obligacion_legal', 'Obligación legal'),
+        ('interes_legitimo', 'Interés legítimo'),
+    ]
+
+    id_rat_pregunta = models.AutoField(primary_key=True)
+    actividad_tratamiento = models.CharField(max_length=255)
+    categorias_datos = models.TextField()
+    descripcion_titulares = models.TextField()
+    finalidad_tratamiento = models.TextField()
+    base_legitimidad = models.CharField(max_length=50, choices=BASE_LEGITIMIDAD_CHOICES)
+    periodo_conservacion = models.PositiveIntegerField()
+    fuente_datos = models.CharField(max_length=255)
+
+    empresa = models.ForeignKey(
+        'Empresa',
+        on_delete=models.DO_NOTHING,
+        db_column='empresa_id_empresa'
+    )
+    responsable = models.ForeignKey(
+        'Trabajador',
+        on_delete=models.DO_NOTHING,
+        db_column='trabajador_id_responsable',
+        related_name='preguntas_rat_responsable'
+    )
+    version = models.ForeignKey(
+        'RegistroVersiones',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='registro_versiones_id'
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'RAT_PREGUNTAS'
+
+    def __str__(self):
+        return self.actividad_tratamiento
+
+
+# =========================
+# Tabla RAT Respuestas
+# =========================
+class RATRespuestas(models.Model):
+    id_rat_respuesta = models.AutoField(primary_key=True)
+    respuesta = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    pregunta = models.ForeignKey(
+        'RATPreguntas',
+        on_delete=models.CASCADE,
+        db_column='rat_preguntas_id_rat_pregunta',
+        related_name='respuestas'
+    )
+    trabajador = models.ForeignKey(
+        'Trabajador',
+        on_delete=models.DO_NOTHING,
+        db_column='trabajador_id_trabajador'
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'RAT_RESPUESTAS'
+
+    def __str__(self):
+        return f"{self.trabajador} → {self.pregunta}"
