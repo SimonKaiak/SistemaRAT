@@ -5,14 +5,15 @@
 {% block content %}
 <section>
     <header>
-        <a href="{% url 'seguimiento_admin' %}" class="button small primary">← Volver a Seguimiento</a>
-        
-        <h2 style="margin-top: 1em;">Panel de Generación de Informes con IA</h2>
+        <a href="{% url 'seguimiento_admin' %}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver a Seguimiento</a>
+        <hr style="margin-top:1.5em;" />
+        <h2>Panel de Generación de Informes con IA</h2>
         <p>Utiliza Gemini AI para generar informes personalizados</p>
     </header>
 
-    <!-- BOTÓN 1: EDITAR PROMPT -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <!-- EDITAR PROMPT -->
+    <hr />
+    <div style="background: rgba(255,255,255,0.05); padding: 2em 2em 0.5em 2em; border-radius: 8px; margin-bottom: 2em;">
         <h3 style="color: #51ff85;">📝 Editar Prompt</h3>
         <form method="POST" action="{% url 'editar_prompt' %}">
             {% csrf_token %}
@@ -24,18 +25,19 @@
                 <div class="col-12">
                     <label for="prompt_texto"><strong>Escribe el prompt para la IA:</strong></label>
                     <textarea name="prompt_texto" id="prompt_texto" rows="8" 
-                              placeholder="Ejemplo: Genera un informe ejecutivo sobre las evaluaciones de desempeño del último trimestre, incluyendo estadísticas y recomendaciones..."
+                              placeholder="Ejemplo: Genera un informe ejecutivo sobre las evaluaciones de desempeño del último trimestre..."
                               style="background: rgba(255,255,255,0.05); color: white;" required>{% if ultimo_prompt %}{{ ultimo_prompt.prompt_texto }}{% endif %}</textarea>
                 </div>
-                <div class="col-12">
-                    <button type="submit" class="button primary">💾 Guardar Nuevo Prompt</button>
+                <div class="col-12" style="text-align:center;margin-top:1em;margin-bottom:0;">
+                    <button type="submit" class="button">💾 Guardar Nuevo Prompt</button>
                 </div>
             </div>
         </form>
     </div>
 
-    <!-- BOTÓN 2: VER HISTORIAL -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <!-- HISTORIAL -->
+    <hr />
+    <div style="background: rgba(255,255,255,0.05); padding: 2em 2em 0.5em 2em; border-radius: 8px; margin-bottom: 2em;">
         <h3 style="color: #2196F3;">📋 Historial de Prompts</h3>
         
         {% if historial %}
@@ -43,13 +45,14 @@
             <table class="alt">
                 <thead>
                     <tr>
-                        <th style="width: 8%;">ID</th>
-                        <th style="width: 12%;">Fecha</th>
-                        <th style="width: 15%;">Empresa</th>
-                        <th style="width: 30%;">Prompt</th>
-                        <th style="width: 10%;">Estado</th>
-                        <th style="width: 12%;">Generar Informe</th>
-                        <th style="width: 13%;">Ver Informe</th>
+                        <th style="width: 6%;">ID</th>
+                        <th style="width: 11%;">Fecha</th>
+                        <th style="width: 13%;">Empresa</th>
+                        <th style="width: 28%;">Prompt</th>
+                        <th style="width: 9%;">Estado</th>
+                        <th style="width: 11%;">Generar</th>
+                        <th style="width: 11%;">Ver</th>
+                        <th style="width: 11%;">Eliminar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,26 +79,23 @@
                         </td>
                         <td style="text-align: center;">
                             {% if prompt.pdf_generado %}
-                                <button class="button small" disabled style="opacity: 0.4; cursor: not-allowed;">
-                                    ✓ Ya Generado
-                                </button>
+                                <button class="button small" disabled style="opacity: 0.4; cursor: not-allowed;">✓ Ya Generado</button>
                             {% else %}
-                                <a href="{% url 'generar_informe_gemini' prompt.id_prompt %}" 
-                                   class="button small primary" 
-                                   target="_blank">
-                                    🤖 Generar Informe
-                                </a>
+                                <a href="{% url 'generar_informe_gemini' prompt.id_prompt %}" class="button small" target="_blank">🤖 Generar</a>
                             {% endif %}
                         </td>
                         <td style="text-align: center;">
                             {% if prompt.pdf_generado %}
-                                <a href="{% url 'ver_informe_gemini' prompt.id_prompt %}" 
-                                   class="button small primary" target="_blank">
-                                    📄 Ver Informe
-                                </a>
+                                <a href="{% url 'ver_informe_gemini' prompt.id_prompt %}" class="button small" target="_blank">📄 Ver</a>
                             {% else %}
                                 <span style="opacity: 0.3;">---</span>
                             {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            <form method="POST" action="{% url 'eliminar_prompt' prompt.id_prompt %}" onsubmit="return confirm('¿Eliminar este prompt?');">
+                                {% csrf_token %}
+                                <button type="submit" class="button small" style="background:rgba(255,80,80,0.2);border-color:rgba(255,80,80,0.5);">🗑 Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
@@ -108,17 +108,7 @@
         </p>
         {% endif %}
     </div>
-
-    <!-- BOTÓN 3: GENERAR INFORME (usando el último prompt) -->
-    {% if ultimo_prompt %}
-    <div style="text-align: center; margin-top: 2em; padding-bottom: 2em;">
-        <a href="{% url 'generar_informe_gemini' ultimo_prompt.id_prompt %}" 
-           class="button primary large" 
-           target="_blank">
-            🚀 Generar Informe con Último Prompt
-        </a>
-    </div>
-    {% endif %}
+    <hr />
 
 </section>
 {% endblock %}

@@ -5,9 +5,15 @@
 {% block content %}
 <section>
     <header>
-        <a href="{% url 'seguimiento_admin' %}" class="button small">← Volver a Seguimiento</a>
-        
-        <h2 style="margin-top: 1em;">Detalle de Evaluación</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
+            <a href="{% url 'seguimiento_admin' %}" class="button">← Volver a Seguimiento</a>
+            <div style="display:flex;gap:0.8em;">
+                <a href="{% url 'generar_pdf_detalle' trabajador.id_trabajador %}" class="button" target="_blank">📄 Imprimir Informe</a>
+                <a href="{% url 'generar_excel_detalle' trabajador.id_trabajador %}" class="button">📊 Descargar Excel</a>
+            </div>
+        </div>
+        <hr style="margin-top:1.5em;" />
+        <h2>Detalle de Evaluación</h2>
         <p>Colaborador: <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</strong><br>
         Cargo: {{ trabajador.cargo.nombre_cargo }} | Nivel: <em>{{ trabajador.nivel_jerarquico.nombre_nivel_jerarquico }}</em><br>
         Jefatura Directa: 
@@ -39,11 +45,16 @@
             </div>
         </div>
     </div>
+    <hr />
 
-    {% for dim_nombre, resultados_lista in dimensiones_data.items %}
-    <h3 style="color: {% if forloop.first %}#51ff85{% else %}#2196F3{% endif %}; margin-top: {% if forloop.first %}2em{% else %}3em{% endif %};">
-        Dimensión: {{ dim_nombre }}
-    </h3>
+{% for dim_nombre, resultados_lista in dimensiones_data.items %}
+
+    {% if not forloop.first %}<hr />{% endif %}
+
+    <div style="background: rgba(255,255,255,0.05); padding: 2em 2em 0.5em 2em; border-radius: 8px; margin-bottom: 1em;">
+        <h3 style="color: {% if forloop.first %}#51ff85{% else %}#2196F3{% endif %}; margin-top: 0;">
+            Dimensión: {{ dim_nombre }}
+        </h3>
     <div class="table-wrapper">
         <table class="alt">
             <thead>
@@ -102,26 +113,14 @@
             </tbody>
         </table>
     </div>
+    </div>
     {% empty %}
     <div style="text-align: center; padding: 3em; opacity: 0.5;">
         <p>No hay resultados consolidados disponibles para este colaborador.</p>
     </div>
     {% endfor %}
 
-    <!-- BOTONES PARA REPORTES -->
-    <div style="text-align: center; margin-top: 3em;">
-        <a href="{% url 'generar_pdf_detalle' trabajador.id_trabajador %}" 
-           class="button primary large" 
-           target="_blank"
-           style="margin-right: 1em;">
-            📄 Imprimir Informe
-        </a>
-        
-        <a href="{% url 'generar_excel_detalle' trabajador.id_trabajador %}" 
-           class="button primary large">
-            📊 Descargar Reporte Excel
-        </a>
-    </div>
+    <hr />
 
 </section>
 {% endblock %}

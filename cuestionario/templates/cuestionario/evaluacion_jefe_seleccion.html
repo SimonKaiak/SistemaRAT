@@ -5,8 +5,9 @@
 {% block content %}
 <section>
     <header>
-        <a href="{% url 'index' %}?id={{ evaluador.id_trabajador }}" class="button small">← Volver al Panel</a>
-        <h2 style="margin-top: 1em;">Dimensiones de Evaluación</h2>
+        <a href="{% url 'index' %}?id={{ evaluador.id_trabajador }}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver al Panel</a>
+        <hr style="margin-top:1.5em;" />
+        <h2>Dimensiones de Evaluación</h2>
         <p>Evaluando a: <strong style="color: #51ff85;">{{ evaluado.nombre }} {{ evaluado.apellido_paterno }} {{ evaluado.apellido_materno }}</strong><br>
         Cargo: {{ evaluado.cargo.nombre_cargo }}</p>
     </header>

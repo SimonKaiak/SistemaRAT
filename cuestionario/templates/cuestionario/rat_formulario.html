@@ -1,0 +1,39 @@
+{% extends "cuestionario/base.html" %}
+
+{% block title %}RAT – {% if editando %}Editar pregunta{% else %}Nueva pregunta{% endif %}{% endblock %}
+
+{% block content %}
+<section>
+    <header>
+        <h2>{% if editando %}✏️ Editar pregunta RAT{% else %}📋 Nueva pregunta RAT{% endif %}</h2>
+        <p>Completa los campos para <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+    </header>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <div style="display:flex;flex-direction:column;gap:1em;max-width:700px;">
+            {% for field in form %}
+            <div>
+                <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">
+                    {{ field.label }}{% if field.field.required %} <span style="color:#ff6b6b;">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="display:block;margin-top:0.25em;opacity:0.6;">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <p style="color:#ff6b6b;margin-top:0.3em;font-size:0.85em;">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div style="display:flex;gap:0.8em;flex-wrap:wrap;margin-top:0.5em;">
+                <button type="submit" class="button primary">
+                    {% if editando %}Guardar cambios{% else %}Guardar pregunta{% endif %}
+                </button>
+                <a href="{% url 'rat_panel_coordinador' %}" class="button">← Cancelar</a>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

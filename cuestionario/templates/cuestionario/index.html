@@ -90,6 +90,15 @@
         </section>
 
         <section>
+            <span class="icon solid major fa-shield-alt"></span>
+            <h3>RAT – Protección de Datos</h3>
+            <p>Completa el Registro de Actividad de Tratamiento de datos de tu empresa.</p>
+            <ul class="actions">
+                <li><a href="{% url 'rat_panel_usuario' %}" class="button primary">Ir al RAT</a></li>
+            </ul>
+        </section>
+
+        <section>
             <span class="icon solid major fa-info-circle"></span>
             <h3>Información</h3>
             <p>Este proceso consta de dos partes obligatorias. Los resultados serán revisados por tu jefatura directa.</p>
@@ -189,6 +198,15 @@
                             Editar Cuestionario
                         </a>
                     </li>
+                </ul>
+            </section>
+
+            <section>
+                <span class="icon solid major fa-shield-alt"></span>
+                <h3>RAT – Protección de Datos</h3>
+                <p>Gestiona el Registro de Actividad de Tratamiento de datos de {{ trabajador.empresa.nombre_empresa }}.</p>
+                <ul class="actions">
+                    <li><a href="{% url 'rat_panel_coordinador' %}" class="button primary">Panel RAT</a></li>
                 </ul>
             </section>
         </div>

@@ -12,6 +12,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.enums import TA_JUSTIFY
 from io import BytesIO
+from django.shortcuts import render, redirect, get_object_or_404
 
 load_dotenv()
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
@@ -241,6 +242,14 @@ def generar_informe_gemini(request, prompt_id):
             </body>
             </html>
         """, status=500)
+    
+
+@login_required
+def eliminar_prompt(request, prompt_id):
+    prompt = get_object_or_404(PromptGemini, id_prompt=prompt_id)
+    if request.method == 'POST':
+        prompt.delete()
+    return redirect('panel_gemini')
 
 
 @login_required

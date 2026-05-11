@@ -37,9 +37,11 @@ urlpatterns = [
     # RUTAS GEMINI
     path('gemini/', gemini_admin.panel_gemini, name='panel_gemini'),
     path('gemini/editar-prompt/', gemini_admin.editar_prompt, name='editar_prompt'),
+    path('gemini/eliminar-prompt/<int:prompt_id>/', gemini_admin.eliminar_prompt, name='eliminar_prompt'),
     path('gemini/generar/<int:prompt_id>/', gemini_admin.generar_informe_gemini, name='generar_informe_gemini'),
     path('gemini/listar-modelos/', gemini_admin.listar_modelos, name='listar_modelos'),
     path('gemini/ver-informe/<int:prompt_id>/', gemini_admin.ver_informe_gemini, name='ver_informe_gemini'),
+    
     
     path('autoevaluacion/<int:trabajador_id>/', 
          views.cuestionario_autoevaluacion, 
@@ -87,4 +89,14 @@ urlpatterns = [
     path('poblador/cargo/', poblador.guardar_cargo, name='guardar_cargo'),
     path('poblador/texto/', poblador.guardar_texto, name='guardar_texto'),
     path('poblador/trabajador/', poblador.guardar_trabajador, name='guardar_trabajador'),
+
+    # RUTAS RAT
+    path('rat/', views.rat_panel_usuario, name='rat_panel_usuario'),
+    path('rat/responder/<int:pregunta_id>/', views.rat_responder, name='rat_responder'),
+    path('rat/coordinador/', views.rat_panel_coordinador, name='rat_panel_coordinador'),
+    path('rat/coordinador/nueva/', views.rat_nueva_pregunta, name='rat_nueva_pregunta'),
+    path('rat/coordinador/editar/<int:pregunta_id>/', views.rat_editar_pregunta, name='rat_editar_pregunta'),
+    path('rat/coordinador/eliminar/<int:pregunta_id>/', views.rat_eliminar_pregunta, name='rat_eliminar_pregunta'),
+    path('rat/versiones/', views.rat_versiones, name='rat_versiones'),
+    path('rat/versiones/nueva/', views.rat_nueva_version, name='rat_nueva_version'),
 ]

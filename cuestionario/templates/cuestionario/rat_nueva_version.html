@@ -1,0 +1,32 @@
+{% extends "cuestionario/base.html" %}
+
+{% block title %}RAT – Nueva versión{% endblock %}
+
+{% block content %}
+<section>
+    <header>
+        <h2>🗃 Registrar nueva versión</h2>
+        <p>Documenta el motivo de la modificación en <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+    </header>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <div style="display:flex;flex-direction:column;gap:1em;max-width:500px;">
+            {% for field in form %}
+            <div>
+                <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <p style="color:#ff6b6b;margin-top:0.3em;font-size:0.85em;">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div style="display:flex;gap:0.8em;flex-wrap:wrap;margin-top:0.5em;">
+                <button type="submit" class="button primary">Guardar versión</button>
+                <a href="{% url 'rat_versiones' %}" class="button">← Cancelar</a>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

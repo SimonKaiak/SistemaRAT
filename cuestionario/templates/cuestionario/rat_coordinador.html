@@ -1,0 +1,86 @@
+{% extends "cuestionario/base.html" %}
+
+{% block title %}RAT – Panel Coordinador{% endblock %}
+
+{% block content %}
+<section>
+    <header>
+        <h2>🗂 Panel Coordinador — RAT</h2>
+        <p>Gestiona las preguntas RAT de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+    </header>
+
+    <div style="margin-bottom:1.5em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;">
+        <a href="{% url 'index' %}" class="button">← Volver al inicio</a>
+        <div style="display:flex;gap:0.8em;">
+            <a href="{% url 'rat_versiones' %}" class="button">🗃 Versiones</a>
+            <a href="{% url 'rat_nueva_pregunta' %}" class="button primary">+ Nueva pregunta</a>
+        </div>
+    </div>
+
+    {% if not preguntas %}
+        <div style="background:rgba(255,200,50,0.15);border-left:4px solid #f0c040;padding:1em 1.5em;border-radius:6px;margin-bottom:1.5em;">
+            ⚠️ No hay preguntas RAT creadas aún para esta empresa.
+        </div>
+    {% endif %}
+
+    <div style="display:flex;flex-direction:column;gap:1.2em;margin-top:1em;">
+        {% for pregunta in preguntas %}
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;">
+            <div style="background:rgba(255,255,255,0.08);padding:0.9em 1.3em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5em;">
+                <h4 style="margin:0;">{{ pregunta.actividad_tratamiento }}</h4>
+                <div style="display:flex;gap:0.5em;">
+                    <a href="{% url 'rat_editar_pregunta' pregunta.id_rat_pregunta %}" class="button primary small" style="margin:0;">✏️ Editar</a>
+                    <a href="{% url 'rat_eliminar_pregunta' pregunta.id_rat_pregunta %}" class="button small" style="margin:0;background:rgba(255,80,80,0.2);border-color:rgba(255,80,80,0.5);">🗑 Eliminar</a>
+                </div>
+            </div>
+
+            <div style="padding:1em 1.3em;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.88em;margin-bottom:1em;">
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <th style="text-align:left;padding:0.4em 0.8em 0.4em 0;opacity:0.65;width:200px;">Responsable</th>
+                        <td style="padding:0.4em 0;">{{ pregunta.responsable }}</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <th style="text-align:left;padding:0.4em 0.8em 0.4em 0;opacity:0.65;">Finalidad</th>
+                        <td style="padding:0.4em 0;">{{ pregunta.finalidad_tratamiento }}</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <th style="text-align:left;padding:0.4em 0.8em 0.4em 0;opacity:0.65;">Base de legitimidad</th>
+                        <td style="padding:0.4em 0;">{{ pregunta.get_base_legitimidad_display }}</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <th style="text-align:left;padding:0.4em 0.8em 0.4em 0;opacity:0.65;">Período de conservación</th>
+                        <td style="padding:0.4em 0;">{{ pregunta.periodo_conservacion }} meses</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <th style="text-align:left;padding:0.4em 0.8em 0.4em 0;opacity:0.65;">Fuente de datos</th>
+                        <td style="padding:0.4em 0;">{{ pregunta.fuente_datos }}</td>
+                    </tr>
+                    <tr>
+                        <th style="text-align:left;padding:0.4em 0.8em 0.4em 0;opacity:0.65;">Versión</th>
+                        <td style="padding:0.4em 0;">{{ pregunta.version|default:"Sin versión" }}</td>
+                    </tr>
+                </table>
+
+                <h5 style="margin:0 0 0.6em;opacity:0.85;">Respuestas de trabajadores:</h5>
+                {% if pregunta.respuestas.all %}
+                    <div style="display:flex;flex-direction:column;gap:0.5em;">
+                        {% for respuesta in pregunta.respuestas.all %}
+                        <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.7em 1em;">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:0.3em;font-size:0.86em;">
+                                <strong>{{ respuesta.trabajador }}</strong>
+                                <span style="opacity:0.6;">{{ respuesta.updated_at|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <p style="margin:0;font-size:0.9em;">{{ respuesta.respuesta }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="margin:0;opacity:0.55;font-size:0.88em;font-style:italic;">Ningún trabajador ha respondido aún.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

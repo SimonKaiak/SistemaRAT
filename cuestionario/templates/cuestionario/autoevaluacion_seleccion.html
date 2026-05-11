@@ -5,8 +5,9 @@
 {% block content %}
 <section>
     <header>
-        <a href="{% url 'index' %}?id={{ trabajador.id_trabajador }}" class="button small">← Volver al Panel</a>
-        <h2 style="margin-top: 1em;">Mi Autoevaluación</h2>
+        <a href="{% url 'index' %}?id={{ trabajador.id_trabajador }}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver al Panel</a>
+        <hr style="margin-top:1.5em;" />
+        <h2>Mi Autoevaluación</h2>
         <p>Hola <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</strong>, selecciona el bloque que deseas completar:</p>
     </header>
 

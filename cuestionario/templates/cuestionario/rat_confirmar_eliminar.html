@@ -1,0 +1,24 @@
+{% extends "cuestionario/base.html" %}
+
+{% block title %}RAT – Confirmar eliminación{% endblock %}
+
+{% block content %}
+<section>
+    <header>
+        <h2>⚠️ Confirmar eliminación</h2>
+    </header>
+
+    <div style="background:rgba(255,80,80,0.1);border-left:4px solid rgba(255,80,80,0.7);border-radius:8px;padding:1.2em 1.5em;margin-bottom:1.5em;">
+        <p style="margin:0 0 0.5em;">¿Estás seguro que deseas eliminar la pregunta <strong>{{ pregunta.actividad_tratamiento }}</strong>?</p>
+        <p style="margin:0;font-size:0.88em;opacity:0.75;">Esta acción también eliminará todas las respuestas asociadas y no se puede deshacer.</p>
+    </div>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <div style="display:flex;gap:0.8em;flex-wrap:wrap;">
+            <button type="submit" class="button primary" style="background:rgba(200,50,50,0.8);border-color:rgba(200,50,50,0.8);">Sí, eliminar</button>
+            <a href="{% url 'rat_panel_coordinador' %}" class="button">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

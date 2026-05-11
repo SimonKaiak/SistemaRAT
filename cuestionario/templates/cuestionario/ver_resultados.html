@@ -1,78 +1,167 @@
 {% extends "cuestionario/base.html" %}
 
+
+
 {% block title %}Resultados de Evaluación - {{ trabajador.nombre }}{% endblock %}
 
+
+
 {% block content %}
+
 <section>
+
     <header>
+
         {% if tipo_evaluacion == 'auto' %}
-            <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button primary small">← Volver a Selección</a>
+
+            <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver a Selección</a>
+
         {% else %}
-            <a href="{% url 'evaluacion_jefe_inicio' visor_id trabajador.id_trabajador %}" class="button primary small">← Volver a Selección</a>
+
+            <a href="{% url 'evaluacion_jefe_inicio' visor_id trabajador.id_trabajador %}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver a Selección</a>
+
         {% endif %}
-        
-        <h2 style="margin-top: 1em;">Reporte de Evaluación Finalizada</h2>
+
+        <hr style="margin-top:1.5em;" />
+
+        <h2>Reporte de Evaluación Finalizada</h2>
+
         <p>Colaborador: <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</strong><br>
+
         Cargo: {{ trabajador.cargo.nombre_cargo }} | Nivel: {{ trabajador.nivel_jerarquico.nombre_nivel_jerarquico }} | Fecha de Cierre: {{ fecha_cierre|date:"d/m/Y" }}</p>
+
     </header>
 
-    {% for dim_nombre, respuestas_lista in dimensiones.items %}
-    <div style="margin-bottom: 3em;">
-        <h3 style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 0.5em;">
+
+
+{% for dim_nombre, respuestas_lista in dimensiones.items %}
+
+
+
+    {% if not forloop.first %}<hr />{% endif %}
+
+
+
+    <div style="background: rgba(255,255,255,0.05); padding: 2em 2em 0.5em 2em; border-radius: 8px; margin-bottom: 1em;">
+
+        <h3 style="margin-top:0;">
+
             Dimensión: 
+
             <span style="color: {% if 'Funcional' in dim_nombre %}#2196F3{% else %}#51ff85{% endif %};">
+
                 {{ dim_nombre }}
+
             </span>
+
         </h3>
+
         
+
         <div class="table-wrapper">
+
             <table>
+
                 <thead>
+
                     <tr>
+
                         <th style="width: 75%;">Cód. - Competencia / Indicador</th>
+
                         <th style="text-align: center;">Calificación</th>
+
                     </tr>
+
                 </thead>
+
                 <tbody>
+
                     {% for r in respuestas_lista %}
+
                     <tr>
+
                         <td>
+
                             <span style="color: {% if 'Funcional' in dim_nombre %}#2196F3{% else %}#51ff85{% endif %}; font-weight: bold;">
+
                                 [{{ r.texto_eval.codigo_excel }}]
+
                             </span> 
+
                             <strong>{{ r.texto_eval.competencia.nombre_competencia }}</strong><br>
+
                             <small style="opacity: 0.7; display: block; margin-top: 4px;">{{ r.texto_eval.texto }}</small>
+
                         </td>
+
                         <td style="text-align: center; vertical-align: middle;">
+
                             <span style="background: {% if 'Funcional' in dim_nombre %}rgba(33, 150, 243, 0.2){% else %}rgba(81, 255, 133, 0.2){% endif %}; 
+
                                          color: {% if 'Funcional' in dim_nombre %}#2196F3{% else %}#51ff85{% endif %}; 
+
                                          padding: 0.5em 1em; border-radius: 20px; font-weight: bold; 
+
                                          border: 1px solid {% if 'Funcional' in dim_nombre %}#2196F3{% else %}#51ff85{% endif %};">
+
                                 {{ r.puntaje }}
+
                             </span>
+
                         </td>
+
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
+
     </div>
+
+    </div>
+
     {% empty %}
+
     <div style="text-align: center; padding: 3em; opacity: 0.5;">
+
         <p>No hay datos disponibles para esta selección.</p>
+
     </div>
+
     {% endfor %}
 
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; border-left: 5px solid #51ff85;">
-        <h4>Comentarios Finales</h4>
+
+
+    <hr />
+
+    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px;">
+
+        <h4 style="margin-top:0;color:#51ff85;">💬 Comentarios Finales</h4>
+
         <p style="font-style: italic; margin: 0;">
+
             {% if comentario_final %}
+
                 "{{ comentario_final }}"
+
             {% else %}
-                No se registraron comentarios adicionales.
+
+                <span style="opacity:0.5;">No se registraron comentarios adicionales.</span>
+
             {% endif %}
+
         </p>
+
     </div>
 
+    <hr />
+
+
+
 </section>
+
 {% endblock %}

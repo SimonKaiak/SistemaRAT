@@ -1,0 +1,42 @@
+{% extends "cuestionario/base.html" %}
+
+{% block title %}RAT – Mis Preguntas{% endblock %}
+
+{% block content %}
+<section>
+    <header>
+        <a href="{% url 'index' %}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver al inicio</a>
+        <hr style="margin-top:1.5em;" />
+        <h2>📋 Registro de Actividad de Tratamiento (RAT)</h2>
+        <p>Bienvenido/a, <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }}</strong>.
+           Responde o actualiza cada pregunta RAT de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+    </header>
+
+    {% if not preguntas %}
+        <div style="background:rgba(255,200,50,0.15);border-left:4px solid #f0c040;padding:1em 1.5em;border-radius:6px;margin-bottom:1.5em;">
+            ⚠️ Aún no hay preguntas RAT creadas. El coordinador debe crearlas primero.
+        </div>
+    {% else %}
+        <div style="display:flex;flex-direction:column;gap:1em;">
+            {% for pregunta in preguntas %}
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;display:flex;justify-content:space-between;align-items:center;gap:1em;flex-wrap:wrap;">
+                <div style="flex:1;min-width:200px;">
+                    <h4 style="margin:0 0 0.3em;">{{ pregunta.actividad_tratamiento }}</h4>
+                    <p style="margin:0;font-size:0.9em;opacity:0.7;">Finalidad: {{ pregunta.finalidad_tratamiento }}</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.8em;flex-shrink:0;">
+                    {% if pregunta.id_rat_pregunta in respuestas_existentes %}
+                        <span style="background:#51ff85;color:#000;padding:0.25em 0.8em;border-radius:20px;font-size:0.82em;font-weight:bold;">✅ Respondida</span>
+                    {% else %}
+                        <span style="background:#f0c040;color:#000;padding:0.25em 0.8em;border-radius:20px;font-size:0.82em;font-weight:bold;">⏳ Pendiente</span>
+                    {% endif %}
+                    <a href="{% url 'rat_responder' pregunta.id_rat_pregunta %}" class="button primary small" style="margin:0;">
+                        {% if pregunta.id_rat_pregunta in respuestas_existentes %}Editar{% else %}Responder{% endif %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
