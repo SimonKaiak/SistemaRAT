@@ -21,9 +21,7 @@
 
 {% for dim_nombre, respuestas_lista in dimensiones.items %}
 
-    {% if not forloop.first %}<hr />{% endif %}
-
-    <div style="background: rgba(255,255,255,0.05); padding: 2em 2em 0.5em 2em; border-radius: 8px; margin-bottom: 1em;">
+    <div style="background: rgba(255,255,255,0.05); padding: 2em 2em 1.5em 2em; border-radius: 8px; margin-bottom: 1em; {% if not forloop.first %}margin-top: 1em;{% endif %}">
 
         <h3 style="margin-top:0;">
             Dimensión:
@@ -32,15 +30,15 @@
             </span>
         </h3>
 
-        <div class="table-wrapper">
-            <table>
+        <div class="table-wrapper" style="margin-bottom: 0 !important; overflow: hidden;">
+            <table style="margin-bottom: 0; border-bottom: none;">
                 <thead>
                     <tr>
                         <th style="width: 75%;">Cód. - Competencia / Indicador</th>
                         <th style="text-align: center;">Calificación</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="border-bottom: none;">
                     {% for r in respuestas_lista %}
                     <tr>
                         <td>
@@ -64,20 +62,20 @@
             </table>
         </div>
 
-        {% with comentario=comentarios_por_dimension|get_item:dim_nombre %}
-        <div style="margin-top: 1em; padding: 1em 1.5em; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 3px solid {% if 'Funcional' in dim_nombre %}#2196F3{% else %}#51ff85{% endif %};">
-            <strong style="font-size: 0.85em; opacity: 0.7;">💬 Comentarios {{ dim_nombre }}:</strong>
-            <p style="margin: 0.4em 0 0 0; font-style: italic;">
-                {% if comentario %}
-                    "{{ comentario }}"
-                {% else %}
-                    <span style="opacity:0.5;">No se registraron comentarios adicionales.</span>
-                {% endif %}
-            </p>
-        </div>
-        {% endwith %}
-
     </div>
+
+    {% with comentario=comentarios_por_dimension|get_item:dim_nombre %}
+    <div style="padding: 1em 1.5em; margin-top: -1px; margin-bottom: 0; border-top: 1px solid rgba(255,255,255,0.15); border-left: 3px solid {% if 'Funcional' in dim_nombre %}#2196F3{% else %}#51ff85{% endif %}; background: rgba(255,255,255,0.03);">
+        <strong style="font-size: 0.85em; opacity: 0.7;">💬 Comentarios {{ dim_nombre }}:</strong>
+        <p style="margin: 0.4em 0 0 0; font-style: italic;">
+            {% if comentario %}
+                "{{ comentario }}"
+            {% else %}
+                <span style="opacity:0.5;">No se registraron comentarios adicionales.</span>
+            {% endif %}
+        </p>
+    </div>
+    {% endwith %}
 
     {% empty %}
     <div style="text-align: center; padding: 3em; opacity: 0.5;">

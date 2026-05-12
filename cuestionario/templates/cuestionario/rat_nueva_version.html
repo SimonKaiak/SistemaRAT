@@ -1,6 +1,6 @@
 {% extends "cuestionario/base.html" %}
 
-{% block title %}RAT – Nueva versión{% endblock %}
+{% block title %}RAT – {% if editando %}Editar versión{% else %}Nueva versión{% endif %}{% endblock %}
 
 {% block content %}
 <section>
@@ -9,10 +9,12 @@
         <header>
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
                 <a href="{% url 'rat_versiones' %}" class="button">← Cancelar</a>
-                <button type="submit" class="button primary">Guardar versión</button>
+                <button type="submit" class="button primary">
+                    {% if editando %}Guardar cambios{% else %}Guardar versión{% endif %}
+                </button>
             </div>
             <hr style="margin-top:1.5em;" />
-            <h2>🗃 Registrar nueva versión</h2>
+            <h2>{% if editando %}✏️ Editar versión{% else %}🗃 Registrar nueva versión{% endif %}</h2>
             <p>Documenta el motivo de la modificación en <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
         </header>
 

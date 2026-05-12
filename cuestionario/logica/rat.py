@@ -34,16 +34,49 @@ class RATPreguntaForm(forms.ModelForm):
             'fuente_datos',
             'version',
         ]
+
         widgets = {
-            'actividad_tratamiento': forms.TextInput(attrs={'class': 'form-control', 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'responsable': forms.Select(attrs={'class': 'form-select', 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'categorias_datos': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'descripcion_titulares': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'finalidad_tratamiento': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'base_legitimidad': forms.Select(attrs={'class': 'form-select', 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'periodo_conservacion': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'fuente_datos': forms.TextInput(attrs={'class': 'form-control', 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
-            'version': forms.Select(attrs={'class': 'form-select', 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;'}),
+            'actividad_tratamiento': forms.TextInput(attrs={
+                'class': 'form-control',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'placeholder': 'Ej: Gestión de nóminas y remuneraciones',
+            }),
+            'responsable': forms.Select(attrs={
+                'class': 'form-select',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+            }),
+            'categorias_datos': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 2,
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'placeholder': 'Ej: Datos identificativos (RUT, nombre), datos económicos (sueldo, cuenta bancaria)',
+            }),
+            'descripcion_titulares': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 2,
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'placeholder': 'Ej: Trabajadores y ex-trabajadores de la empresa en relación laboral vigente o finalizada',
+            }),
+            'finalidad_tratamiento': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 2,
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'placeholder': 'Ej: Calcular y pagar remuneraciones, cumplir obligaciones tributarias y previsionales',
+            }),
+            'base_legitimidad': forms.Select(attrs={
+                'class': 'form-select',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+            }),
+            'periodo_conservacion': forms.NumberInput(attrs={
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;color:inherit;background:rgba(255,255,255,0.05);',
+                'placeholder': 'Ej: 60  (meses)',
+            }),
+            'fuente_datos': forms.TextInput(attrs={
+                'class': 'form-control',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'placeholder': 'Ej: El propio trabajador mediante contrato de trabajo y ficha de ingreso',
+            }),
+            'version': forms.Select(attrs={
+                'class': 'form-select',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+            }),
         }
 
     def __init__(self, *args, empresa=None, **kwargs):
@@ -267,3 +300,46 @@ def rat_nueva_version(request):
         'form': form,
     }
     return render(request, 'cuestionario/rat_nueva_version.html', context)
+
+@login_required
+def rat_editar_version(request, version_id):
+    trabajador = _get_trabajador_o_none(request)
+    if not trabajador or not trabajador.es_coordinador:
+        return redirect('index')
+
+    version = get_object_or_404(RegistroVersiones, pk=version_id, empresa=trabajador.empresa)
+
+    if request.method == 'POST':
+        form = RegistroVersionesForm(request.POST, instance=version)
+        if form.is_valid():
+            form.save()
+            return redirect('rat_versiones')
+    else:
+        form = RegistroVersionesForm(instance=version)
+
+    context = {
+        'trabajador': trabajador,
+        'form': form,
+        'editando': True,
+        'version': version,
+    }
+    return render(request, 'cuestionario/rat_nueva_version.html', context)
+
+
+@login_required
+def rat_eliminar_version(request, version_id):
+    trabajador = _get_trabajador_o_none(request)
+    if not trabajador or not trabajador.es_coordinador:
+        return redirect('index')
+
+    version = get_object_or_404(RegistroVersiones, pk=version_id, empresa=trabajador.empresa)
+
+    if request.method == 'POST':
+        version.delete()
+        return redirect('rat_versiones')
+
+    context = {
+        'trabajador': trabajador,
+        'version': version,
+    }
+    return render(request, 'cuestionario/rat_confirmar_eliminar_version.html', context)

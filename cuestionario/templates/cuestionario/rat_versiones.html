@@ -21,12 +21,15 @@
     {% else %}
         <div style="display:flex;flex-direction:column;gap:0.7em;margin-top:1em;">
             {% for v in versiones %}
-            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.9em 1.3em;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5em;">
-                <div>
+                <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.9em 1.3em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5em;">                <div>
                     <strong style="font-size:1em;">v{{ v.version }}</strong>
                     <p style="margin:0.3em 0 0;font-size:0.88em;opacity:0.75;">{{ v.motivo_modificacion }}</p>
                 </div>
-                <span style="font-size:0.82em;opacity:0.6;flex-shrink:0;">{{ v.fecha_modificacion|date:"d/m/Y" }}</span>
+                <div style="display:flex;align-items:center;gap:0.5em;flex-shrink:0;">
+                    <span style="font-size:0.82em;opacity:0.6;">{{ v.fecha_modificacion|date:"d/m/Y" }}</span>
+                    <a href="{% url 'rat_editar_version' v.pk %}" class="button primary small" style="margin:0;">✏️ Editar</a>
+                    <a href="{% url 'rat_eliminar_version' v.pk %}" class="button small" style="margin:0;background:rgba(255,80,80,0.2);border-color:rgba(255,80,80,0.5);">🗑 Eliminar</a>
+                </div>
             </div>
             {% endfor %}
         </div>

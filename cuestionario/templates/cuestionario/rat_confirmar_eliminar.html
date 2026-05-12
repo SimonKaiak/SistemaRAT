@@ -5,6 +5,13 @@
 {% block content %}
 <section>
     <header>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <a href="{% url 'rat_panel_coordinador' %}" class="button">← Cancelar</a>
+            <form method="post" action="" style="margin:0;">
+                {% csrf_token %}
+        <button type="submit" class="button primary" style="background:rgba(200,50,50,0.8);border-color:rgba(200,50,50,0.8);color:white !important;">Sí, eliminar</button>
+        </div>
+        <hr style="margin-top:1.5em;" />
         <h2>⚠️ Confirmar eliminación</h2>
     </header>
 
@@ -13,12 +20,7 @@
         <p style="margin:0;font-size:0.88em;opacity:0.75;">Esta acción también eliminará todas las respuestas asociadas y no se puede deshacer.</p>
     </div>
 
-    <form method="post" action="">
-        {% csrf_token %}
-        <div style="display:flex;gap:0.8em;flex-wrap:wrap;">
-            <button type="submit" class="button primary" style="background:rgba(200,50,50,0.8);border-color:rgba(200,50,50,0.8);">Sí, eliminar</button>
-            <a href="{% url 'rat_panel_coordinador' %}" class="button">Cancelar</a>
-        </div>
-    </form>
+    <hr />
+
 </section>
 {% endblock %}

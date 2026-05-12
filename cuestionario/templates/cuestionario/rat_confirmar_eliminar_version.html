@@ -1,0 +1,27 @@
+{% extends "cuestionario/base.html" %}
+
+{% block title %}RAT – Confirmar eliminación de versión{% endblock %}
+
+{% block content %}
+<section>
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <a href="{% url 'rat_versiones' %}" class="button">← Cancelar</a>
+            <form method="post" action="" style="margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="button primary" style="background:rgba(200,50,50,0.8);border-color:rgba(200,50,50,0.8);color:white !important;">Sí, eliminar</button>
+            </form>
+        </div>
+        <hr style="margin-top:1.5em;" />
+        <h2>⚠️ Confirmar eliminación</h2>
+    </header>
+
+    <div style="background:rgba(255,80,80,0.1);border-left:4px solid rgba(255,80,80,0.7);border-radius:8px;padding:1.2em 1.5em;margin-bottom:1.5em;">
+        <p style="margin:0 0 0.5em;">¿Estás seguro que deseas eliminar la versión <strong>v{{ version.version }}</strong>?</p>
+        <p style="margin:0;font-size:0.88em;opacity:0.75;">Esta acción no se puede deshacer.</p>
+    </div>
+
+    <hr />
+
+</section>
+{% endblock %}
