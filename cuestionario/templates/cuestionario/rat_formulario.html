@@ -4,13 +4,20 @@
 
 {% block content %}
 <section>
-    <header>
-        <h2>{% if editando %}✏️ Editar pregunta RAT{% else %}📋 Nueva pregunta RAT{% endif %}</h2>
-        <p>Completa los campos para <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
-    </header>
-
     <form method="post" action="">
         {% csrf_token %}
+        <header>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
+                <a href="{% url 'rat_panel_coordinador' %}" class="button">← Cancelar</a>
+                <button type="submit" class="button primary">
+                    {% if editando %}Guardar cambios{% else %}Guardar pregunta{% endif %}
+                </button>
+            </div>
+            <hr style="margin-top:1.5em;" />
+            <h2>{% if editando %}✏️ Editar pregunta RAT{% else %}📋 Nueva pregunta RAT{% endif %}</h2>
+            <p>Completa los campos para <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+        </header>
+
         <div style="display:flex;flex-direction:column;gap:1em;max-width:700px;">
             {% for field in form %}
             <div>
@@ -26,13 +33,6 @@
                 {% endif %}
             </div>
             {% endfor %}
-
-            <div style="display:flex;gap:0.8em;flex-wrap:wrap;margin-top:0.5em;">
-                <button type="submit" class="button primary">
-                    {% if editando %}Guardar cambios{% else %}Guardar pregunta{% endif %}
-                </button>
-                <a href="{% url 'rat_panel_coordinador' %}" class="button">← Cancelar</a>
-            </div>
         </div>
     </form>
 </section>

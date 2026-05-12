@@ -86,6 +86,7 @@ def ver_resultados(request, trabajador_id, tipo_evaluacion):
     textos_map = {t.codigo_excel: t for t in textos_qs}
 
     dimensiones_data = {}
+    comentarios_por_dimension = {}
     for respuesta in respuestas:
         codigo = respuesta.textos_evaluacion_codigo_excel
         texto_eval = textos_map.get(codigo)
@@ -95,6 +96,7 @@ def ver_resultados(request, trabajador_id, tipo_evaluacion):
         dim_nombre = texto_eval.dimension.nombre_dimension
         if dim_nombre not in dimensiones_data:
             dimensiones_data[dim_nombre] = []
+            comentarios_por_dimension[dim_nombre] = respuesta.comentario or ""
 
         respuesta.texto_eval = texto_eval
         dimensiones_data[dim_nombre].append(respuesta)
@@ -102,7 +104,7 @@ def ver_resultados(request, trabajador_id, tipo_evaluacion):
     context = {
         'trabajador': trabajador_a_ver,
         'dimensiones': dimensiones_data,
-        'comentario_final': respuestas.first().comentario if respuestas.exists() else "",
+        'comentarios_por_dimension': comentarios_por_dimension,  # ← reemplaza 'comentario_final'
         'fecha_cierre': respuestas.first().momento_evaluacion if respuestas.exists() else None,
         'visor_id': visor_id,
         'tipo_evaluacion': tipo_evaluacion,

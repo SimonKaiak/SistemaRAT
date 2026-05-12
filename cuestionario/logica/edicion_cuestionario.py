@@ -54,17 +54,30 @@ def panel_edicion(request):
     return render(request, 'cuestionario/edicion_cuestionario.html', context)
 
 
+def _get_trabajador_o_redirigir(request):
+    """Retorna el trabajador si es coordinador, o None si debe redirigirse."""
+    if request.user.is_superuser:
+        return None  # superuser no necesita validación de empresa
+    try:
+        trabajador = Trabajador.objects.get(user=request.user)
+        if not trabajador.es_coordinador:
+            return 'redirect'
+        return trabajador
+    except Trabajador.DoesNotExist:
+        return 'redirect'
+
+
 @login_required
 def editar_dimension(request, dimension_id):
-    if not request.user.is_superuser:
-        try:
-            trabajador = Trabajador.objects.get(user=request.user)
-            if not trabajador.es_coordinador:
-                return redirect('index')
-        except Trabajador.DoesNotExist:
-            return redirect('index')
+    trabajador = _get_trabajador_o_redirigir(request)
+    if trabajador == 'redirect':
+        return redirect('index')
 
     dimension = get_object_or_404(Dimension, id_dimension=dimension_id)
+
+    # Verificar que la dimensión pertenece a la empresa del coordinador
+    if trabajador and dimension.empresa != trabajador.empresa:
+        return redirect('index')
 
     if request.method == 'POST':
         nombre = request.POST.get('nombre_dimension', '').strip()
@@ -79,15 +92,15 @@ def editar_dimension(request, dimension_id):
 
 @login_required
 def editar_competencia(request, competencia_id):
-    if not request.user.is_superuser:
-        try:
-            trabajador = Trabajador.objects.get(user=request.user)
-            if not trabajador.es_coordinador:
-                return redirect('index')
-        except Trabajador.DoesNotExist:
-            return redirect('index')
+    trabajador = _get_trabajador_o_redirigir(request)
+    if trabajador == 'redirect':
+        return redirect('index')
 
     competencia = get_object_or_404(Competencia, id_competencia=competencia_id)
+
+    # Verificar que la competencia pertenece a la empresa del coordinador
+    if trabajador and competencia.empresa != trabajador.empresa:
+        return redirect('index')
 
     if request.method == 'POST':
         nombre = request.POST.get('nombre_competencia', '').strip()
@@ -102,15 +115,15 @@ def editar_competencia(request, competencia_id):
 
 @login_required
 def editar_nivel(request, nivel_id):
-    if not request.user.is_superuser:
-        try:
-            trabajador = Trabajador.objects.get(user=request.user)
-            if not trabajador.es_coordinador:
-                return redirect('index')
-        except Trabajador.DoesNotExist:
-            return redirect('index')
+    trabajador = _get_trabajador_o_redirigir(request)
+    if trabajador == 'redirect':
+        return redirect('index')
 
     nivel = get_object_or_404(NivelJerarquico, id_nivel_jerarquico=nivel_id)
+
+    # Verificar que el nivel pertenece a la empresa del coordinador
+    if trabajador and nivel.empresa != trabajador.empresa:
+        return redirect('index')
 
     if request.method == 'POST':
         nombre = request.POST.get('nombre_nivel_jerarquico', '').strip()
@@ -125,15 +138,15 @@ def editar_nivel(request, nivel_id):
 
 @login_required
 def editar_texto(request, texto_id):
-    if not request.user.is_superuser:
-        try:
-            trabajador = Trabajador.objects.get(user=request.user)
-            if not trabajador.es_coordinador:
-                return redirect('index')
-        except Trabajador.DoesNotExist:
-            return redirect('index')
+    trabajador = _get_trabajador_o_redirigir(request)
+    if trabajador == 'redirect':
+        return redirect('index')
 
     texto = get_object_or_404(TextosEvaluacion, id_textos_evaluacion=texto_id)
+
+    # Verificar que el texto pertenece a la empresa del coordinador
+    if trabajador and texto.empresa != trabajador.empresa:
+        return redirect('index')
 
     if request.method == 'POST':
         nuevo_texto = request.POST.get('texto', '').strip()
@@ -148,15 +161,15 @@ def editar_texto(request, texto_id):
 
 @login_required
 def editar_escala(request, escala_id):
-    if not request.user.is_superuser:
-        try:
-            trabajador = Trabajador.objects.get(user=request.user)
-            if not trabajador.es_coordinador:
-                return redirect('index')
-        except Trabajador.DoesNotExist:
-            return redirect('index')
+    trabajador = _get_trabajador_o_redirigir(request)
+    if trabajador == 'redirect':
+        return redirect('index')
 
     escala = get_object_or_404(Escala, id_escala=escala_id)
+
+    # Verificar que la escala pertenece a la empresa del coordinador
+    if trabajador and escala.empresa != trabajador.empresa:
+        return redirect('index')
 
     if request.method == 'POST':
         titulo = request.POST.get('titulo', '').strip()

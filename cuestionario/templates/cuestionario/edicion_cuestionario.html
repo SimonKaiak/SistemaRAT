@@ -3,9 +3,17 @@
 {% block title %}Edición de Cuestionario{% endblock %}
 
 {% block content %}
+<style>
+    table.alt td, table.alt th { vertical-align: middle; }
+    table.alt td { padding-top: 0.6em; padding-bottom: 0.6em; }
+    table.alt td form { margin: auto 0; justify-content: space-between; width: 100%; }
+</style>
 <section>
     <header>
-        <a href="{% url 'index' %}" class="button small primary">← Volver al Panel</a>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
+            <a href="{% url 'index' %}" class="button">← Volver al Panel</a>
+        </div>
+        <hr style="margin-top:1.5em;" />
         <h2 style="margin-top: 1em;">Edición de Cuestionario</h2>
         <p>Edita dimensiones, competencias, niveles y textos de evaluación por empresa.</p>
     </header>
@@ -19,9 +27,9 @@
     {% endif %}
 
     <!-- EMPRESA ACTIVA -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em; border-radius: 8px; margin-bottom: 2em;">
         {% if empresa_actual %}
-            <p><strong>Empresa: </strong><span style="color: #51ff85; font-weight: bold;">{{ empresa_actual.nombre_empresa }}</span></p>
+            <p style="margin: 0;"><strong>Empresa: </strong><span style="color: #51ff85; font-weight: bold;">{{ empresa_actual.nombre_empresa }}</span></p>
         {% else %}
             <form method="GET" action="{% url 'panel_edicion' %}">
                 <label><strong>Selecciona empresa:</strong></label>
@@ -39,7 +47,8 @@
     {% if empresa_actual %}
 
     <!-- DIMENSIONES -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <hr />
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 0;">
         <h3 style="color: #51ff85;">Dimensiones</h3>
         <div class="table-wrapper">
             <table class="alt">
@@ -56,7 +65,7 @@
                         <td>{{ dim.id_dimension }}</td>
                         <td>{{ dim.nombre_dimension }}</td>
                         <td>
-                            <form method="POST" action="{% url 'editar_dimension' dim.id_dimension %}" style="display:flex; gap: 0.5em;">
+                            <form method="POST" action="{% url 'editar_dimension' dim.id_dimension %}" style="display:flex; gap: 0.5em; align-items: center;">
                                 {% csrf_token %}
                                 <input type="text" name="nombre_dimension" value="{{ dim.nombre_dimension }}"
                                        style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 250px;">
@@ -69,9 +78,10 @@
             </table>
         </div>
     </div>
+    <hr />
 
     <!-- COMPETENCIAS -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 2em;">
         <h3 style="color: #2196F3;">Competencias</h3>
         <div class="table-wrapper">
             <table class="alt">
@@ -90,7 +100,7 @@
                         <td>{{ comp.dimension.nombre_dimension }}</td>
                         <td>{{ comp.nombre_competencia }}</td>
                         <td>
-                            <form method="POST" action="{% url 'editar_competencia' comp.id_competencia %}" style="display:flex; gap: 0.5em;">
+                            <form method="POST" action="{% url 'editar_competencia' comp.id_competencia %}" style="display:flex; gap: 0.5em; align-items: center;">
                                 {% csrf_token %}
                                 <input type="text" name="nombre_competencia" value="{{ comp.nombre_competencia }}"
                                        style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 300px;">
@@ -105,7 +115,8 @@
     </div>
 
     <!-- NIVELES JERÁRQUICOS -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <hr />
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 0;">
         <h3 style="color: #ce93d8;">Niveles Jerárquicos</h3>
         <div class="table-wrapper">
             <table class="alt">
@@ -122,7 +133,7 @@
                         <td>{{ nivel.id_nivel_jerarquico }}</td>
                         <td>{{ nivel.nombre_nivel_jerarquico }}</td>
                         <td>
-                            <form method="POST" action="{% url 'editar_nivel' nivel.id_nivel_jerarquico %}" style="display:flex; gap: 0.5em;">
+                            <form method="POST" action="{% url 'editar_nivel' nivel.id_nivel_jerarquico %}" style="display:flex; gap: 0.5em; align-items: center;">
                                 {% csrf_token %}
                                 <input type="text" name="nombre_nivel_jerarquico" value="{{ nivel.nombre_nivel_jerarquico }}"
                                        style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 250px;">
@@ -135,9 +146,10 @@
             </table>
         </div>
     </div>
+    <hr />
 
     <!-- TEXTOS DE EVALUACIÓN -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 2em;">
         <h3 style="color: #ff9800;">Textos de Evaluación</h3>
         <div class="table-wrapper">
             <table class="alt">
@@ -158,7 +170,7 @@
                         <td>{{ texto.competencia.nombre_competencia }}</td>
                         <td>{{ texto.nivel_jerarquico.nombre_nivel_jerarquico }}</td>
                         <td>
-                            <form method="POST" action="{% url 'editar_texto' texto.id_textos_evaluacion %}" style="display:flex; gap: 0.5em; align-items: flex-start;">
+                            <form method="POST" action="{% url 'editar_texto' texto.id_textos_evaluacion %}" style="display:flex; gap: 0.5em; align-items: center;">
                                 {% csrf_token %}
                                 <textarea name="texto" rows="3"
                                           style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 100%; font-size: 0.85em;">{{ texto.texto }}</textarea>
@@ -173,7 +185,8 @@
     </div>
 
     <!-- ESCALA -->
-    <div style="background: rgba(255,255,255,0.05); padding: 2em; border-radius: 8px; margin-bottom: 2em;">
+    <hr />
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 0;">
         <h3 style="color: #f48fb1;">Escala de Evaluación</h3>
         <div class="table-wrapper">
             <table class="alt">
@@ -196,7 +209,7 @@
                                 {% csrf_token %}
                                 <input type="text" name="titulo" value="{{ escala.titulo }}"
                                        style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 100%; font-size:0.85em;">
-                                <div style="display:flex; gap: 0.5em; align-items: flex-start;">
+                                <div style="display:flex; gap: 0.5em; align-items: center; justify-content: space-between; width: 100%;">
                                     <textarea name="descripcion" rows="3"
                                               style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 100%; font-size: 0.85em;">{{ escala.descripcion }}</textarea>
                                     <button type="submit" class="button small primary" style="white-space: nowrap;">Guardar</button>
@@ -209,6 +222,7 @@
             </table>
         </div>
     </div>
+    <hr />
 
     {% else %}
     <p style="opacity: 0.5; text-align: center; padding: 3em;">

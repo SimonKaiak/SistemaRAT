@@ -4,12 +4,14 @@
 
 {% block content %}
 <section>
-    <header style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.8em;">
-        <div>
-            <h2>🗃 Registro de Versiones — RAT</h2>
-            <p>Historial de versiones de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
+            <a href="{% url 'rat_panel_coordinador' %}" class="button">← Volver al panel</a>
+            <a href="{% url 'rat_nueva_version' %}" class="button primary">+ Nueva versión</a>
         </div>
-        <a href="{% url 'rat_nueva_version' %}" class="button primary small">+ Nueva versión</a>
+        <hr style="margin-top:1.5em;" />
+        <h2>🗃 Registro de Versiones — RAT</h2>
+        <p>Historial de versiones de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
     </header>
 
     {% if not versiones %}
@@ -30,8 +32,5 @@
         </div>
     {% endif %}
 
-    <div style="margin-top:2em;">
-        <a href="{% url 'rat_panel_coordinador' %}" class="button">← Volver al panel</a>
-    </div>
 </section>
 {% endblock %}

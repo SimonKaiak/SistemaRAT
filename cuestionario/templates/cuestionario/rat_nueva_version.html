@@ -4,13 +4,18 @@
 
 {% block content %}
 <section>
-    <header>
-        <h2>🗃 Registrar nueva versión</h2>
-        <p>Documenta el motivo de la modificación en <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
-    </header>
-
     <form method="post" action="">
         {% csrf_token %}
+        <header>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
+                <a href="{% url 'rat_versiones' %}" class="button">← Cancelar</a>
+                <button type="submit" class="button primary">Guardar versión</button>
+            </div>
+            <hr style="margin-top:1.5em;" />
+            <h2>🗃 Registrar nueva versión</h2>
+            <p>Documenta el motivo de la modificación en <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+        </header>
+
         <div style="display:flex;flex-direction:column;gap:1em;max-width:500px;">
             {% for field in form %}
             <div>
@@ -21,11 +26,6 @@
                 {% endif %}
             </div>
             {% endfor %}
-
-            <div style="display:flex;gap:0.8em;flex-wrap:wrap;margin-top:0.5em;">
-                <button type="submit" class="button primary">Guardar versión</button>
-                <a href="{% url 'rat_versiones' %}" class="button">← Cancelar</a>
-            </div>
         </div>
     </form>
 </section>
