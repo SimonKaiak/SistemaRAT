@@ -5,7 +5,7 @@ Proyecto basado en Permify para gestión de cuestionarios.
 ## Tecnologías
 - Python
 - Django
-- SQLite
+- PostgreSQL18
 
 ## Ejecución
 python manage.py runserver
