@@ -1,10 +1,6 @@
 import os
 from pathlib import Path
 import dj_database_url
-import pymysql # <--- AGREGADO: Para compatibilidad con Python 3.13
-
-# AGREGADO: Parche para que Django reconozca el driver en Railway
-pymysql.install_as_MySQLdb()
 
 # Rutas base
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,7 +15,8 @@ ALLOWED_HOSTS = ['*'] # <--- Simplificado para evitar errores de dominio en el d
 # Confianza explícita para CSRF (Actualizado para V2)
 CSRF_TRUSTED_ORIGINS = [
     'https://mohalav2-production.up.railway.app',
-    'https://*.railway.app'
+    'https://*.railway.app',
+    'https://*.onrender.com',
 ]
 
 # Aplicaciones (Tu app es cuestionario)
@@ -64,28 +61,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Sistema_Mohala.wsgi.application'
 
-# --- 🗄️ BASE DE DATOS (Corregida para evitar Timeout en V2) ---
-MYSQL_URL = os.environ.get('DATABASE_URL') or os.environ.get('MYSQL_URL')
+# --- 🗄️ BASE DE DATOS ---
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-if MYSQL_URL:
+if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(
-            MYSQL_URL,
-            conn_max_age=0, 
-            ssl_require=False
+            DATABASE_URL,
+            conn_max_age=600,
         )
     }
-    # Forzamos el motor de MySQL
-    DATABASES['default']['ENGINE'] = 'django.db.backends.mysql'
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'mohala',
-            'USER': 'root',
-            'PASSWORD': '53176_Ben101',
+            'USER': 'postgres',
+            'PASSWORD': '',
             'HOST': 'localhost',
-            'PORT': '3306',
+            'PORT': '5432',
         }
     }
 
