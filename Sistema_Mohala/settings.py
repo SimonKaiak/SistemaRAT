@@ -75,9 +75,9 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'mohala',
+            'NAME': 'SistemaRAT_BD',
             'USER': 'postgres',
-            'PASSWORD': '',
+            'PASSWORD': 'admin123',
             'HOST': 'localhost',
             'PORT': '5432',
         }
