@@ -61,7 +61,6 @@ def ver_resultados(request, trabajador_id, tipo_evaluacion):
     if tipo_evaluacion == 'auto':
         respuestas = Autoevaluacion.objects.filter(
             trabajador=trabajador_a_ver,
-            estado_finalizacion=True
         )
         visor_id = trabajador_a_ver.id_trabajador
     else:

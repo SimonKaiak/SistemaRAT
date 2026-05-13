@@ -9,9 +9,6 @@
         <header>
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
                 <a href="{% url 'rat_panel_usuario' %}" class="button">← Volver</a>
-                <button type="submit" class="button primary">
-                    {% if editando %}Guardar cambios{% else %}Guardar respuesta{% endif %}
-                </button>
             </div>
             <hr style="margin-top:1.5em;" />
             <h2>{% if editando %}✏️ Editar respuesta{% else %}📝 Responder pregunta{% endif %}</h2>
@@ -53,6 +50,12 @@
             {% endif %}
         </div>
 
+        <hr />
+        <div style="display:flex;justify-content:flex-start;padding:0em 0;">
+            <button type="submit" class="button primary">
+                {% if editando %}Guardar cambios{% else %}Guardar respuesta{% endif %}
+            </button>
+        </div>
         <hr />
 
     </form>

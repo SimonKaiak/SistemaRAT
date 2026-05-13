@@ -5,21 +5,22 @@
 {% block content %}
 <section>
     <header>
-        <p style="font-size: 1.1em; margin-top: -0.5em; margin-bottom: 1.5em; border-bottom: solid 1px rgba(255, 255, 255, 0.125); padding-bottom: 0.5em;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
+            <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button">← Volver a Dimensiones</a>
+        </div>
+        <hr style="margin-top:1.5em;" />
+        <p style="margin-bottom: 0.5em;">
             <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</strong><br>
             <span style="opacity: 0.7; font-size: 0.9em;">Nivel: {{ trabajador.nivel_jerarquico.nombre_nivel_jerarquico }}</span>
         </p>
-        
-        <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button small">← Volver a Dimensiones</a>
-        
-        <h2 style="margin-top: 1em;">Mi Autoevaluación de Desempeño</h2>
-        
+        <hr />
+        <h2>Mi Autoevaluación de Desempeño</h2>
         <h3 style="color: {% if dimension_es_primera %}#51ff85{% else %}#2196F3{% endif %};">
             Dimensión: {{ dimension.nombre_dimension }}
         </h3>
     </header>
 
-    <form method="POST" onsubmit="this.btnSubmit.disabled=true; this.btnSubmit.innerText='Guardando...'; return true;">
+    <form id="form-autoevaluacion" method="POST" onsubmit="this.btnSubmit.disabled=true; this.btnSubmit.innerText='Guardando...'; return true;">
         {% csrf_token %}
         
         <div class="table-wrapper">
@@ -77,32 +78,27 @@
         </div>
 
         {% if preguntas %}
-        <div class="row gtr-uniform" style="margin-top: 2em;">
-            <div class="col-12">
-                <label for="comentario">
-                    <strong>Comentarios adicionales sobre competencias {{ dimension.nombre_dimension }}:</strong>
-                </label>
-                <textarea name="comentario" id="comentario" rows="4" 
-                          placeholder="Escribe aquí cualquier observación sobre tu desempeño en esta dimensión..."
-                          style="background: rgba(255,255,255,0.05); color: white;"></textarea>
-            </div>
+                <hr />
 
-            <div class="col-12" style="margin-top: 2em; padding-bottom: 3em;">
-                <ul class="actions">
-                    <li>
-                        <button type="submit" name="btnSubmit" class="button primary">
-                            Guardar {{ dimension.nombre_dimension }}
-                        </button>
-                    </li>
-                    <li>
-                        <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button">
-                            Volver
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        {% endif %}
+                <div style="margin-top: 0; margin-bottom: 2em;">
+                    <label for="comentario">
+                        <strong>Comentarios adicionales sobre competencias {{ dimension.nombre_dimension }}:</strong>
+                    </label>
+                    <textarea name="comentario" id="comentario" rows="4" 
+                            placeholder="Escribe aquí cualquier observación sobre tu desempeño en esta dimensión..."
+                            style="background: rgba(255,255,255,0.05); color: white;"></textarea>
+                </div>
+
+                <hr />
+
+                <div style="display:flex; justify-content:center; padding: 1.5em 0;">
+                    <button type="submit" name="btnSubmit" class="button primary">
+                        Guardar {{ dimension.nombre_dimension }}
+                    </button>
+                </div>
+
+                <hr />
+                {% endif %}
     </form>
 </section>
 {% endblock %}
