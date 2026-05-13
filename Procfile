@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn --timeout 300 --graceful-timeout 300 Sistema_Mohala.wsgi --bind 0.0.0.0:$PORT
+web: python manage.py migrate && python manage.py crear_admin && gunicorn --timeout 300 --graceful-timeout 300 Sistema_Mohala.wsgi --bind 0.0.0.0:$PORT
