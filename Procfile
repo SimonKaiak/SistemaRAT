@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py crear_tablas && python manage.py crear_admin && gunicorn --timeout 300 --graceful-timeout 300 Sistema_Mohala.wsgi --bind 0.0.0.0:$PORT
+python manage.py migrate cuestionario 0009 && python manage.py crear_tablas && python manage.py migrate --fake cuestionario 0010 && python manage.py migrate --fake cuestionario 0011 && python manage.py migrate && python manage.py crear_admin && gunicorn --timeout 300 --graceful-timeout 300 Sistema_Mohala.wsgi --bind 0.0.0.0:$PORT
