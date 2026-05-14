@@ -1,0 +1,67 @@
+{% extends "cuestionario/base.html" %}
+
+{% block title %}Edición de Niveles Jerárquicos{% endblock %}
+
+{% block content %}
+<style>
+    table.alt td, table.alt th { vertical-align: middle; }
+    table.alt td { padding-top: 0.6em; padding-bottom: 0.6em; }
+</style>
+<section>
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
+            <a href="{% url 'index' %}" class="button">← Volver al Panel</a>
+        </div>
+        <hr style="margin-top:1.5em;" />
+        <h2 style="margin-top: 1em;">Edición de Niveles Jerárquicos</h2>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="box" style="border-left: 4px solid #51ff85; margin-bottom: 1.5em;">
+            <p style="color: #51ff85; font-weight: bold; margin: 0;">{{ message }}</p>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if empresa_actual %}
+    <hr />
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 0;">
+        <h3 style="color: #ce93d8;">Niveles Jerárquicos</h3>
+        <div class="table-wrapper">
+            <table class="alt">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre actual</th>
+                        <th>Editar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nivel in niveles %}
+                    <tr>
+                        <td>{{ nivel.id_nivel_jerarquico }}</td>
+                        <td>{{ nivel.nombre_nivel_jerarquico }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'editar_nivel' nivel.id_nivel_jerarquico %}" style="display:flex; gap: 0.5em; align-items: center;">
+                                {% csrf_token %}
+                                <input type="text" name="nombre_nivel_jerarquico" value="{{ nivel.nombre_nivel_jerarquico }}"
+                                       style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 250px;">
+                                <button type="submit" class="button small primary">Guardar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr />
+    {% else %}
+    <p style="opacity: 0.5; text-align: center; padding: 3em;">
+        No se encontró la empresa.
+    </p>
+    {% endif %}
+
+</section>
+{% endblock %}

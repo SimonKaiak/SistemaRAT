@@ -78,6 +78,7 @@ urlpatterns = [
     path('edicion/nivel/editar/<int:nivel_id>/', edicion_cuestionario.editar_nivel, name='editar_nivel'),
     path('edicion/texto/editar/<int:texto_id>/', edicion_cuestionario.editar_texto, name='editar_texto'),
     path('edicion/escala/editar/<int:escala_id>/', edicion_cuestionario.editar_escala, name='editar_escala'),
+    path('edicion/niveles/', edicion_cuestionario.panel_edicion_niveles, name='panel_edicion_niveles'),
 
     # RUTAS POBLADOR
     path('poblador/', poblador.panel_poblador, name='panel_poblador'),

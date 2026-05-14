@@ -35,7 +35,7 @@
                 <div class="inner">
                     <header>
                         <h1 style="border-bottom: solid 2px rgba(255, 255, 255, 0.125); padding-bottom: 0.5em;">
-                            Sistema RAT
+                            Sistema RAT{% if empresa_actual %} : <span style="color: #4fc3f7;">{{ empresa_actual.nombre_empresa }}</span>{% endif %}{% if empresa_seleccionada %} : <span style="color: #4fc3f7;">{{ empresa_seleccionada.nombre_empresa }}</span>{% endif %}
                         </h1>
                     </header>
                     

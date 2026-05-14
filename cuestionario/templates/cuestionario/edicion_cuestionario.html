@@ -26,24 +26,6 @@
         {% endfor %}
     {% endif %}
 
-    <!-- EMPRESA ACTIVA -->
-    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em; border-radius: 8px; margin-bottom: 2em;">
-        {% if empresa_actual %}
-            <p style="margin: 0;"><strong>Empresa: </strong><span style="color: #51ff85; font-weight: bold;">{{ empresa_actual.nombre_empresa }}</span></p>
-        {% else %}
-            <form method="GET" action="{% url 'panel_edicion' %}">
-                <label><strong>Selecciona empresa:</strong></label>
-                <select name="empresa_id" onchange="this.form.submit()"
-                        style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px; margin-left: 1em;">
-                    <option value="">-- Selecciona empresa --</option>
-                    {% for empresa in empresas %}
-                        <option value="{{ empresa.id_empresa }}">{{ empresa.nombre_empresa }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-        {% endif %}
-    </div>
-
     {% if empresa_actual %}
 
     <!-- DIMENSIONES -->
@@ -114,38 +96,6 @@
         </div>
     </div>
 
-    <!-- NIVELES JERÁRQUICOS -->
-    <hr />
-    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 0;">
-        <h3 style="color: #ce93d8;">Niveles Jerárquicos</h3>
-        <div class="table-wrapper">
-            <table class="alt">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre actual</th>
-                        <th>Editar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for nivel in niveles %}
-                    <tr>
-                        <td>{{ nivel.id_nivel_jerarquico }}</td>
-                        <td>{{ nivel.nombre_nivel_jerarquico }}</td>
-                        <td>
-                            <form method="POST" action="{% url 'editar_nivel' nivel.id_nivel_jerarquico %}" style="display:flex; gap: 0.5em; align-items: center;">
-                                {% csrf_token %}
-                                <input type="text" name="nombre_nivel_jerarquico" value="{{ nivel.nombre_nivel_jerarquico }}"
-                                       style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 250px;">
-                                <button type="submit" class="button small primary">Guardar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
     <hr />
 
     <!-- TEXTOS DE EVALUACIÓN -->

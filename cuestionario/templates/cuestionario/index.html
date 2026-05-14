@@ -7,25 +7,39 @@
 {% block content %}
     
 <!-- PANEL ADMIN -->
-    {% if es_admin_sistema %}
+{% if es_admin_sistema %}
     <section>
         <header>
             <h2>Panel de Control - Administrador</h2>
-            <p>Bienvenido, <strong>{{ nombre_usuario }}</strong>.</p>
+            <p>Bienvenid@, <strong>{{ nombre_usuario }}</strong>.</p>
         </header>
+
+        <!-- SELECTOR DE EMPRESA -->
+        <div class="box" style="margin-bottom: 2em; display: flex; align-items: center; gap: 1em; flex-wrap: wrap;">
+            <strong>Empresas:</strong>
+            <select id="selector-empresa-admin" onchange="seleccionarEmpresa()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px; min-width: 220px;">
+                <option value="">— Seleccionar empresa —</option>
+                {% for empresa in empresas_activas %}
+                <option value="{{ empresa.id_empresa }}" {% if empresa_seleccionada and empresa_seleccionada.id_empresa == empresa.id_empresa %}selected{% endif %}>
+                    {{ empresa.nombre_empresa }}
+                </option>
+                {% endfor %}
+                <option value="__nueva__">＋ Crear nueva empresa</option>
+            </select>
+        </div>
+
+        {% if empresa_seleccionada %}
         <div class="features">
             <section>
                 <span class="icon solid major fa-chart-line"></span>
                 <h3>Seguimiento General</h3>
                 <p>Visualiza el estado de las evaluaciones por empresa.</p>
-                <ul class="actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em;">
-                    {% for empresa in empresas_activas %}
+                <ul class="actions">
                     <li>
-                        <a href="{% url 'seguimiento_admin' %}?empresa_id={{ empresa.id_empresa }}" class="button primary">
-                            {{ empresa.nombre_empresa }}
+                        <a href="{% url 'seguimiento_admin' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                            Ver Seguimiento — {{ empresa_seleccionada.nombre_empresa }}
                         </a>
                     </li>
-                    {% endfor %}
                 </ul>
             </section>
             <section>
@@ -40,28 +54,44 @@
                 <span class="icon solid major fa-edit"></span>
                 <h3>Edición de Cuestionario</h3>
                 <p>Edita dimensiones, competencias y textos de evaluación por empresa.</p>
-                <ul class="actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em;">
-                    {% for empresa in empresas_activas %}
+                <ul class="actions">
                     <li>
-                        <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa.id_empresa }}" class="button primary">
-                            {{ empresa.nombre_empresa }}
+                        <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                            Editar — {{ empresa_seleccionada.nombre_empresa }}
                         </a>
                     </li>
-                    {% endfor %}
                 </ul>
             </section>
+
             <section>
-                <span class="icon solid major fa-building"></span>
-                <h3>Registrar Empresa</h3>
-                <p>Agrega una nueva empresa y completa todos sus datos estructurales.</p>
+                <span class="icon solid major fa-sitemap"></span>
+                <h3>Edición de Niveles Jerárquicos</h3>
+                <p>Edita los niveles jerárquicos de {{ empresa_seleccionada.nombre_empresa }}.</p>
                 <ul class="actions">
-                    <li><a href="{% url 'panel_poblador' %}" class="button primary">Poblar Nueva Empresa</a></li>
+                    <li>
+                        <a href="{% url 'panel_edicion_niveles' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                            Editar Niveles
+                        </a>
+                    </li>
                 </ul>
             </section>
         </div>
+        {% endif %}
     </section>
 
-    {% else %}
+
+    <script>
+    function seleccionarEmpresa() {
+        const id = document.getElementById('selector-empresa-admin').value;
+        if (id === '__nueva__') {
+            window.location.href = "{% url 'panel_poblador' %}";
+        } else if (id) {
+            window.location.href = '/?empresa_id=' + id;
+        }
+    }
+    </script>
+
+{% else %}
     <section>
         <header>
             <h2>Bienvenid@, {{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</h2>
@@ -112,7 +142,6 @@
                 <div class="inner">
                     <h2>Panel de Jefatura</h2>
                     <p>Selecciona a un colaborador para gestionar sus dimensiones de evaluación:</p>
-                    
                     <div class="table-wrapper">
                         <table class="alt">
                             <thead>
@@ -129,7 +158,6 @@
                                         <strong>{{ subordinado.nombre }} {{ subordinado.apellido_paterno }}</strong><br>
                                         <span style="font-size: 0.8em; opacity: 0.7;">{{ subordinado.cargo.nombre_cargo }}</span>
                                     </td>
-                                    
                                     <td style="vertical-align: middle;">
                                         {% if subordinado.autoevaluacion_terminada %}
                                             <span style="color: #51ff85; font-size: 0.9em;">✅ Autoevaluación lista</span>
@@ -137,24 +165,15 @@
                                             <span style="color: #ffc107; font-size: 0.9em;">⏳ Pendiente de autoevaluación</span>
                                         {% endif %}
                                     </td>
-
                                     <td style="text-align: center;">
                                         {% if subordinado.autoevaluacion_terminada %}
                                             {% if subordinado.ya_evaluado %}
-                                                <a href="{% url 'evaluacion_jefe_inicio' trabajador.id_trabajador subordinado.id_trabajador %}" class="button primary small">
-                                                    ✅ Finalizado (Ver)
-                                                </a>
+                                                <a href="{% url 'evaluacion_jefe_inicio' trabajador.id_trabajador subordinado.id_trabajador %}" class="button primary small">✅ Finalizado (Ver)</a>
                                             {% else %}
-                                                <a href="{% url 'evaluacion_jefe_inicio' trabajador.id_trabajador subordinado.id_trabajador %}" class="button primary small">
-                                                    Evaluar Colaborador →
-                                                </a>
+                                                <a href="{% url 'evaluacion_jefe_inicio' trabajador.id_trabajador subordinado.id_trabajador %}" class="button primary small">Evaluar Colaborador →</a>
                                             {% endif %}
                                         {% else %}
-                                            <button class="button primary small" disabled 
-                                                    style="opacity: 0.4; cursor: not-allowed;" 
-                                                    title="El colaborador debe finalizar su autoevaluación para que puedas evaluarlo.">
-                                                Bloqueado
-                                            </button>
+                                            <button class="button primary small" disabled style="opacity: 0.4; cursor: not-allowed;" title="El colaborador debe finalizar su autoevaluación.">Bloqueado</button>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -172,7 +191,6 @@
     </section>
     {% endif %}
 
-    <!-- PANEL COORDINADOR -->
     {% if es_coordinador %}
     <section style="margin-top: 2em;">
         <header>
@@ -194,13 +212,22 @@
                 <p>Edita dimensiones, competencias y textos de {{ trabajador.empresa.nombre_empresa }}.</p>
                 <ul class="actions">
                     <li>
-                        <a href="{% url 'panel_edicion' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button primary">
-                            Editar Cuestionario
+                        <a href="{% url 'panel_edicion' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button primary">Editar Cuestionario</a>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <span class="icon solid major fa-sitemap"></span>
+                <h3>Edición de Niveles Jerárquicos</h3>
+                <p>Edita los niveles jerárquicos de {{ trabajador.empresa.nombre_empresa }}.</p>
+                <ul class="actions">
+                    <li>
+                        <a href="{% url 'panel_edicion_niveles' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button primary">
+                            Editar Niveles
                         </a>
                     </li>
                 </ul>
             </section>
-
             <section>
                 <span class="icon solid major fa-shield-alt"></span>
                 <h3>RAT – Protección de Datos</h3>
@@ -213,6 +240,6 @@
     </section>
     {% endif %}
 
-    {% endif %}
+{% endif %}
 
 {% endblock %}

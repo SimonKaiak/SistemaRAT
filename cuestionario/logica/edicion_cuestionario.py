@@ -10,8 +10,9 @@ def panel_edicion(request):
     empresa_actual = None
 
     if request.user.is_superuser:
-        empresa_id = request.GET.get('empresa_id')
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
         if empresa_id:
+            request.session['empresa_id_admin'] = empresa_id
             try:
                 empresa_actual = Empresa.objects.get(id_empresa=empresa_id)
             except Empresa.DoesNotExist:
@@ -131,7 +132,7 @@ def editar_nivel(request, nivel_id):
             nivel.nombre_nivel_jerarquico = nombre
             nivel.save()
             messages.success(request, f'✅ Nivel jerárquico "{nombre}" actualizado correctamente.')
-        return redirect(f'/edicion/?empresa_id={nivel.empresa.id_empresa}')
+        return redirect(f'/edicion/niveles/?empresa_id={nivel.empresa.id_empresa}')
 
     return redirect('panel_edicion')
 
@@ -183,3 +184,36 @@ def editar_escala(request, escala_id):
         return redirect(f'/edicion/?empresa_id={escala.empresa.id_empresa}')
 
     return redirect('panel_edicion')
+
+
+@login_required
+def panel_edicion_niveles(request):
+    es_coordinador = False
+    empresa_actual = None
+
+    if request.user.is_superuser:
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+        if empresa_id:
+            request.session['empresa_id_admin'] = empresa_id
+            try:
+                empresa_actual = Empresa.objects.get(id_empresa=empresa_id)
+            except Empresa.DoesNotExist:
+                pass
+    else:
+        try:
+            trabajador = Trabajador.objects.get(user=request.user)
+            if not trabajador.es_coordinador:
+                return redirect('index')
+            es_coordinador = True
+            empresa_actual = trabajador.empresa
+        except Trabajador.DoesNotExist:
+            return redirect('index')
+
+    niveles = NivelJerarquico.objects.filter(empresa=empresa_actual) if empresa_actual else []
+
+    context = {
+        'empresa_actual': empresa_actual,
+        'niveles': niveles,
+        'es_coordinador': es_coordinador,
+    }
+    return render(request, 'cuestionario/edicion_niveles.html', context)

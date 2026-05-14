@@ -6,6 +6,11 @@ from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, 
 def index(request):
     # 1. VALIDACIÓN PARA ADMINISTRADOR
     if request.user.is_superuser:
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+        empresa_seleccionada = None
+        if empresa_id:
+            empresa_seleccionada = Empresa.objects.filter(id_empresa=empresa_id).first()
+            request.session['empresa_id_admin'] = empresa_id
         context = {
             'es_admin_sistema': True,
             'nombre_usuario': request.user.username,
@@ -14,6 +19,7 @@ def index(request):
             'equipo': [],
             'ya_hizo_autoevaluacion': False,
             'empresas_activas': Empresa.objects.filter(empresa_activa=True),
+            'empresa_seleccionada': empresa_seleccionada,
         }
         return render(request, 'cuestionario/index.html', context)
 
