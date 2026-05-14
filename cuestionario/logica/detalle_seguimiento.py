@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
-from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, ResultadoConsolidado, TextosEvaluacion
+from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, ResultadoConsolidado, TextosEvaluacion, Dimension
 
 @login_required
 def detalle_seguimiento(request, trabajador_id):
@@ -57,12 +57,36 @@ def detalle_seguimiento(request, trabajador_id):
     auto = Autoevaluacion.objects.filter(trabajador=trabajador, estado_finalizacion=True).first()
     jefe = EvaluacionJefatura.objects.filter(trabajador_evaluado=trabajador, estado_finalizacion=True).first()
 
+    # Comentarios por dimension - Autoevaluacion
+    comentarios_auto = {}
+    autoevals = Autoevaluacion.objects.filter(trabajador=trabajador, estado_finalizacion=True)
+    for ae in autoevals:
+        texto_eval = textos_map.get(ae.textos_evaluacion_codigo_excel)
+        if not texto_eval:
+            continue
+        dim_nombre = texto_eval.dimension.nombre_dimension
+        if dim_nombre not in comentarios_auto and ae.comentario:
+            comentarios_auto[dim_nombre] = ae.comentario
+
+    # Comentarios por dimension - Evaluacion Jefatura
+    comentarios_jefe = {}
+    jefaturas = EvaluacionJefatura.objects.filter(trabajador_evaluado=trabajador, estado_finalizacion=True)
+    for ej in jefaturas:
+        texto_eval = textos_map.get(ej.textos_evaluacion_codigo_excel)
+        if not texto_eval:
+            continue
+        dim_nombre = texto_eval.dimension.nombre_dimension
+        if dim_nombre not in comentarios_jefe and ej.comentario:
+            comentarios_jefe[dim_nombre] = ej.comentario
+
     context = {
         'trabajador': trabajador,
         'dimensiones_data': dimensiones_data,
         'diff_promedio_total': diff_promedio_total,
         'timestamp_auto': auto.momento_evaluacion if auto else None,
         'timestamp_jefe': jefe.momento_evaluacion if jefe else None,
+        'comentarios_auto': comentarios_auto,
+        'comentarios_jefe': comentarios_jefe,
     }
 
     return render(request, 'cuestionario/detalle_seguimiento.html', context)
