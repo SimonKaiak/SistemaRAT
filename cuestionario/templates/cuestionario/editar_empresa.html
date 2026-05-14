@@ -1,0 +1,34 @@
+{% extends "cuestionario/base.html" %}
+
+{% block content %}
+<section>
+    <header>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0.5em 0;">
+            <a href="/poblador/?empresa_id={{ empresa.id_empresa }}" class="button">← Volver al Panel</a>
+        </div>
+        <hr style="margin-top:1em;" />
+        <h2 style="margin-top: 1em;">Editar Empresa</h2>
+        <p>Modifica los datos de la empresa seleccionada.</p>
+    </header>
+
+    <div class="box">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-6 col-12-small">
+                    <label>Nombre de la empresa</label>
+                    <input type="text" name="nombre_empresa" value="{{ empresa.nombre_empresa }}" style="width: 100%;" required />
+                </div>
+                <div class="col-6 col-12-small">
+                    <label>RUT</label>
+                    <input type="text" name="rut_empresa" value="{{ empresa.rut_empresa }}" style="width: 100%;" required />
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 1.5em;">
+                <button type="submit" class="button primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+    <hr style="margin-bottom: 0;" />
+</section>
+{% endblock %}

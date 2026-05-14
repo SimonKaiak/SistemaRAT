@@ -364,3 +364,291 @@ def guardar_trabajador(request):
         'nivel': nivel.nombre_nivel_jerarquico,
         'cargo': cargo.nombre_cargo
     })
+
+
+# ─────────────────────────────────────────────
+# EDITAR EMPRESA
+# ─────────────────────────────────────────────
+
+@login_required
+def editar_empresa(request, empresa_id):
+    if not request.user.is_superuser:
+        return redirect('index')
+    try:
+        empresa = Empresa.objects.get(id_empresa=empresa_id)
+    except Empresa.DoesNotExist:
+        return redirect('panel_poblador')
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre_empresa', '').strip()
+        rut = request.POST.get('rut_empresa', '').strip()
+        if nombre and rut:
+            empresa.nombre_empresa = nombre
+            empresa.rut_empresa = rut
+            empresa.save()
+            return redirect(f"/?empresa_id={empresa.id_empresa}")
+
+    return render(request, 'cuestionario/editar_empresa.html', {'empresa': empresa})
+
+
+# ─────────────────────────────────────────────
+# ELIMINAR EMPRESA
+# ─────────────────────────────────────────────
+
+@login_required
+@require_POST
+def eliminar_empresa(request, empresa_id):
+    if not request.user.is_superuser:
+        return redirect('index')
+    try:
+        empresa = Empresa.objects.get(id_empresa=empresa_id)
+        empresa.delete()
+    except Empresa.DoesNotExist:
+        pass
+    return redirect('panel_poblador')
+
+
+# ─────────────────────────────────────────────
+# CRUD INLINE — helpers
+# ─────────────────────────────────────────────
+
+def _empresa_id_de(obj):
+    return obj.empresa.id_empresa
+
+
+# ─── DEPARTAMENTO ────────────────────────────
+
+@login_required
+@require_POST
+def editar_departamento(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        dep = Departamento.objects.get(pk=pk)
+        dep.nombre_departamento = data.get('nombre', dep.nombre_departamento).strip()
+        dep.save()
+        return JsonResponse({'ok': True, 'nombre': dep.nombre_departamento})
+    except Departamento.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+@login_required
+@require_POST
+def eliminar_departamento(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    try:
+        dep = Departamento.objects.get(pk=pk)
+        dep.delete()
+        return JsonResponse({'ok': True})
+    except Departamento.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+# ─── NIVEL ───────────────────────────────────
+
+@login_required
+@require_POST
+def editar_nivel(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        nivel = NivelJerarquico.objects.get(pk=pk)
+        nivel.nombre_nivel_jerarquico = data.get('nombre', nivel.nombre_nivel_jerarquico).strip()
+        nivel.save()
+        return JsonResponse({'ok': True, 'nombre': nivel.nombre_nivel_jerarquico})
+    except NivelJerarquico.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+@login_required
+@require_POST
+def eliminar_nivel(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    try:
+        NivelJerarquico.objects.get(pk=pk).delete()
+        return JsonResponse({'ok': True})
+    except NivelJerarquico.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+# ─── ESCALA ──────────────────────────────────
+
+@login_required
+@require_POST
+def editar_escala_poblador(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        escala = Escala.objects.get(pk=pk)
+        escala.titulo = data.get('titulo', escala.titulo).strip()
+        escala.descripcion = data.get('descripcion', escala.descripcion).strip()
+        escala.save()
+        return JsonResponse({'ok': True, 'titulo': escala.titulo, 'descripcion': escala.descripcion})
+    except Escala.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+# ─── DIMENSION ───────────────────────────────
+
+@login_required
+@require_POST
+def editar_dimension_poblador(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        dim = Dimension.objects.get(pk=pk)
+        dim.nombre_dimension = data.get('nombre', dim.nombre_dimension).strip()
+        dim.save()
+        return JsonResponse({'ok': True, 'nombre': dim.nombre_dimension})
+    except Dimension.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+@login_required
+@require_POST
+def eliminar_dimension(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    try:
+        Dimension.objects.get(pk=pk).delete()
+        return JsonResponse({'ok': True})
+    except Dimension.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+# ─── COMPETENCIA ─────────────────────────────
+
+@login_required
+@require_POST
+def editar_competencia_poblador(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        comp = Competencia.objects.get(pk=pk)
+        comp.nombre_competencia = data.get('nombre', comp.nombre_competencia).strip()
+        if data.get('dimension_id'):
+            comp.dimension = Dimension.objects.get(pk=data['dimension_id'])
+        comp.save()
+        return JsonResponse({'ok': True, 'nombre': comp.nombre_competencia, 'dimension': comp.dimension.nombre_dimension})
+    except (Competencia.DoesNotExist, Dimension.DoesNotExist):
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+@login_required
+@require_POST
+def eliminar_competencia(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    try:
+        Competencia.objects.get(pk=pk).delete()
+        return JsonResponse({'ok': True})
+    except Competencia.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+# ─── CARGO ───────────────────────────────────
+
+@login_required
+@require_POST
+def editar_cargo_poblador(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        cargo = Cargo.objects.get(pk=pk)
+        cargo.nombre_cargo = data.get('nombre', cargo.nombre_cargo).strip()
+        if data.get('nivel_id'):
+            cargo.nivel_jerarquico = NivelJerarquico.objects.get(pk=data['nivel_id'])
+        cargo.save()
+        return JsonResponse({'ok': True, 'nombre': cargo.nombre_cargo, 'nivel': cargo.nivel_jerarquico.nombre_nivel_jerarquico})
+    except (Cargo.DoesNotExist, NivelJerarquico.DoesNotExist):
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+@login_required
+@require_POST
+def eliminar_cargo(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    try:
+        Cargo.objects.get(pk=pk).delete()
+        return JsonResponse({'ok': True})
+    except Cargo.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+# ─── TEXTO EVALUACION ────────────────────────
+
+@login_required
+@require_POST
+def editar_texto_poblador(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        texto = TextosEvaluacion.objects.get(pk=pk)
+        texto.codigo_excel = data.get('codigo', texto.codigo_excel).strip()
+        texto.texto = data.get('texto', texto.texto).strip()
+        texto.save()
+        return JsonResponse({'ok': True, 'codigo': texto.codigo_excel, 'texto': texto.texto})
+    except TextosEvaluacion.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+@login_required
+@require_POST
+def eliminar_texto(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    try:
+        TextosEvaluacion.objects.get(pk=pk).delete()
+        return JsonResponse({'ok': True})
+    except TextosEvaluacion.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+# ─── TRABAJADOR ──────────────────────────────
+
+@login_required
+@require_POST
+def editar_trabajador_poblador(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    data = json.loads(request.body)
+    try:
+        t = Trabajador.objects.get(pk=pk)
+        t.nombre = data.get('nombre', t.nombre).strip()
+        t.apellido_paterno = data.get('apellido_paterno', t.apellido_paterno).strip()
+        t.apellido_materno = data.get('apellido_materno', t.apellido_materno).strip()
+        t.email = data.get('email', t.email).strip()
+        t.genero = data.get('genero', t.genero)
+        t.es_coordinador = data.get('es_coordinador', t.es_coordinador)
+        if data.get('nivel_id'):
+            t.nivel_jerarquico = NivelJerarquico.objects.get(pk=data['nivel_id'])
+        if data.get('cargo_id'):
+            t.cargo = Cargo.objects.get(pk=data['cargo_id'])
+        if data.get('departamento_id'):
+            t.departamento = Departamento.objects.get(pk=data['departamento_id'])
+        t.save()
+        return JsonResponse({'ok': True, 'nombre': f"{t.nombre} {t.apellido_paterno}"})
+    except Trabajador.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})
+
+
+@login_required
+@require_POST
+def eliminar_trabajador(request, pk):
+    if not request.user.is_superuser:
+        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+    try:
+        Trabajador.objects.get(pk=pk).delete()
+        return JsonResponse({'ok': True})
+    except Trabajador.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'No encontrado'})

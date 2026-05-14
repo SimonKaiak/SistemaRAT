@@ -1,41 +1,87 @@
 {% extends "cuestionario/base.html" %}
 
 {% block content %}
+<style>
+    table.alt td, table.alt th { vertical-align: middle; }
+    table.alt td { padding-top: 0.6em; padding-bottom: 0.6em; }
+    .card-seccion {
+        background: rgba(255,255,255,0.05);
+        padding: 1.5em 2em 0.5em 2em;
+        border-radius: 30px;
+        margin-top: 2.5em;
+        margin-bottom: 0.8em;
+    }
+    .input-inline {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 0.3em 0.7em;
+        border-radius: 4px;
+        width: 370px;
+    }
+    .btn-guardar, .btn-eliminar-inline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 2.6em;
+        padding: 0 1.2em;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85em;
+        font-family: inherit;
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+        text-decoration: none;
+        box-sizing: border-box;
+    }
+    .btn-guardar {
+        border: 2px solid rgba(255,255,255,0.3);
+        background: transparent;
+        color: white;
+    }
+    .btn-guardar:hover { background: rgba(255,255,255,0.1); }
+    .btn-eliminar-inline {
+        border: 2px solid #c0392b;
+        background: #c0392b;
+        color: white;
+    }
+    .btn-eliminar-inline:hover { background: #a93226; border-color: #a93226; }
+    .acciones-celda { display: flex; gap: 0.5em; align-items: center; justify-content: flex-end; }
+        table.alt th:last-child, table.alt td:last-child { text-align: right; }
+    #seccion-textos {
+        margin-left: -2em;
+        margin-right: -2em;
+        padding-left: 3em;
+        padding-right: 3em;
+    }
+</style>
+
 <section>
     <header>
-        <h2>Poblador de Empresa</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0.5em 0; flex-wrap:wrap; gap:0.8em;">
+            <a href="{% url 'index' %}" class="button">← Volver al Panel</a>
+        </div>
+        <hr style="margin-top:1.5em;" />
+        <h2 style="margin-top: 1em;">Poblador de Empresa</h2>
         <p>Registra una nueva empresa y completa todos sus datos en orden.</p>
     </header>
-
-    <!-- SELECTOR DE EMPRESA EXISTENTE -->
-    <div class="box" style="margin-bottom: 2em;">
-        <strong>¿Continuar con una empresa ya creada?</strong>
-        <div style="margin-top: 0.8em; display: flex; gap: 1em; align-items: center; flex-wrap: wrap;">
-            <select id="selector-empresa" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px; min-width: 250px;">
-                <option value="">-- Seleccionar empresa existente --</option>
-                {% for emp in empresas %}
-                    <option value="{{ emp.id_empresa }}" {% if empresa_actual and empresa_actual.id_empresa == emp.id_empresa %}selected{% endif %}>
-                        {{ emp.nombre_empresa }} (ID {{ emp.id_empresa }})
-                    </option>
-                {% endfor %}
-            </select>
-            <button onclick="cargarEmpresa()" class="button small">Seleccionar Empresa</button>
-        </div>
-    </div>
 
     <hr />
 
     <!-- ══════════════════════════════════════ -->
     <!-- 1. EMPRESA                             -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-empresa">
+    <div class="card-seccion" id="seccion-empresa">
         <h3 style="color: #f48fb1;">① Empresa</h3>
 
         {% if empresa_actual %}
-        <div class="box" style="border-left: 3px solid #51ff85; margin-bottom: 1em;">
-            <strong style="color: #51ff85;">✅ Empresa activa:</strong>
-            {{ empresa_actual.nombre_empresa }} — RUT {{ empresa_actual.rut_empresa }} — ID {{ empresa_actual.id_empresa }}
-        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1em; padding: 0.8em 0;">
+            <div>
+                <strong style="color: #51ff85;">✅ Empresa activa:</strong>
+                {{ empresa_actual.nombre_empresa }} — RUT {{ empresa_actual.rut_empresa }} — ID {{ empresa_actual.id_empresa }}
+            </div>
+                <a href="{% url 'editar_empresa' empresa_actual.id_empresa %}" class="btn-guardar">💾 EDITAR</a>
+            </div>
         {% else %}
         <div class="row">
             <div class="col-6 col-12-small">
@@ -57,16 +103,25 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 2. DEPARTAMENTOS                       -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-departamentos" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-departamentos" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #f48fb1;">② Departamentos</h3>
 
         {% if departamentos %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-departamentos">
                     {% for dep in departamentos %}
-                    <tr><td>{{ dep.id_departamento }}</td><td>{{ dep.nombre_departamento }}</td></tr>
+                    <tr id="dep-{{ dep.id_departamento }}">
+                        <td>{{ dep.id_departamento }}</td>
+                        <td><input class="input-inline nombre-field" value="{{ dep.nombre_departamento }}" /></td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarInline('dep', {{ dep.id_departamento }})" class="btn-guardar">💾 GUARDAR</button>
+                                <button onclick="eliminarFila('dep', {{ dep.id_departamento }}, '{{ dep.nombre_departamento|escapejs }}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -74,21 +129,19 @@
         {% else %}
         <div class="table-wrapper" style="margin-bottom: 1em; display:none;" id="wrapper-tabla-departamentos">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-departamentos"></tbody>
             </table>
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-8 col-12-small">
-                <input type="text" id="nombre_departamento" placeholder="Nombre del departamento" style="width: 100%;" />
-            </div>
+        <hr style="margin-top: 0;" />
+        <div style="display: flex; align-items: center; gap: 1em;">
+            <input type="text" id="nombre_departamento" placeholder="Nombre del departamento" style="flex: 1;" />
+            <button onclick="guardarDepartamento()" class="button primary" style="white-space: nowrap;">Agregar Departamento</button>
         </div>
-        <div id="msg-departamento" style="margin: 0.5em 0;"></div>
-        <ul class="actions">
-            <li><button onclick="guardarDepartamento()" class="button primary">Agregar Departamento</button></li>
-        </ul>
+        <div id="msg-departamento" style="margin: 1.5em 0;"></div>
+        <hr style="margin-top: 2em;" />
     </div>
 
     <hr />
@@ -96,16 +149,25 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 3. NIVELES JERARQUICOS                 -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-niveles" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-niveles" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #f48fb1;">③ Niveles Jerárquicos</h3>
 
         {% if niveles %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-niveles">
                     {% for n in niveles %}
-                    <tr><td>{{ n.id_nivel_jerarquico }}</td><td>{{ n.nombre_nivel_jerarquico }}</td></tr>
+                    <tr id="nivel-{{ n.id_nivel_jerarquico }}">
+                        <td>{{ n.id_nivel_jerarquico }}</td>
+                        <td><input class="input-inline nombre-field" value="{{ n.nombre_nivel_jerarquico }}" /></td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarInline('nivel', {{ n.id_nivel_jerarquico }})" class="btn-guardar">💾 GUARDAR</button>
+                                <button onclick="eliminarFila('nivel', {{ n.id_nivel_jerarquico }}, '{{ n.nombre_nivel_jerarquico|escapejs }}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -113,21 +175,18 @@
         {% else %}
         <div class="table-wrapper" style="margin-bottom: 1em; display:none;" id="wrapper-tabla-niveles">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-niveles"></tbody>
             </table>
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-8 col-12-small">
-                <input type="text" id="nombre_nivel" placeholder="Nombre del nivel (ej: Operativo)" style="width: 100%;" />
-            </div>
+        <hr style="margin-top: 0;" />
+        <div style="display: flex; align-items: center; gap: 1em;">
+            <input type="text" id="nombre_nivel" placeholder="Nombre del nivel (ej: Operativo)" style="flex: 1;" />
+            <button onclick="guardarNivel()" class="button primary" style="white-space: nowrap;">Agregar Nivel</button>
         </div>
-        <div id="msg-nivel" style="margin: 0.5em 0;"></div>
-        <ul class="actions">
-            <li><button onclick="guardarNivel()" class="button primary">Agregar Nivel</button></li>
-        </ul>
+        <hr style="margin-top: 2em;" />
     </div>
 
     <hr />
@@ -135,21 +194,29 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 4. ESCALA                              -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-escala" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-escala" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #f48fb1;">④ Escala de Evaluación <small style="opacity:0.6;">(4 valores fijos)</small></h3>
 
         {% if escalas %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>Valor</th><th>Título</th><th>Descripción</th></tr></thead>
-                <tbody>
+                <thead><tr><th>Valor</th><th>Título</th><th>Descripción</th><th>Acciones</th></tr></thead>
+                <tbody id="tabla-escala">
                     {% for e in escalas %}
-                    <tr><td>{{ e.valor }}</td><td>{{ e.titulo }}</td><td>{{ e.descripcion }}</td></tr>
+                    <tr id="escala-{{ e.id_escala }}">
+                        <td>{{ e.valor }}</td>
+                        <td><input class="input-inline titulo-field" value="{{ e.titulo }}" /></td>
+                        <td><input class="input-inline desc-field" value="{{ e.descripcion }}" style="width:300px;" /></td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarEscalaInline({{ e.id_escala }})" class="btn-guardar">💾 GUARDAR</button>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        <div class="box" style="border-left: 3px solid #51ff85;"><strong style="color: #51ff85;">✅ Escala ya guardada.</strong></div>
         {% else %}
         <div style="display: flex; flex-direction: column; gap: 1em; margin-bottom: 1em;">
             {% for i in "1234" %}
@@ -178,16 +245,25 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 5. DIMENSIONES                         -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-dimensiones" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-dimensiones" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #51ff85;">⑤ Dimensiones</h3>
 
         {% if dimensiones %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-dimensiones">
                     {% for d in dimensiones %}
-                    <tr><td>{{ d.id_dimension }}</td><td>{{ d.nombre_dimension }}</td></tr>
+                    <tr id="dim-{{ d.id_dimension }}">
+                        <td>{{ d.id_dimension }}</td>
+                        <td><input class="input-inline nombre-field" value="{{ d.nombre_dimension }}" /></td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarInline('dim', {{ d.id_dimension }})" class="btn-guardar">💾 GUARDAR</button>
+                                <button onclick="eliminarFila('dim', {{ d.id_dimension }}, '{{ d.nombre_dimension|escapejs }}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -195,21 +271,19 @@
         {% else %}
         <div class="table-wrapper" style="margin-bottom: 1em; display:none;" id="wrapper-tabla-dimensiones">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-dimensiones"></tbody>
             </table>
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-8 col-12-small">
-                <input type="text" id="nombre_dimension" placeholder="Nombre de la dimensión (ej: Organizacionales)" style="width: 100%;" />
-            </div>
+        <hr style="margin-top: 0;" />
+        <div style="display: flex; align-items: center; gap: 1em;">
+            <input type="text" id="nombre_dimension" placeholder="Nombre de la dimensión (ej: Organizacionales)" style="flex: 1;" />
+            <button onclick="guardarDimension()" class="button primary" style="white-space: nowrap;">Agregar Dimensión</button>
         </div>
         <div id="msg-dimension" style="margin: 0.5em 0;"></div>
-        <ul class="actions">
-            <li><button onclick="guardarDimension()" class="button primary">Agregar Dimensión</button></li>
-        </ul>
+        <hr style="margin-top: 2em;" />
     </div>
 
     <hr />
@@ -217,16 +291,26 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 6. COMPETENCIAS                        -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-competencias" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-competencias" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #51ff85;">⑥ Competencias</h3>
 
         {% if competencias %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Dimensión</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Dimensión</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-competencias">
                     {% for c in competencias %}
-                    <tr><td>{{ c.id_competencia }}</td><td>{{ c.dimension.nombre_dimension }}</td><td>{{ c.nombre_competencia }}</td></tr>
+                    <tr id="comp-{{ c.id_competencia }}">
+                        <td>{{ c.id_competencia }}</td>
+                        <td class="dimension-cell">{{ c.dimension.nombre_dimension }}</td>
+                        <td><input class="input-inline nombre-field" value="{{ c.nombre_competencia }}" /></td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarInline('comp', {{ c.id_competencia }})" class="btn-guardar">💾 GUARDAR</button>
+                                <button onclick="eliminarFila('comp', {{ c.id_competencia }}, '{{ c.nombre_competencia|escapejs }}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -234,29 +318,25 @@
         {% else %}
         <div class="table-wrapper" style="margin-bottom: 1em; display:none;" id="wrapper-tabla-competencias">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Dimensión</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Dimensión</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-competencias"></tbody>
             </table>
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-4 col-12-small">
-                <select id="select-dimension-comp" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Dimensión --</option>
-                    {% for d in dimensiones %}
-                    <option value="{{ d.id_dimension }}">{{ d.nombre_dimension }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-8 col-12-small">
-                <input type="text" id="nombre_competencia" placeholder="Nombre de la competencia" style="width: 100%;" />
-            </div>
+        <hr style="margin-top: 0;" />
+        <div style="display: flex; align-items: center; gap: 1em;">
+            <select id="select-dimension-comp" style="width: 200px; flex-shrink: 0; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Dimensión --</option>
+                {% for d in dimensiones %}
+                <option value="{{ d.id_dimension }}">{{ d.nombre_dimension }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="nombre_competencia" placeholder="Nombre de la competencia" style="flex: 1; min-width: 0;" />
+            <button onclick="guardarCompetencia()" class="button primary" style="white-space: nowrap; flex-shrink: 0;">Agregar Competencia</button>
         </div>
         <div id="msg-competencia" style="margin: 0.5em 0;"></div>
-        <ul class="actions">
-            <li><button onclick="guardarCompetencia()" class="button primary">Agregar Competencia</button></li>
-        </ul>
+        <hr style="margin-top: 2em;" />
     </div>
 
     <hr />
@@ -264,16 +344,26 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 7. CARGOS                              -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-cargos" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-cargos" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #2196F3;">⑦ Cargos</h3>
 
         {% if cargos %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nivel</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nivel</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-cargos">
                     {% for c in cargos %}
-                    <tr><td>{{ c.id_cargo }}</td><td>{{ c.nivel_jerarquico.nombre_nivel_jerarquico }}</td><td>{{ c.nombre_cargo }}</td></tr>
+                    <tr id="cargo-{{ c.id_cargo }}">
+                        <td>{{ c.id_cargo }}</td>
+                        <td class="nivel-cell">{{ c.nivel_jerarquico.nombre_nivel_jerarquico }}</td>
+                        <td><input class="input-inline nombre-field" value="{{ c.nombre_cargo }}" /></td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarInline('cargo', {{ c.id_cargo }})" class="btn-guardar">💾 GUARDAR</button>
+                                <button onclick="eliminarFila('cargo', {{ c.id_cargo }}, '{{ c.nombre_cargo|escapejs }}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -281,29 +371,25 @@
         {% else %}
         <div class="table-wrapper" style="margin-bottom: 1em; display:none;" id="wrapper-tabla-cargos">
             <table class="alt">
-                <thead><tr><th>ID</th><th>Nivel</th><th>Nombre</th></tr></thead>
+                <thead><tr><th>ID</th><th>Nivel</th><th>Nombre</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-cargos"></tbody>
             </table>
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-4 col-12-small">
-                <select id="select-nivel-cargo" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Nivel Jerárquico --</option>
-                    {% for n in niveles %}
-                    <option value="{{ n.id_nivel_jerarquico }}">{{ n.nombre_nivel_jerarquico }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-8 col-12-small">
-                <input type="text" id="nombre_cargo" placeholder="Nombre del cargo (ej: Analista)" style="width: 100%;" />
-            </div>
+        <hr style="margin-top: 0;" />
+        <div style="display: flex; align-items: center; gap: 1em;">
+            <select id="select-nivel-cargo" style="width: 260px; flex-shrink: 0; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Nivel Jerárquico --</option>
+                {% for n in niveles %}
+                <option value="{{ n.id_nivel_jerarquico }}">{{ n.nombre_nivel_jerarquico }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="nombre_cargo" placeholder="Nombre del cargo (ej: Analista)" style="flex: 1; min-width: 0;" />
+            <button onclick="guardarCargo()" class="button primary" style="white-space: nowrap; flex-shrink: 0;">Agregar Cargo</button>
         </div>
         <div id="msg-cargo" style="margin: 0.5em 0;"></div>
-        <ul class="actions">
-            <li><button onclick="guardarCargo()" class="button primary">Agregar Cargo</button></li>
-        </ul>
+        <hr style="margin-top: 2em;" />
     </div>
 
     <hr />
@@ -311,22 +397,28 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 8. TEXTOS DE EVALUACION                -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-textos" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-textos" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #2196F3;">⑧ Textos de Evaluación</h3>
         <p style="opacity: 0.7; font-size: 0.9em;">El código Excel se genera automáticamente en CODIGO_EVALUACION al guardar.</p>
 
         {% if textos %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>Código</th><th>Dimensión</th><th>Competencia</th><th>Nivel</th><th>Texto</th></tr></thead>
+                <thead><tr><th>Código</th><th>Dimensión</th><th>Competencia</th><th>Nivel</th><th>Texto</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-textos">
                     {% for t in textos %}
-                    <tr>
-                        <td><strong>{{ t.codigo_excel }}</strong></td>
+                    <tr id="texto-{{ t.id_textos_evaluacion }}">
+                        <td><input class="input-inline codigo-field" value="{{ t.codigo_excel }}" style="width:90px;" /></td>
                         <td>{{ t.dimension.nombre_dimension }}</td>
                         <td>{{ t.competencia.nombre_competencia }}</td>
                         <td>{{ t.nivel_jerarquico.nombre_nivel_jerarquico }}</td>
-                        <td style="font-size:0.85em; opacity:0.8;">{{ t.texto|truncatechars:60 }}</td>
+                        <td><input class="input-inline texto-field" value="{{ t.texto }}" style="width:240px;" /></td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarTextoInline({{ t.id_textos_evaluacion }})" class="btn-guardar">💾 GUARDAR</button>
+                                <button onclick="eliminarFila('texto', {{ t.id_textos_evaluacion }}, '{{ t.codigo_excel|escapejs }}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -335,50 +427,42 @@
         {% else %}
         <div class="table-wrapper" style="margin-bottom: 1em; display:none;" id="wrapper-tabla-textos">
             <table class="alt">
-                <thead><tr><th>Código</th><th>Dimensión</th><th>Competencia</th><th>Nivel</th><th>Texto</th></tr></thead>
+                <thead><tr><th>Código</th><th>Dimensión</th><th>Competencia</th><th>Nivel</th><th>Texto</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-textos"></tbody>
             </table>
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-3 col-12-small">
-                <input type="text" id="codigo_excel" placeholder="Código (ej: CIO1.1)" style="width:100%;" />
-            </div>
-            <div class="col-3 col-12-small">
-                <select id="select-dimension-texto" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;" onchange="filtrarCompetencias()">
-                    <option value="">-- Dimensión --</option>
-                    {% for d in dimensiones %}
-                    <option value="{{ d.id_dimension }}">{{ d.nombre_dimension }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-3 col-12-small">
-                <select id="select-competencia-texto" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Competencia --</option>
-                    {% for c in competencias %}
-                    <option value="{{ c.id_competencia }}" data-dim="{{ c.dimension.id_dimension }}">{{ c.nombre_competencia }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-3 col-12-small">
-                <select id="select-nivel-texto" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Nivel --</option>
-                    {% for n in niveles %}
-                    <option value="{{ n.id_nivel_jerarquico }}">{{ n.nombre_nivel_jerarquico }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <hr style="margin-top: 0;" />
+        <div style="display: flex; align-items: center; gap: 1em; flex-wrap: wrap;">
+            <input type="text" id="codigo_excel" placeholder="Código (ej: CIO1.1)" style="width: 120px; flex-shrink: 0;" />
+            <select id="select-dimension-texto" style="flex: 1; min-width: 150px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;" onchange="filtrarCompetencias()">
+                <option value="">-- Dimensión --</option>
+                {% for d in dimensiones %}
+                <option value="{{ d.id_dimension }}">{{ d.nombre_dimension }}</option>
+                {% endfor %}
+            </select>
+            <select id="select-competencia-texto" style="flex: 1; min-width: 150px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Competencia --</option>
+                {% for c in competencias %}
+                <option value="{{ c.id_competencia }}" data-dim="{{ c.dimension.id_dimension }}">{{ c.nombre_competencia }}</option>
+                {% endfor %}
+            </select>
+            <select id="select-nivel-texto" style="flex: 1; min-width: 150px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Nivel --</option>
+                {% for n in niveles %}
+                <option value="{{ n.id_nivel_jerarquico }}">{{ n.nombre_nivel_jerarquico }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="row" style="margin-top: 0.5em;">
-            <div class="col-12">
-                <textarea id="texto_evaluacion" placeholder="Texto del indicador de evaluación" rows="3" style="width:100%;"></textarea>
-            </div>
+        <div style="margin-top: 0.8em;">
+            <textarea id="texto_evaluacion" placeholder="Texto del indicador de evaluación" rows="3" style="width:100%;"></textarea>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 0.5em;">
+            <button onclick="guardarTexto()" class="button primary" style="white-space: nowrap;">Agregar Texto</button>
         </div>
         <div id="msg-texto" style="margin: 0.5em 0;"></div>
-        <ul class="actions">
-            <li><button onclick="guardarTexto()" class="button primary">Agregar Texto</button></li>
-        </ul>
+        <hr style="margin-top: 1em;" />
     </div>
 
     <hr />
@@ -386,23 +470,29 @@
     <!-- ══════════════════════════════════════ -->
     <!-- 9. TRABAJADORES                        -->
     <!-- ══════════════════════════════════════ -->
-    <div id="seccion-trabajadores" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
+    <div class="card-seccion" id="seccion-trabajadores" {% if not empresa_actual %}style="opacity:0.4; pointer-events:none;"{% endif %}>
         <h3 style="color: #2196F3;">⑨ Trabajadores</h3>
         <p style="opacity: 0.7; font-size: 0.9em;">El usuario de login se crea automáticamente con la contraseña <strong>Mohala2026</strong>.</p>
 
         {% if trabajadores %}
         <div class="table-wrapper" style="margin-bottom: 1em;">
             <table class="alt">
-                <thead><tr><th>ID</th><th>RUT</th><th>Nombre</th><th>Nivel</th><th>Cargo</th><th>Coordinador</th></tr></thead>
+                <thead><tr><th>ID</th><th>RUT</th><th>Nombre</th><th>Nivel</th><th>Cargo</th><th>Coord.</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-trabajadores">
                     {% for t in trabajadores %}
-                    <tr>
+                    <tr id="trab-{{ t.id_trabajador }}">
                         <td>{{ t.id_trabajador }}</td>
                         <td>{{ t.rut }}</td>
-                        <td>{{ t.nombre }} {{ t.apellido_paterno }}</td>
+                        <td><input class="input-inline nombre-field" value="{{ t.nombre }} {{ t.apellido_paterno }}" style="width:180px;" /></td>
                         <td>{{ t.nivel_jerarquico.nombre_nivel_jerarquico }}</td>
                         <td>{{ t.cargo.nombre_cargo }}</td>
                         <td>{% if t.es_coordinador %}<span style="color:#51ff85;">✅</span>{% else %}—{% endif %}</td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button onclick="guardarTrabajadorInline({{ t.id_trabajador }})" class="btn-guardar">💾 GUARDAR</button>
+                                <button onclick="eliminarFila('trab', {{ t.id_trabajador }}, '{{ t.nombre|escapejs }} {{ t.apellido_paterno|escapejs }}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -411,87 +501,64 @@
         {% else %}
         <div class="table-wrapper" style="margin-bottom: 1em; display:none;" id="wrapper-tabla-trabajadores">
             <table class="alt">
-                <thead><tr><th>ID</th><th>RUT</th><th>Nombre</th><th>Nivel</th><th>Cargo</th><th>Coordinador</th></tr></thead>
+                <thead><tr><th>ID</th><th>RUT</th><th>Nombre</th><th>Nivel</th><th>Cargo</th><th>Coord.</th><th>Acciones</th></tr></thead>
                 <tbody id="tabla-trabajadores"></tbody>
             </table>
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-3 col-12-small">
-                <input type="text" id="t_rut" placeholder="RUT (ej: 12.345.678-9)" style="width:100%;" />
-            </div>
-            <div class="col-3 col-12-small">
-                <input type="text" id="t_nombre" placeholder="Nombre" style="width:100%;" />
-            </div>
-            <div class="col-3 col-12-small">
-                <input type="text" id="t_ap_paterno" placeholder="Apellido Paterno" style="width:100%;" />
-            </div>
-            <div class="col-3 col-12-small">
-                <input type="text" id="t_ap_materno" placeholder="Apellido Materno" style="width:100%;" />
-            </div>
+        <hr style="margin-top: 0;" />
+        <div style="display: flex; gap: 1em; flex-wrap: wrap;">
+            <input type="text" id="t_rut" placeholder="RUT (ej: 12.345.678-9)" style="flex: 1; min-width: 150px;" />
+            <input type="text" id="t_nombre" placeholder="Nombre" style="flex: 1; min-width: 120px;" />
+            <input type="text" id="t_ap_paterno" placeholder="Apellido Paterno" style="flex: 1; min-width: 130px;" />
+            <input type="text" id="t_ap_materno" placeholder="Apellido Materno" style="flex: 1; min-width: 130px;" />
         </div>
-        <div class="row" style="margin-top: 0.5em;">
-            <div class="col-4 col-12-small">
-                <input type="email" id="t_email" placeholder="Email" style="width:100%;" />
-            </div>
-            <div class="col-2 col-12-small">
-                <select id="t_genero" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Género --</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Femenino">Femenino</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-            <div class="col-3 col-12-small">
-                <select id="t_nivel" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;" onchange="filtrarCargos()">
-                    <option value="">-- Nivel Jerárquico --</option>
-                    {% for n in niveles %}
-                    <option value="{{ n.id_nivel_jerarquico }}">{{ n.nombre_nivel_jerarquico }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-3 col-12-small">
-                <select id="t_cargo" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Cargo --</option>
-                    {% for c in cargos %}
-                    <option value="{{ c.id_cargo }}" data-nivel="{{ c.nivel_jerarquico.id_nivel_jerarquico }}">{{ c.nombre_cargo }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div style="display: flex; gap: 1em; flex-wrap: wrap; margin-top: 0.8em;">
+            <input type="email" id="t_email" placeholder="Email" style="flex: 2; min-width: 180px;" />
+            <select id="t_genero" style="flex: 1; min-width: 120px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Género --</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <select id="t_nivel" style="flex: 1; min-width: 160px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;" onchange="filtrarCargos()">
+                <option value="">-- Nivel Jerárquico --</option>
+                {% for n in niveles %}
+                <option value="{{ n.id_nivel_jerarquico }}">{{ n.nombre_nivel_jerarquico }}</option>
+                {% endfor %}
+            </select>
+            <select id="t_cargo" style="flex: 1; min-width: 160px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Cargo --</option>
+                {% for c in cargos %}
+                <option value="{{ c.id_cargo }}" data-nivel="{{ c.nivel_jerarquico.id_nivel_jerarquico }}">{{ c.nombre_cargo }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="row" style="margin-top: 0.5em;">
-            <div class="col-4 col-12-small">
-                <select id="t_departamento" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Departamento --</option>
-                    {% for dep in departamentos %}
-                    <option value="{{ dep.id_departamento }}">{{ dep.nombre_departamento }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-4 col-12-small">
-                <select id="t_jefe" style="width:100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
-                    <option value="">-- Jefe Directo (opcional) --</option>
-                    {% for t in trabajadores %}
-                    <option value="{{ t.id_trabajador }}">{{ t.nombre }} {{ t.apellido_paterno }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-4 col-12-small" style="display:flex; align-items:center; gap:0.5em;">
+        <div style="display: flex; gap: 1em; flex-wrap: wrap; margin-top: 0.8em; align-items: center;">
+            <select id="t_departamento" style="flex: 1; min-width: 160px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Departamento --</option>
+                {% for dep in departamentos %}
+                <option value="{{ dep.id_departamento }}">{{ dep.nombre_departamento }}</option>
+                {% endfor %}
+            </select>
+            <select id="t_jefe" style="flex: 1; min-width: 160px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.5em 1em; border-radius: 4px;">
+                <option value="">-- Jefe Directo (opcional) --</option>
+                {% for t in trabajadores %}
+                <option value="{{ t.id_trabajador }}">{{ t.nombre }} {{ t.apellido_paterno }}</option>
+                {% endfor %}
+            </select>
+            <div style="display:flex; align-items:center; gap:0.5em; flex-shrink:0;">
                 <input type="checkbox" id="t_coordinador" style="margin:0;" />
                 <label for="t_coordinador" style="margin:0;">Es Coordinador</label>
             </div>
+            <button onclick="guardarTrabajador()" class="button primary" style="white-space: nowrap; flex-shrink:0;">Agregar Trabajador</button>
         </div>
         <div id="msg-trabajador" style="margin: 0.5em 0;"></div>
-        <ul class="actions">
-            <li><button onclick="guardarTrabajador()" class="button primary">Agregar Trabajador</button></li>
-        </ul>
+        <hr style="margin-top: 2em;" />
     </div>
 
     <hr />
-    <ul class="actions">
-        <li><a href="{% url 'index' %}" class="button primary">← Volver al Panel</a></li>
-    </ul>
 
 </section>
 
@@ -499,14 +566,12 @@
 // ─── Estado global ───────────────────────────────
 let empresaId = {% if empresa_actual %}{{ empresa_actual.id_empresa }}{% else %}null{% endif %};
 
-// Datos dinámicos para selects (se actualizan al agregar)
 let nivelesData = [{% for n in niveles %}{ id: {{ n.id_nivel_jerarquico }}, nombre: "{{ n.nombre_nivel_jerarquico }}" },{% endfor %}];
 let dimensionesData = [{% for d in dimensiones %}{ id: {{ d.id_dimension }}, nombre: "{{ d.nombre_dimension }}" },{% endfor %}];
 let competenciasData = [{% for c in competencias %}{ id: {{ c.id_competencia }}, nombre: "{{ c.nombre_competencia }}", dim_id: {{ c.dimension.id_dimension }} },{% endfor %}];
 let cargosData = [{% for c in cargos %}{ id: {{ c.id_cargo }}, nombre: "{{ c.nombre_cargo }}", nivel_id: {{ c.nivel_jerarquico.id_nivel_jerarquico }} },{% endfor %}];
 let trabajadoresData = [{% for t in trabajadores %}{ id: {{ t.id_trabajador }}, nombre: "{{ t.nombre }} {{ t.apellido_paterno }}" },{% endfor %}];
 
-// ─── Helpers ─────────────────────────────────────
 function msg(id, texto, ok=true) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -528,18 +593,6 @@ function mostrarTabla(wrapperId) {
     if (w) w.style.display = 'block';
 }
 
-function agregarFila(tablaId, celdas) {
-    const tbody = document.getElementById(tablaId);
-    if (!tbody) return;
-    const tr = document.createElement('tr');
-    celdas.forEach(c => {
-        const td = document.createElement('td');
-        td.innerHTML = c;
-        tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-}
-
 function actualizarSelect(selectId, opciones, valorKey, textoKey) {
     const sel = document.getElementById(selectId);
     if (!sel) return;
@@ -549,13 +602,6 @@ function actualizarSelect(selectId, opciones, valorKey, textoKey) {
     sel.appendChild(opt);
 }
 
-function cargarEmpresa() {
-    const sel = document.getElementById('selector-empresa');
-    const id = sel.value;
-    if (id) window.location.href = `?empresa_id=${id}`;
-}
-
-// ─── CSRF ─────────────────────────────────────────
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -578,18 +624,104 @@ async function post(url, data) {
     return r.json();
 }
 
+// ─── CRUD URLs ────────────────────────────────────
+const CRUD_URLS = {
+    dep:    { editar: '/poblador/departamento/editar/', eliminar: '/poblador/departamento/eliminar/' },
+    nivel:  { editar: '/poblador/nivel/editar/', eliminar: '/poblador/nivel/eliminar/' },
+    escala: { editar: '/poblador/escala/editar/' },
+    dim:    { editar: '/poblador/dimension/editar/', eliminar: '/poblador/dimension/eliminar/' },
+    comp:   { editar: '/poblador/competencia/editar/', eliminar: '/poblador/competencia/eliminar/' },
+    cargo:  { editar: '/poblador/cargo/editar/', eliminar: '/poblador/cargo/eliminar/' },
+    texto:  { editar: '/poblador/texto/editar/', eliminar: '/poblador/texto/eliminar/' },
+    trab:   { editar: '/poblador/trabajador/editar/', eliminar: '/poblador/trabajador/eliminar/' },
+};
+
+// ─── Guardar inline nombre simple ────────────────
+async function guardarInline(tipo, id) {
+    const fila = document.getElementById(`${tipo}-${id}`);
+    const input = fila.querySelector('.nombre-field');
+    const nuevoValor = input.value.trim();
+    if (!nuevoValor) { return; }
+    const res = await post(CRUD_URLS[tipo].editar + id + '/', { nombre: nuevoValor });
+    if (res.ok) {
+        input.style.border = '1px solid #51ff85';
+        setTimeout(() => input.style.border = '1px solid rgba(255,255,255,0.2)', 2000);
+    } else {
+        alert('Error: ' + res.error);
+    }
+}
+
+// ─── Eliminar fila ────────────────────────────────
+async function eliminarFila(tipo, id, nombre) {
+    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+    const res = await post(CRUD_URLS[tipo].eliminar + id + '/', {});
+    if (res.ok) {
+        document.getElementById(`${tipo}-${id}`).remove();
+    } else {
+        alert('Error: ' + res.error);
+    }
+}
+
+// ─── Guardar escala inline ────────────────────────
+async function guardarEscalaInline(id) {
+    const fila = document.getElementById(`escala-${id}`);
+    const titulo = fila.querySelector('.titulo-field').value.trim();
+    const descripcion = fila.querySelector('.desc-field').value.trim();
+    if (!titulo || !descripcion) return;
+    const res = await post(CRUD_URLS.escala.editar + id + '/', { titulo, descripcion });
+    if (res.ok) {
+        const tf = fila.querySelector('.titulo-field');
+        tf.style.border = '1px solid #51ff85';
+        setTimeout(() => tf.style.border = '1px solid rgba(255,255,255,0.2)', 2000);
+    } else {
+        alert('Error: ' + res.error);
+    }
+}
+
+// ─── Guardar texto inline ─────────────────────────
+async function guardarTextoInline(id) {
+    const fila = document.getElementById(`texto-${id}`);
+    const codigo = fila.querySelector('.codigo-field').value.trim();
+    const texto = fila.querySelector('.texto-field').value.trim();
+    if (!codigo || !texto) return;
+    const res = await post(CRUD_URLS.texto.editar + id + '/', { codigo, texto });
+    if (res.ok) {
+        const cf = fila.querySelector('.codigo-field');
+        cf.style.border = '1px solid #51ff85';
+        setTimeout(() => cf.style.border = '1px solid rgba(255,255,255,0.2)', 2000);
+    } else {
+        alert('Error: ' + res.error);
+    }
+}
+
+// ─── Guardar trabajador inline ────────────────────
+async function guardarTrabajadorInline(id) {
+    const fila = document.getElementById(`trab-${id}`);
+    const nombreCompleto = fila.querySelector('.nombre-field').value.trim();
+    const partes = nombreCompleto.split(' ');
+    const nombre = partes[0] || '';
+    const apellido_paterno = partes[1] || '';
+    const apellido_materno = partes.slice(2).join(' ') || '';
+    const res = await post(CRUD_URLS.trab.editar + id + '/', { nombre, apellido_paterno, apellido_materno });
+    if (res.ok) {
+        const input = fila.querySelector('.nombre-field');
+        input.style.border = '1px solid #51ff85';
+        setTimeout(() => input.style.border = '1px solid rgba(255,255,255,0.2)', 2000);
+    } else {
+        alert('Error: ' + res.error);
+    }
+}
+
 // ─── 1. EMPRESA ───────────────────────────────────
 async function guardarEmpresa() {
     const nombre = document.getElementById('nombre_empresa').value.trim();
     const rut = document.getElementById('rut_empresa').value.trim();
     if (!nombre || !rut) { msg('msg-empresa', '❌ Nombre y RUT son obligatorios', false); return; }
-
     const res = await post("{% url 'guardar_empresa' %}", { nombre_empresa: nombre, rut_empresa: rut });
     if (res.ok) {
         empresaId = res.id_empresa;
         msg('msg-empresa', `✅ Empresa "${res.nombre}" creada con ID ${res.id_empresa}`);
         habilitarSecciones();
-        // Recargar para actualizar todos los selects con el nuevo empresa_id
         setTimeout(() => { window.location.href = `?empresa_id=${res.id_empresa}`; }, 1200);
     } else {
         msg('msg-empresa', `❌ ${res.error}`, false);
@@ -601,12 +733,19 @@ async function guardarDepartamento() {
     if (!empresaId) { msg('msg-departamento', '❌ Primero crea o selecciona una empresa', false); return; }
     const nombre = document.getElementById('nombre_departamento').value.trim();
     if (!nombre) { msg('msg-departamento', '❌ El nombre es obligatorio', false); return; }
-
     const res = await post("{% url 'guardar_departamento' %}", { empresa_id: empresaId, nombre_departamento: nombre });
     if (res.ok) {
         mostrarTabla('wrapper-tabla-departamentos');
-        agregarFila('tabla-departamentos', [res.id, res.nombre]);
-        // Actualizar select de departamentos en trabajadores
+        const tbody = document.getElementById('tabla-departamentos');
+        const tr = document.createElement('tr');
+        tr.id = `dep-${res.id}`;
+        tr.innerHTML = `<td>${res.id}</td>
+            <td><input class="input-inline nombre-field" value="${res.nombre}" /></td>
+            <td><div class="acciones-celda">
+                <button onclick="guardarInline('dep', ${res.id})" class="btn-guardar">💾 GUARDAR</button>
+                <button onclick="eliminarFila('dep', ${res.id}, '${res.nombre}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+            </div></td>`;
+        tbody.appendChild(tr);
         actualizarSelect('t_departamento', res, 'id', 'nombre');
         document.getElementById('nombre_departamento').value = '';
         msg('msg-departamento', `✅ "${res.nombre}" agregado`);
@@ -620,13 +759,20 @@ async function guardarNivel() {
     if (!empresaId) { msg('msg-nivel', '❌ Primero crea o selecciona una empresa', false); return; }
     const nombre = document.getElementById('nombre_nivel').value.trim();
     if (!nombre) { msg('msg-nivel', '❌ El nombre es obligatorio', false); return; }
-
     const res = await post("{% url 'guardar_nivel' %}", { empresa_id: empresaId, nombre_nivel: nombre });
     if (res.ok) {
         mostrarTabla('wrapper-tabla-niveles');
-        agregarFila('tabla-niveles', [res.id, res.nombre]);
+        const tbody = document.getElementById('tabla-niveles');
+        const tr = document.createElement('tr');
+        tr.id = `nivel-${res.id}`;
+        tr.innerHTML = `<td>${res.id}</td>
+            <td><input class="input-inline nombre-field" value="${res.nombre}" /></td>
+            <td><div class="acciones-celda">
+                <button onclick="guardarInline('nivel', ${res.id})" class="btn-guardar">💾 GUARDAR</button>
+                <button onclick="eliminarFila('nivel', ${res.id}, '${res.nombre}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+            </div></td>`;
+        tbody.appendChild(tr);
         nivelesData.push({ id: res.id, nombre: res.nombre });
-        // Actualizar selects de nivel
         ['select-nivel-cargo', 't_nivel'].forEach(id => actualizarSelect(id, res, 'id', 'nombre'));
         document.getElementById('nombre_nivel').value = '';
         msg('msg-nivel', `✅ "${res.nombre}" agregado`);
@@ -659,11 +805,19 @@ async function guardarDimension() {
     if (!empresaId) { msg('msg-dimension', '❌ Primero crea o selecciona una empresa', false); return; }
     const nombre = document.getElementById('nombre_dimension').value.trim();
     if (!nombre) { msg('msg-dimension', '❌ El nombre es obligatorio', false); return; }
-
     const res = await post("{% url 'guardar_dimension' %}", { empresa_id: empresaId, nombre_dimension: nombre });
     if (res.ok) {
         mostrarTabla('wrapper-tabla-dimensiones');
-        agregarFila('tabla-dimensiones', [res.id, res.nombre]);
+        const tbody = document.getElementById('tabla-dimensiones');
+        const tr = document.createElement('tr');
+        tr.id = `dim-${res.id}`;
+        tr.innerHTML = `<td>${res.id}</td>
+            <td><input class="input-inline nombre-field" value="${res.nombre}" /></td>
+            <td><div class="acciones-celda">
+                <button onclick="guardarInline('dim', ${res.id})" class="btn-guardar">💾 GUARDAR</button>
+                <button onclick="eliminarFila('dim', ${res.id}, '${res.nombre}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+            </div></td>`;
+        tbody.appendChild(tr);
         dimensionesData.push({ id: res.id, nombre: res.nombre });
         ['select-dimension-comp', 'select-dimension-texto'].forEach(id => actualizarSelect(id, res, 'id', 'nombre'));
         document.getElementById('nombre_dimension').value = '';
@@ -680,18 +834,24 @@ async function guardarCompetencia() {
     const nombre = document.getElementById('nombre_competencia').value.trim();
     if (!dim_id) { msg('msg-competencia', '❌ Selecciona una dimensión', false); return; }
     if (!nombre) { msg('msg-competencia', '❌ El nombre es obligatorio', false); return; }
-
     const res = await post("{% url 'guardar_competencia' %}", { empresa_id: empresaId, dimension_id: dim_id, nombre_competencia: nombre });
     if (res.ok) {
         mostrarTabla('wrapper-tabla-competencias');
-        agregarFila('tabla-competencias', [res.id, res.dimension, res.nombre]);
+        const tbody = document.getElementById('tabla-competencias');
+        const tr = document.createElement('tr');
+        tr.id = `comp-${res.id}`;
+        tr.innerHTML = `<td>${res.id}</td>
+            <td class="dimension-cell">${res.dimension}</td>
+            <td><input class="input-inline nombre-field" value="${res.nombre}" /></td>
+            <td><div class="acciones-celda">
+                <button onclick="guardarInline('comp', ${res.id})" class="btn-guardar">💾 GUARDAR</button>
+                <button onclick="eliminarFila('comp', ${res.id}, '${res.nombre}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+            </div></td>`;
+        tbody.appendChild(tr);
         competenciasData.push({ id: res.id, nombre: res.nombre, dim_id: parseInt(dim_id) });
-        // Agregar opción al select de textos con data-dim
         const sel = document.getElementById('select-competencia-texto');
         const opt = document.createElement('option');
-        opt.value = res.id;
-        opt.textContent = res.nombre;
-        opt.dataset.dim = dim_id;
+        opt.value = res.id; opt.textContent = res.nombre; opt.dataset.dim = dim_id;
         sel.appendChild(opt);
         document.getElementById('nombre_competencia').value = '';
         msg('msg-competencia', `✅ "${res.nombre}" agregada`);
@@ -707,18 +867,24 @@ async function guardarCargo() {
     const nombre = document.getElementById('nombre_cargo').value.trim();
     if (!nivel_id) { msg('msg-cargo', '❌ Selecciona un nivel', false); return; }
     if (!nombre) { msg('msg-cargo', '❌ El nombre es obligatorio', false); return; }
-
     const res = await post("{% url 'guardar_cargo' %}", { empresa_id: empresaId, nivel_id, nombre_cargo: nombre });
     if (res.ok) {
         mostrarTabla('wrapper-tabla-cargos');
-        agregarFila('tabla-cargos', [res.id, res.nivel, res.nombre]);
+        const tbody = document.getElementById('tabla-cargos');
+        const tr = document.createElement('tr');
+        tr.id = `cargo-${res.id}`;
+        tr.innerHTML = `<td>${res.id}</td>
+            <td class="nivel-cell">${res.nivel}</td>
+            <td><input class="input-inline nombre-field" value="${res.nombre}" /></td>
+            <td><div class="acciones-celda">
+                <button onclick="guardarInline('cargo', ${res.id})" class="btn-guardar">💾 GUARDAR</button>
+                <button onclick="eliminarFila('cargo', ${res.id}, '${res.nombre}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+            </div></td>`;
+        tbody.appendChild(tr);
         cargosData.push({ id: res.id, nombre: res.nombre, nivel_id: parseInt(nivel_id) });
-        // Agregar al select de cargo en trabajadores con data-nivel
         const sel = document.getElementById('t_cargo');
         const opt = document.createElement('option');
-        opt.value = res.id;
-        opt.textContent = res.nombre;
-        opt.dataset.nivel = nivel_id;
+        opt.value = res.id; opt.textContent = res.nombre; opt.dataset.nivel = nivel_id;
         sel.appendChild(opt);
         document.getElementById('nombre_cargo').value = '';
         msg('msg-cargo', `✅ "${res.nombre}" agregado`);
@@ -735,24 +901,28 @@ async function guardarTexto() {
     const comp_id = document.getElementById('select-competencia-texto').value;
     const nivel_id = document.getElementById('select-nivel-texto').value;
     const texto = document.getElementById('texto_evaluacion').value.trim();
-
     if (!codigo || !dim_id || !comp_id || !nivel_id || !texto) {
         msg('msg-texto', '❌ Todos los campos son obligatorios', false); return;
     }
-
     const res = await post("{% url 'guardar_texto' %}", {
         empresa_id: empresaId, dimension_id: dim_id, competencia_id: comp_id,
         nivel_id, codigo_excel: codigo, texto
     });
     if (res.ok) {
         mostrarTabla('wrapper-tabla-textos');
-        agregarFila('tabla-textos', [
-            `<strong>${res.codigo}</strong>`,
-            dimensionesData.find(d => d.id == dim_id)?.nombre || '',
-            res.competencia,
-            res.nivel,
-            res.texto.substring(0, 60) + (res.texto.length > 60 ? '...' : '')
-        ]);
+        const tbody = document.getElementById('tabla-textos');
+        const tr = document.createElement('tr');
+        tr.id = `texto-${res.id}`;
+        tr.innerHTML = `
+            <td><input class="input-inline codigo-field" value="${res.codigo}" style="width:90px;" /></td>
+            <td>${dimensionesData.find(d => d.id == dim_id)?.nombre || ''}</td>
+            <td>${res.competencia}</td><td>${res.nivel}</td>
+            <td><input class="input-inline texto-field" value="${res.texto}" style="width:240px;" /></td>
+            <td><div class="acciones-celda">
+                <button onclick="guardarTextoInline(${res.id})" class="btn-guardar">💾 GUARDAR</button>
+                <button onclick="eliminarFila('texto', ${res.id}, '${res.codigo}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+            </div></td>`;
+        tbody.appendChild(tr);
         document.getElementById('codigo_excel').value = '';
         document.getElementById('texto_evaluacion').value = '';
         msg('msg-texto', `✅ Texto "${res.codigo}" agregado`);
@@ -778,23 +948,27 @@ async function guardarTrabajador() {
         jefe_id: document.getElementById('t_jefe').value || null,
         es_coordinador: document.getElementById('t_coordinador').checked
     };
-
     if (!data.rut || !data.nombre || !data.apellido_paterno || !data.apellido_materno ||
         !data.email || !data.genero || !data.nivel_id || !data.cargo_id || !data.departamento_id) {
         msg('msg-trabajador', '❌ Todos los campos son obligatorios excepto jefe directo', false); return;
     }
-
     const res = await post("{% url 'guardar_trabajador' %}", data);
     if (res.ok) {
         mostrarTabla('wrapper-tabla-trabajadores');
-        agregarFila('tabla-trabajadores', [
-            res.id, data.rut, res.nombre, res.nivel, res.cargo,
-            data.es_coordinador ? '<span style="color:#51ff85;">✅</span>' : '—'
-        ]);
+        const tbody = document.getElementById('tabla-trabajadores');
+        const tr = document.createElement('tr');
+        tr.id = `trab-${res.id}`;
+        tr.innerHTML = `<td>${res.id}</td><td>${data.rut}</td>
+            <td><input class="input-inline nombre-field" value="${res.nombre}" style="width:180px;" /></td>
+            <td>${res.nivel}</td><td>${res.cargo}</td>
+            <td>${data.es_coordinador ? '<span style="color:#51ff85;">✅</span>' : '—'}</td>
+            <td><div class="acciones-celda">
+                <button onclick="guardarTrabajadorInline(${res.id})" class="btn-guardar">💾 GUARDAR</button>
+                <button onclick="eliminarFila('trab', ${res.id}, '${res.nombre}')" class="btn-eliminar-inline">🗑️ ELIMINAR</button>
+            </div></td>`;
+        tbody.appendChild(tr);
         trabajadoresData.push({ id: res.id, nombre: res.nombre });
-        // Agregar al select de jefe directo
         actualizarSelect('t_jefe', res, 'id', 'nombre');
-        // Limpiar campos
         ['t_rut','t_nombre','t_ap_paterno','t_ap_materno','t_email'].forEach(id => {
             document.getElementById(id).value = '';
         });
