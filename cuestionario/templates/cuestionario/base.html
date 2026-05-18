@@ -36,9 +36,9 @@
                     <header>
                         <h1 style="border-bottom: solid 2px rgba(255, 255, 255, 0.125); padding-bottom: 0.5em; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5em;">
                             <span>Sistema RAT{% if empresa_actual %} : <span style="color: #4fc3f7;">{{ empresa_actual.nombre_empresa }}</span>{% endif %}{% if empresa_seleccionada %} : <span style="color: #4fc3f7;">{{ empresa_seleccionada.nombre_empresa }}</span>{% endif %}</span>
-                            {% if empresa_seleccionada %}
+                            {% if empresa_seleccionada and request.path != '/gestion-usuarios/' %}
                             <div style="display: flex; gap: 0.4em; align-items: center;">
-                            <a href="{% url 'panel_poblador' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" style="font-size: 0.28em; padding: 0.4em 0.9em; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; color: white; text-decoration: none; white-space: nowrap;">✏️ Editar</a>
+                                <a href="{% url 'panel_poblador' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" style="font-size: 0.28em; padding: 0.4em 0.9em; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; color: white; text-decoration: none; white-space: nowrap;">✏️ Editar</a>
                                 <form method="post" action="{% url 'eliminar_empresa' empresa_seleccionada.id_empresa %}" onsubmit="return confirm('¿Eliminar {{ empresa_seleccionada.nombre_empresa }}?');" style="margin:0; display:flex; align-items:center;">
                                     {% csrf_token %}
                                     <button type="submit" style="all: unset; font-size: 0.28em; padding: 0.4em 0.9em; border: 1px solid #c0392b; border-radius: 4px; background: #c0392b; color: white; cursor: pointer; white-space: nowrap; box-sizing: border-box;">🗑️ Eliminar</button>

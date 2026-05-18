@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import logica as views
-from .logica import validador_login, seguimiento, detalle_seguimiento, reporte_pdf, reporte_excel, gemini_admin, reporte_global, manejo_archivos, edicion_cuestionario, poblador
+from .logica import validador_login, seguimiento, detalle_seguimiento, reporte_pdf, reporte_excel, gemini_admin, reporte_global, manejo_archivos, edicion_cuestionario, poblador, gestion_usuarios, carga_excel
 from .logica.rat import rat_editar_version, rat_eliminar_version
 
 urlpatterns = [
@@ -108,6 +108,16 @@ urlpatterns = [
     path('poblador/trabajador/editar/<int:pk>/', poblador.editar_trabajador_poblador, name='editar_trabajador_poblador'),
     path('poblador/trabajador/eliminar/<int:pk>/', poblador.eliminar_trabajador, name='eliminar_trabajador'),
     path('poblador/trabajador/', poblador.guardar_trabajador, name='guardar_trabajador'),
+
+    # RUTAS GESTIÓN DE USUARIOS
+    path('gestion-usuarios/', gestion_usuarios.panel_gestion_usuarios, name='gestion_usuarios'),
+    path('gestion-usuarios/modificar/<int:trabajador_id>/', gestion_usuarios.modificar_usuario, name='modificar_usuario'),
+    path('gestion-usuarios/resetear-clave/<int:trabajador_id>/', gestion_usuarios.resetear_clave, name='resetear_clave_usuario'),
+    path('gestion-usuarios/eliminar/<int:trabajador_id>/', gestion_usuarios.eliminar_usuario_panel, name='eliminar_usuario_panel'),
+    path('gestion-usuarios/agregar-coordinador/<int:trabajador_id>/', gestion_usuarios.agregar_coordinador, name='agregar_coordinador'),
+    path('gestion-usuarios/quitar-coordinador/<int:trabajador_id>/', gestion_usuarios.quitar_coordinador, name='quitar_coordinador'),
+    path('gestion-usuarios/crear/', gestion_usuarios.crear_usuario_panel, name='crear_usuario_panel'),
+    path('gestion-usuarios/cargar-excel/', carga_excel.cargar_usuarios_excel, name='cargar_usuarios_excel'),
 
     # RUTAS RAT
     path('rat/', views.rat_panel_usuario, name='rat_panel_usuario'),

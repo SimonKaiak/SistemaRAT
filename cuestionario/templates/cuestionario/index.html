@@ -47,7 +47,7 @@
                 <h3>Gestión de Usuarios</h3>
                 <p>Accede al panel nativo de Django para gestionar cuentas y permisos.</p>
                 <ul class="actions">
-                    <li><a href="/admin/" class="button primary">Ir al Admin de Django</a></li>
+                    <li><a href="{% url 'gestion_usuarios' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">Gestionar Usuarios</a></li>
                 </ul>
             </section>
             <section>
