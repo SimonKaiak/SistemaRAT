@@ -14,4 +14,5 @@ from .rat import (
     rat_eliminar_pregunta,
     rat_versiones,
     rat_nueva_version,
+    seleccion_instrumentos,
 )

@@ -2,7 +2,7 @@ from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import logica as views
 from .logica import validador_login, seguimiento, detalle_seguimiento, reporte_pdf, reporte_excel, gemini_admin, reporte_global, manejo_archivos, edicion_cuestionario, poblador, gestion_usuarios, carga_excel
-from .logica.rat import rat_editar_version, rat_eliminar_version
+from .logica.rat import rat_editar_version, rat_eliminar_version, seleccion_instrumentos
 
 urlpatterns = [
     path('login/', validador_login.login_view, name='login'),
@@ -130,4 +130,5 @@ urlpatterns = [
     path('rat/versiones/nueva/', views.rat_nueva_version, name='rat_nueva_version'),
     path('rat/version/<int:version_id>/editar/', rat_editar_version, name='rat_editar_version'),
     path('rat/version/<int:version_id>/eliminar/', rat_eliminar_version, name='rat_eliminar_version'),
+    path('instrumentos/', seleccion_instrumentos, name='seleccion_instrumentos'),
 ]

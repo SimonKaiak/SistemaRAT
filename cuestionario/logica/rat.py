@@ -343,3 +343,25 @@ def rat_eliminar_version(request, version_id):
         'version': version,
     }
     return render(request, 'cuestionario/rat_confirmar_eliminar_version.html', context)
+
+
+@login_required
+def seleccion_instrumentos(request):
+    trabajador = get_object_or_404(Trabajador, user=request.user)
+    empresa = trabajador.empresa
+
+    from cuestionario.models import InstrumentoEmpresa
+    instrumentos_empresa = InstrumentoEmpresa.objects.filter(
+        empresa=empresa, habilitado=True
+    ).select_related('instrumento')
+
+    instrumentos_rat   = [ie for ie in instrumentos_empresa if 'RAT' in ie.instrumento.nombre_instrumento]
+    instrumentos_otros = [ie for ie in instrumentos_empresa if 'RAT' not in ie.instrumento.nombre_instrumento]
+
+    return render(request, 'cuestionario/seleccion_instrumentos.html', {
+        'trabajador':         trabajador,
+        'empresa_actual':     empresa,
+        'instrumentos_rat':   instrumentos_rat,
+        'instrumentos_otros': instrumentos_otros,
+        'es_coordinador':     trabajador.es_coordinador,
+    })

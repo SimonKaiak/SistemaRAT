@@ -51,13 +51,13 @@
                 </ul>
             </section>
             <section>
-                <span class="icon solid major fa-edit"></span>
-                <h3>Edición de Cuestionarios</h3>
-                <p>Edita dimensiones, competencias y textos de evaluación por empresa.</p>
+                <span class="icon solid major fa-shield-alt"></span>
+                <h3>Edición de Instrumentos RAT</h3>
+                <p>Gestiona los instrumentos RAT de {{ empresa_seleccionada.nombre_empresa }}.</p>
                 <ul class="actions">
                     <li>
-                        <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
-                            Editar — {{ empresa_seleccionada.nombre_empresa }}
+                        <a href="{% url 'seleccion_instrumentos' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                            Editar Instrumentos
                         </a>
                     </li>
                 </ul>
@@ -207,16 +207,6 @@
                 </ul>
             </section>
             <section>
-                <span class="icon solid major fa-edit"></span>
-                <h3>Edición de Cuestionario</h3>
-                <p>Edita dimensiones, competencias y textos de {{ trabajador.empresa.nombre_empresa }}.</p>
-                <ul class="actions">
-                    <li>
-                        <a href="{% url 'panel_edicion' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button primary">Editar Cuestionario</a>
-                    </li>
-                </ul>
-            </section>
-            <section>
                 <span class="icon solid major fa-sitemap"></span>
                 <h3>Edición de Niveles Jerárquicos</h3>
                 <p>Edita los niveles jerárquicos de {{ trabajador.empresa.nombre_empresa }}.</p>
@@ -230,10 +220,10 @@
             </section>
             <section>
                 <span class="icon solid major fa-shield-alt"></span>
-                <h3>RAT – Protección de Datos</h3>
-                <p>Gestiona el Registro de Actividad de Tratamiento de datos de {{ trabajador.empresa.nombre_empresa }}.</p>
+                <h3>Edición de Instrumentos RAT</h3>
+                <p>Gestiona el Registro de Actividad de Tratamiento de {{ trabajador.empresa.nombre_empresa }}.</p>
                 <ul class="actions">
-                    <li><a href="{% url 'rat_panel_coordinador' %}" class="button primary">Panel RAT</a></li>
+                    <li><a href="{% url 'seleccion_instrumentos' %}" class="button primary">Panel RAT</a></li>
                 </ul>
             </section>
         </div>
