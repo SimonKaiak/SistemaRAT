@@ -166,7 +166,7 @@
 
 <section>
   <header>
-    <a href="{% url 'index' %}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver al inicio</a>
+    <a href="{{ next_url|default:'javascript:history.back()' }}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver al panel</a>
     <hr style="margin-top:1em;" />
     <h2 style="margin-bottom:0.2em;">Instrumentos disponibles</h2>
     <p style="opacity:0.6;margin:0;">
@@ -193,6 +193,7 @@
           {{ ie.instrumento.nombre_instrumento }}
         </option>
         {% endfor %}
+        <option value="__nuevo__">＋ Crear nuevo RAT</option>
       </select>
     </div>
 
@@ -221,14 +222,9 @@
       <p class="card-title">{{ ie.instrumento.nombre_instrumento }}</p>
       <p class="card-desc">{{ ie.instrumento.descripcion|default:"Instrumento de evaluación de la empresa." }}</p>
       <div class="card-actions">
-        {% if trabajador %}
-        <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button primary small" style="margin:0;">Responder</a>
-        {% else %}
-        <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button primary small" style="margin:0;">Ver Cuestionario</a>
-        {% endif %}
-        {% if user.is_superuser or es_coordinador %}
-        <a href="{% url 'panel_edicion' %}" class="button small" style="margin:0;">✏️ Editar</a>
-        {% endif %}
+      {% if user.is_superuser or es_coordinador %}
+      <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa_actual.id_empresa }}&next=/instrumentos/%3Fempresa_id%3D{{ empresa_actual.id_empresa }}%26next%3D%252F%253Fempresa_id%253D{{ empresa_actual.id_empresa }}" class="button small" style="margin:0;">✏️ Editar</a>
+      {% endif %}
       </div>
     </div>
     {% endfor %}
@@ -255,19 +251,26 @@
   {% endfor %}
 
   function mostrarDetalleRAT(select) {
-    const detalle = document.getElementById('rat-detalle');
-    const id = select.value;
-    if (!id) {
-      detalle.classList.remove('visible');
-      return;
-    }
-    const d = ratData[id];
-    document.getElementById('rat-detalle-nombre').textContent = d.nombre;
-    document.getElementById('rat-detalle-desc').textContent   = d.desc;
-    document.getElementById('btn-responder').href = d.urlResponder;
-    const btnEditar = document.getElementById('btn-editar');
-    if (btnEditar) btnEditar.href = d.urlEditar;
-    detalle.classList.add('visible');
+      const detalle = document.getElementById('rat-detalle');
+      const id = select.value;
+
+      if (!id) {
+        detalle.classList.remove('visible');
+        return;
+      }
+
+      if (id === '__nuevo__') {
+        window.location.href = "{% url 'rat_crear_instrumento' %}?empresa_id={{ empresa_actual.id_empresa }}&next=/instrumentos/%3Fempresa_id%3D{{ empresa_actual.id_empresa }}%26next%3D%252F%253Fempresa_id%253D{{ empresa_actual.id_empresa }}";
+        return;
+      }
+
+      const d = ratData[id];
+      document.getElementById('rat-detalle-nombre').textContent = d.nombre;
+      document.getElementById('rat-detalle-desc').textContent   = d.desc;
+      document.getElementById('btn-responder').href = d.urlResponder;
+      const btnEditar = document.getElementById('btn-editar');
+      if (btnEditar) btnEditar.href = d.urlEditar;
+      detalle.classList.add('visible');
   }
 </script>
 {% endblock %}

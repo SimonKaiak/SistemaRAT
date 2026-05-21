@@ -1,0 +1,32 @@
+{% extends "cuestionario/base.html" %}
+{% block title %}Crear Instrumento RAT{% endblock %}
+{% block content %}
+<section>
+  <header>
+    <a href="{{ next_url }}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver</a>
+    <hr style="margin-top:1em;" />
+    <h2>Crear nuevo instrumento RAT</h2>
+    <p style="opacity:0.6;">El instrumento se creará y quedará habilitado para <strong>{{ empresa.nombre_empresa }}</strong>.</p>
+  </header>
+
+  <div class="box">
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <div class="row">
+        <div class="col-6 col-12-small">
+          <label>Nombre del instrumento</label>
+          <input type="text" name="nombre_instrumento" placeholder="Ej: RAT 2" style="width:100%;" required />
+        </div>
+        <div class="col-6 col-12-small">
+          <label>Descripción (opcional)</label>
+          <input type="text" name="descripcion" placeholder="Breve descripción..." style="width:100%;" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:1.5em;">
+        <button type="submit" class="button primary">Crear y habilitar</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

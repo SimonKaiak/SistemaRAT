@@ -56,7 +56,7 @@
                 <p>Gestiona los instrumentos RAT de {{ empresa_seleccionada.nombre_empresa }}.</p>
                 <ul class="actions">
                     <li>
-                        <a href="{% url 'seleccion_instrumentos' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                        <a href="{% url 'seleccion_instrumentos' %}?empresa_id={{ empresa_seleccionada.id_empresa }}&next=%2F%3Fempresa_id%3D{{ empresa_seleccionada.id_empresa }}" class="button primary">
                             Editar Instrumentos
                         </a>
                     </li>

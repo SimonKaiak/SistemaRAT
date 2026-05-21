@@ -369,10 +369,50 @@ def seleccion_instrumentos(request):
     instrumentos_rat   = [ie for ie in instrumentos_empresa if 'RAT' in ie.instrumento.nombre_instrumento]
     instrumentos_otros = [ie for ie in instrumentos_empresa if 'RAT' not in ie.instrumento.nombre_instrumento]
 
+    next_url = request.GET.get('next', None)
+
     return render(request, 'cuestionario/seleccion_instrumentos.html', {
         'trabajador':         trabajador,
         'empresa_actual':     empresa,
         'instrumentos_rat':   instrumentos_rat,
         'instrumentos_otros': instrumentos_otros,
         'es_coordinador':     es_coordinador,
+        'next_url':           next_url,
+    })
+
+
+@login_required
+def rat_crear_instrumento(request):
+    from cuestionario.models import Instrumento, InstrumentoEmpresa, Empresa
+
+    if request.user.is_superuser:
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+        empresa = get_object_or_404(Empresa, id_empresa=empresa_id) if empresa_id else None
+        if not empresa:
+            return redirect('index')
+    else:
+        trabajador = get_object_or_404(Trabajador, user=request.user)
+        if not trabajador.es_coordinador:
+            return redirect('index')
+        empresa = trabajador.empresa
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre_instrumento', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        if nombre:
+            instrumento, _ = Instrumento.objects.get_or_create(
+                nombre_instrumento=nombre,
+                defaults={'descripcion': descripcion}
+            )
+            InstrumentoEmpresa.objects.get_or_create(
+                instrumento=instrumento,
+                empresa=empresa
+            )
+            next_url = request.POST.get('next', f'/instrumentos/?empresa_id={empresa.id_empresa}')
+            return redirect(next_url)
+
+    next_url = request.GET.get('next', f'/instrumentos/?empresa_id={empresa.id_empresa}')
+    return render(request, 'cuestionario/rat_crear_instrumento.html', {
+        'empresa': empresa,
+        'next_url': next_url,
     })

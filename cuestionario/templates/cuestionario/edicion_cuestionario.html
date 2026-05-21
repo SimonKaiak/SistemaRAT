@@ -11,7 +11,7 @@
 <section>
     <header>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
-            <a href="{% url 'index' %}" class="button">← Volver al Panel</a>
+            <a href="{{ request.GET.next|default:"javascript:history.back()" }}" class="button">← Volver</a>
         </div>
         <hr style="margin-top:1.5em;" />
         <h2 style="margin-top: 1em;">Edición de Cuestionario</h2>
