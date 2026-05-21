@@ -347,10 +347,21 @@ def rat_eliminar_version(request, version_id):
 
 @login_required
 def seleccion_instrumentos(request):
-    trabajador = get_object_or_404(Trabajador, user=request.user)
-    empresa = trabajador.empresa
+    from cuestionario.models import InstrumentoEmpresa, Empresa
 
-    from cuestionario.models import InstrumentoEmpresa
+    # Admin: usa empresa_id del query param o sesión
+    if request.user.is_superuser:
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+        empresa = get_object_or_404(Empresa, id_empresa=empresa_id) if empresa_id else None
+        if not empresa:
+            return redirect('index')
+        es_coordinador = True
+        trabajador = None
+    else:
+        trabajador = get_object_or_404(Trabajador, user=request.user)
+        empresa = trabajador.empresa
+        es_coordinador = trabajador.es_coordinador
+
     instrumentos_empresa = InstrumentoEmpresa.objects.filter(
         empresa=empresa, habilitado=True
     ).select_related('instrumento')
@@ -363,5 +374,5 @@ def seleccion_instrumentos(request):
         'empresa_actual':     empresa,
         'instrumentos_rat':   instrumentos_rat,
         'instrumentos_otros': instrumentos_otros,
-        'es_coordinador':     trabajador.es_coordinador,
+        'es_coordinador':     es_coordinador,
     })

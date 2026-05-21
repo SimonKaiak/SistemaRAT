@@ -221,7 +221,11 @@
       <p class="card-title">{{ ie.instrumento.nombre_instrumento }}</p>
       <p class="card-desc">{{ ie.instrumento.descripcion|default:"Instrumento de evaluación de la empresa." }}</p>
       <div class="card-actions">
+        {% if trabajador %}
         <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button primary small" style="margin:0;">Responder</a>
+        {% else %}
+        <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button primary small" style="margin:0;">Ver Cuestionario</a>
+        {% endif %}
         {% if user.is_superuser or es_coordinador %}
         <a href="{% url 'panel_edicion' %}" class="button small" style="margin:0;">✏️ Editar</a>
         {% endif %}
