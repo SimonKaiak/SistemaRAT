@@ -528,7 +528,49 @@ class RegistroVersiones(models.Model):
     def __str__(self):
         return f"v{self.version} - {self.fecha_modificacion}"
 
+# =========================
+# Tabla Instrumento (catálogo global)
+# =========================
+class Instrumento(models.Model):
+    id_instrumento = models.AutoField(primary_key=True)
+    nombre_instrumento = models.CharField(max_length=100, unique=True)
+    descripcion = models.TextField(null=True, blank=True)
+    activo = models.BooleanField(default=True)
 
+    class Meta:
+        managed = True
+        db_table = 'INSTRUMENTO'
+
+    def __str__(self):
+        return self.nombre_instrumento
+
+
+# =========================
+# Tabla Instrumento_Empresa
+# =========================
+class InstrumentoEmpresa(models.Model):
+    id_instrumento_empresa = models.AutoField(primary_key=True)
+    instrumento = models.ForeignKey(
+        'Instrumento',
+        on_delete=models.DO_NOTHING,
+        db_column='instrumento_id'
+    )
+    empresa = models.ForeignKey(
+        'Empresa',
+        on_delete=models.DO_NOTHING,
+        db_column='empresa_id_empresa'
+    )
+    habilitado = models.BooleanField(default=True)
+    fecha_habilitacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = True
+        db_table = 'INSTRUMENTO_EMPRESA'
+        unique_together = (('instrumento', 'empresa'),)
+
+    def __str__(self):
+        return f"{self.instrumento} → {self.empresa}"
+    
 # =========================
 # Tabla RAT Preguntas
 # =========================
@@ -549,10 +591,10 @@ class RATPreguntas(models.Model):
     periodo_conservacion = models.PositiveIntegerField()
     fuente_datos = models.CharField(max_length=255)
 
-    empresa = models.ForeignKey(
-        'Empresa',
+    instrumento = models.ForeignKey(
+        'Instrumento',
         on_delete=models.DO_NOTHING,
-        db_column='empresa_id_empresa'
+        db_column='instrumento_id'
     )
     responsable = models.ForeignKey(
         'Trabajador',
