@@ -7,7 +7,8 @@ from .models import (
     EvaluacionJefatura, ResultadoConsolidado, Escala,
     PromptGemini, ReporteGlobal,
     Biblioteca, Empresa, CodigoEvaluacion,
-    RATPreguntas, RATRespuestas, RegistroVersiones
+    RATPreguntas, RATRespuestas, RegistroVersiones,
+    Instrumento, InstrumentoEmpresa, RATPlantillaPregunta,
 )
 from django.utils.html import format_html
 from django import forms
@@ -172,3 +173,7 @@ admin.site.register(NivelJerarquico)
 admin.site.register(RATPreguntas)
 admin.site.register(RATRespuestas)
 admin.site.register(RegistroVersiones)
+
+admin.site.register(Instrumento)
+admin.site.register(InstrumentoEmpresa)
+admin.site.register(RATPlantillaPregunta)

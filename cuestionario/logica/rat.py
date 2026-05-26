@@ -1,7 +1,41 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django import forms
-from cuestionario.models import RATPreguntas, RATRespuestas, RegistroVersiones, Trabajador, Empresa
+from cuestionario.models import (
+    RATPreguntas, RATRespuestas, RegistroVersiones,
+    Trabajador, Empresa, Instrumento, InstrumentoEmpresa,
+)
+
+
+# ─── HELPERS ──────────────────────────────────────────────────────────────────
+
+def _get_trabajador_o_none(request):
+    try:
+        return Trabajador.objects.get(user=request.user)
+    except Trabajador.DoesNotExist:
+        return None
+
+
+def _get_instrumento_empresa(request, empresa):
+    """
+    Devuelve el InstrumentoEmpresa pedido por query-param `instrumento_id`,
+    validando que esté habilitado para esa empresa.
+    instrumento_id se refiere al id del Instrumento (no del InstrumentoEmpresa).
+    """
+    instrumento_id = request.GET.get('instrumento_id')
+    if instrumento_id:
+        return get_object_or_404(
+            InstrumentoEmpresa,
+            instrumento__id_instrumento=instrumento_id,
+            empresa=empresa,
+            habilitado=True,
+        )
+    # fallback: primer RAT habilitado de la empresa
+    return InstrumentoEmpresa.objects.filter(
+        empresa=empresa,
+        habilitado=True,
+        instrumento__nombre_instrumento__icontains='RAT',
+    ).select_related('instrumento').first()
 
 
 # ─── FORMS ────────────────────────────────────────────────────────────────────
@@ -13,9 +47,8 @@ class RATRespuestaForm(forms.ModelForm):
         widgets = {
             'respuesta': forms.Textarea(attrs={
                 'rows': 4,
-                'class': 'form-control',
                 'placeholder': 'Escribe tu respuesta aquí...',
-                'style': 'width:100%; padding:0.6em; border-radius:6px; border:1px solid #ccc; font-size:0.95em;',
+                'style': 'width:100%; padding:0.6em; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-size:0.95em;',
             }),
         }
 
@@ -34,48 +67,42 @@ class RATPreguntaForm(forms.ModelForm):
             'fuente_datos',
             'version',
         ]
-
         widgets = {
             'actividad_tratamiento': forms.TextInput(attrs={
-                'class': 'form-control',
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
                 'placeholder': 'Ej: Gestión de nóminas y remuneraciones',
             }),
             'responsable': forms.Select(attrs={
-                'class': 'form-select',
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
             }),
             'categorias_datos': forms.Textarea(attrs={
-                'class': 'form-control', 'rows': 2,
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
-                'placeholder': 'Ej: Datos identificativos (RUT, nombre), datos económicos (sueldo, cuenta bancaria)',
+                'rows': 2,
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+                'placeholder': 'Ej: Datos identificativos (RUT, nombre)',
             }),
             'descripcion_titulares': forms.Textarea(attrs={
-                'class': 'form-control', 'rows': 2,
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
-                'placeholder': 'Ej: Trabajadores y ex-trabajadores de la empresa en relación laboral vigente o finalizada',
+                'rows': 2,
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+                'placeholder': 'Ej: Trabajadores y ex-trabajadores de la empresa',
             }),
             'finalidad_tratamiento': forms.Textarea(attrs={
-                'class': 'form-control', 'rows': 2,
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
-                'placeholder': 'Ej: Calcular y pagar remuneraciones, cumplir obligaciones tributarias y previsionales',
+                'rows': 2,
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+                'placeholder': 'Ej: Calcular y pagar remuneraciones',
             }),
             'base_legitimidad': forms.Select(attrs={
-                'class': 'form-select',
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
             }),
             'periodo_conservacion': forms.NumberInput(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;color:inherit;background:rgba(255,255,255,0.05);',
-                'placeholder': 'Ej: 60  (meses)',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+                'placeholder': 'Ej: 60 (meses)',
             }),
             'fuente_datos': forms.TextInput(attrs={
-                'class': 'form-control',
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
-                'placeholder': 'Ej: El propio trabajador mediante contrato de trabajo y ficha de ingreso',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+                'placeholder': 'Ej: El propio trabajador mediante contrato de trabajo',
             }),
             'version': forms.Select(attrs={
-                'class': 'form-select',
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
             }),
         }
 
@@ -96,59 +123,58 @@ class RegistroVersionesForm(forms.ModelForm):
         fields = ['version', 'motivo_modificacion']
         widgets = {
             'version': forms.TextInput(attrs={
-                'class': 'form-control',
                 'placeholder': 'Ej: 1.0, 1.1, 2.0',
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
             }),
             'motivo_modificacion': forms.Textarea(attrs={
-                'class': 'form-control',
                 'rows': 3,
                 'placeholder': 'Describe por qué se modifica esta versión...',
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid #ccc;',
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
             }),
         }
 
 
-# ─── HELPER ───────────────────────────────────────────────────────────────────
-
-def _get_trabajador_o_none(request):
-    try:
-        return Trabajador.objects.get(user=request.user)
-    except Trabajador.DoesNotExist:
-        return None
-
-
-# ─── VIEWS ────────────────────────────────────────────────────────────────────
+# ─── VISTAS TRABAJADOR ────────────────────────────────────────────────────────
 
 @login_required
 def rat_panel_usuario(request):
-    """Vista para el trabajador: lista las preguntas RAT y permite responderlas."""
     trabajador = _get_trabajador_o_none(request)
     if not trabajador:
         return redirect('index')
 
-    preguntas = RATPreguntas.objects.filter(empresa=trabajador.empresa)
+    ie = _get_instrumento_empresa(request, trabajador.empresa)
+    if not ie:
+        return render(request, 'cuestionario/rat_usuario.html', {
+            'trabajador': trabajador,
+            'preguntas': [],
+            'respuestas_existentes': {},
+            'instrumento': None,
+            'sin_instrumento': True,
+        })
+
+    preguntas = RATPreguntas.objects.filter(instrumento_empresa=ie)
     respuestas_existentes = {
         r.pregunta_id: r
-        for r in RATRespuestas.objects.filter(trabajador=trabajador)
+        for r in RATRespuestas.objects.filter(trabajador=trabajador, pregunta__instrumento_empresa=ie)
     }
 
-    context = {
+    return render(request, 'cuestionario/rat_usuario.html', {
         'trabajador': trabajador,
         'preguntas': preguntas,
         'respuestas_existentes': respuestas_existentes,
-    }
-    return render(request, 'cuestionario/rat_usuario.html', context)
+        'instrumento': ie.instrumento,
+        'instrumento_id': ie.instrumento.id_instrumento,
+    })
 
 
 @login_required
 def rat_responder(request, pregunta_id):
-    """Vista para que el trabajador responda (o edite) una pregunta RAT."""
     trabajador = _get_trabajador_o_none(request)
     if not trabajador:
         return redirect('index')
 
-    pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, empresa=trabajador.empresa)
+    ie = _get_instrumento_empresa(request, trabajador.empresa)
+    pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, instrumento_empresa=ie)
     respuesta_existente = RATRespuestas.objects.filter(pregunta=pregunta, trabajador=trabajador).first()
 
     if request.method == 'POST':
@@ -158,111 +184,142 @@ def rat_responder(request, pregunta_id):
             respuesta.pregunta = pregunta
             respuesta.trabajador = trabajador
             respuesta.save()
-            return redirect('rat_panel_usuario')
+            return redirect(f'/rat/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
         form = RATRespuestaForm(instance=respuesta_existente)
 
-    context = {
+    return render(request, 'cuestionario/rat_responder.html', {
         'trabajador': trabajador,
         'pregunta': pregunta,
         'form': form,
         'editando': respuesta_existente is not None,
-    }
-    return render(request, 'cuestionario/rat_responder.html', context)
+        'instrumento': ie.instrumento,
+        'instrumento_id': ie.instrumento.id_instrumento,
+    })
+
+
+# ─── VISTAS COORDINADOR ───────────────────────────────────────────────────────
+
+def _get_empresa_y_trabajador(request):
+    """Devuelve (empresa, trabajador) según sea superuser o coordinador."""
+    if request.user.is_superuser:
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+        empresa = get_object_or_404(Empresa, id_empresa=empresa_id) if empresa_id else None
+        return empresa, None
+    trabajador = _get_trabajador_o_none(request)
+    if not trabajador or not trabajador.es_coordinador:
+        return None, None
+    return trabajador.empresa, trabajador
 
 
 @login_required
 def rat_panel_coordinador(request):
-    """Vista del coordinador: ve todas las preguntas y respuestas de su empresa."""
-    trabajador = _get_trabajador_o_none(request)
-    if not trabajador or not trabajador.es_coordinador:
+    empresa, trabajador = _get_empresa_y_trabajador(request)
+    if not empresa:
         return redirect('index')
 
+    ie = _get_instrumento_empresa(request, empresa)
+    if not ie:
+        return redirect('seleccion_instrumentos')
+
     preguntas = RATPreguntas.objects.filter(
-        empresa=trabajador.empresa
+        instrumento_empresa=ie
     ).prefetch_related('respuestas__trabajador')
 
-    context = {
+    return render(request, 'cuestionario/rat_coordinador.html', {
         'trabajador': trabajador,
+        'empresa': empresa,
+        'empresa_actual': empresa,
         'preguntas': preguntas,
-    }
-    return render(request, 'cuestionario/rat_coordinador.html', context)
+        'instrumento': ie.instrumento,
+        'instrumento_id': ie.instrumento.id_instrumento,
+    })
 
 
 @login_required
 def rat_nueva_pregunta(request):
-    """Coordinador crea una nueva pregunta RAT."""
-    trabajador = _get_trabajador_o_none(request)
-    if not trabajador or not trabajador.es_coordinador:
+    empresa, trabajador = _get_empresa_y_trabajador(request)
+    if not empresa:
         return redirect('index')
 
+    ie = _get_instrumento_empresa(request, empresa)
+    if not ie:
+        return redirect('seleccion_instrumentos')
+
     if request.method == 'POST':
-        form = RATPreguntaForm(request.POST, empresa=trabajador.empresa)
+        form = RATPreguntaForm(request.POST, empresa=empresa)
         if form.is_valid():
             pregunta = form.save(commit=False)
-            pregunta.empresa = trabajador.empresa
+            pregunta.instrumento_empresa = ie
             pregunta.save()
-            return redirect('rat_panel_coordinador')
+            return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
-        form = RATPreguntaForm(empresa=trabajador.empresa)
+        form = RATPreguntaForm(empresa=empresa)
 
-    context = {
+    return render(request, 'cuestionario/rat_formulario.html', {
         'trabajador': trabajador,
+        'empresa_actual': empresa,
         'form': form,
         'editando': False,
-    }
-    return render(request, 'cuestionario/rat_formulario.html', context)
+        'instrumento': ie.instrumento,
+        'instrumento_id': ie.instrumento.id_instrumento,
+    })
 
 
 @login_required
 def rat_editar_pregunta(request, pregunta_id):
-    """Coordinador edita una pregunta RAT existente."""
-    trabajador = _get_trabajador_o_none(request)
-    if not trabajador or not trabajador.es_coordinador:
+    empresa, trabajador = _get_empresa_y_trabajador(request)
+    if not empresa:
         return redirect('index')
 
-    pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, empresa=trabajador.empresa)
+    ie = _get_instrumento_empresa(request, empresa)
+    pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, instrumento_empresa=ie)
 
     if request.method == 'POST':
-        form = RATPreguntaForm(request.POST, instance=pregunta, empresa=trabajador.empresa)
+        form = RATPreguntaForm(request.POST, instance=pregunta, empresa=empresa)
         if form.is_valid():
             form.save()
-            return redirect('rat_panel_coordinador')
+            return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
-        form = RATPreguntaForm(instance=pregunta, empresa=trabajador.empresa)
+        form = RATPreguntaForm(instance=pregunta, empresa=empresa)
 
-    context = {
+    return render(request, 'cuestionario/rat_formulario.html', {
         'trabajador': trabajador,
+        'empresa_actual': empresa,
         'form': form,
         'editando': True,
         'pregunta': pregunta,
-    }
-    return render(request, 'cuestionario/rat_formulario.html', context)
+        'instrumento': ie.instrumento,
+        'instrumento_id': ie.instrumento.id_instrumento,
+    })
 
 
 @login_required
 def rat_eliminar_pregunta(request, pregunta_id):
-    """Coordinador elimina una pregunta RAT."""
-    trabajador = _get_trabajador_o_none(request)
-    if not trabajador or not trabajador.es_coordinador:
+    empresa, trabajador = _get_empresa_y_trabajador(request)
+    if not empresa:
         return redirect('index')
 
-    pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, empresa=trabajador.empresa)
+    ie = _get_instrumento_empresa(request, empresa)
+    pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, instrumento_empresa=ie)
 
     if request.method == 'POST':
         pregunta.delete()
-        return redirect('rat_panel_coordinador')
+        return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
 
-    context = {
+    return render(request, 'cuestionario/rat_confirmar_eliminar.html', {
         'trabajador': trabajador,
+        'empresa_actual': empresa,
         'pregunta': pregunta,
-    }
-    return render(request, 'cuestionario/rat_confirmar_eliminar.html', context)
+        'instrumento': ie.instrumento,
+        'instrumento_id': ie.instrumento.id_instrumento,
+    })
 
+
+# ─── VERSIONES ────────────────────────────────────────────────────────────────
 
 @login_required
 def rat_versiones(request):
-    """Lista de versiones del RAT para la empresa del coordinador."""
     trabajador = _get_trabajador_o_none(request)
     if not trabajador or not trabajador.es_coordinador:
         return redirect('index')
@@ -271,19 +328,17 @@ def rat_versiones(request):
         empresa=trabajador.empresa
     ).order_by('-fecha_modificacion')
 
-    context = {
+    return render(request, 'cuestionario/rat_versiones.html', {
         'trabajador': trabajador,
         'versiones': versiones,
-    }
-    return render(request, 'cuestionario/rat_versiones.html', context)
+    })
 
 
 @login_required
 def rat_nueva_version(request):
-    """Coordinador registra una nueva versión."""
     trabajador = _get_trabajador_o_none(request)
     if not trabajador or not trabajador.es_coordinador:
-        return redirect('index')\
+        return redirect('index')
 
     if request.method == 'POST':
         form = RegistroVersionesForm(request.POST)
@@ -295,11 +350,11 @@ def rat_nueva_version(request):
     else:
         form = RegistroVersionesForm()
 
-    context = {
+    return render(request, 'cuestionario/rat_nueva_version.html', {
         'trabajador': trabajador,
         'form': form,
-    }
-    return render(request, 'cuestionario/rat_nueva_version.html', context)
+    })
+
 
 @login_required
 def rat_editar_version(request, version_id):
@@ -317,13 +372,12 @@ def rat_editar_version(request, version_id):
     else:
         form = RegistroVersionesForm(instance=version)
 
-    context = {
+    return render(request, 'cuestionario/rat_nueva_version.html', {
         'trabajador': trabajador,
         'form': form,
         'editando': True,
         'version': version,
-    }
-    return render(request, 'cuestionario/rat_nueva_version.html', context)
+    })
 
 
 @login_required
@@ -338,18 +392,16 @@ def rat_eliminar_version(request, version_id):
         version.delete()
         return redirect('rat_versiones')
 
-    context = {
+    return render(request, 'cuestionario/rat_confirmar_eliminar_version.html', {
         'trabajador': trabajador,
         'version': version,
-    }
-    return render(request, 'cuestionario/rat_confirmar_eliminar_version.html', context)
+    })
 
+
+# ─── SELECCIÓN E INSTRUMENTOS ─────────────────────────────────────────────────
 
 @login_required
 def seleccion_instrumentos(request):
-    from cuestionario.models import InstrumentoEmpresa, Empresa
-
-    # Admin: usa empresa_id del query param o sesión
     if request.user.is_superuser:
         empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
         empresa = get_object_or_404(Empresa, id_empresa=empresa_id) if empresa_id else None
@@ -366,10 +418,8 @@ def seleccion_instrumentos(request):
         empresa=empresa, habilitado=True
     ).select_related('instrumento')
 
-    instrumentos_rat   = [ie for ie in instrumentos_empresa if 'RAT' in ie.instrumento.nombre_instrumento]
-    instrumentos_otros = [ie for ie in instrumentos_empresa if 'RAT' not in ie.instrumento.nombre_instrumento]
-
-    next_url = request.GET.get('next', None)
+    instrumentos_rat   = [ie for ie in instrumentos_empresa if 'RAT' in ie.instrumento.nombre_instrumento.upper()]
+    instrumentos_otros = [ie for ie in instrumentos_empresa if 'RAT' not in ie.instrumento.nombre_instrumento.upper()]
 
     return render(request, 'cuestionario/seleccion_instrumentos.html', {
         'trabajador':         trabajador,
@@ -377,14 +427,12 @@ def seleccion_instrumentos(request):
         'instrumentos_rat':   instrumentos_rat,
         'instrumentos_otros': instrumentos_otros,
         'es_coordinador':     es_coordinador,
-        'next_url':           next_url,
+        'next_url':           request.GET.get('next'),
     })
 
 
 @login_required
 def rat_crear_instrumento(request):
-    from cuestionario.models import Instrumento, InstrumentoEmpresa, Empresa
-
     if request.user.is_superuser:
         empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
         empresa = get_object_or_404(Empresa, id_empresa=empresa_id) if empresa_id else None
@@ -402,11 +450,13 @@ def rat_crear_instrumento(request):
         if nombre:
             instrumento, _ = Instrumento.objects.get_or_create(
                 nombre_instrumento=nombre,
-                defaults={'descripcion': descripcion}
+                defaults={'descripcion': descripcion},
             )
+            # get_or_create dispara la señal clonar_preguntas_rat si es nuevo
             InstrumentoEmpresa.objects.get_or_create(
                 instrumento=instrumento,
-                empresa=empresa
+                empresa=empresa,
+                defaults={'habilitado': True},
             )
             next_url = request.POST.get('next', f'/instrumentos/?empresa_id={empresa.id_empresa}')
             return redirect(next_url)

@@ -6,7 +6,7 @@
 <section>
     <header>
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-            <a href="{% url 'index' %}" class="button">← Volver al inicio</a>
+            <a href="{% url 'seleccion_instrumentos' %}?empresa_id={{ empresa.id_empresa }}" class="button">← Volver a instrumentos</a>
             <div style="display:flex;gap:0.8em;">
                 <a href="{% url 'rat_versiones' %}" class="button">🗃 Versiones</a>
                 <a href="{% url 'rat_nueva_pregunta' %}" class="button primary">+ Nueva pregunta</a>
@@ -14,7 +14,7 @@
         </div>
         <hr style="margin-top:1.5em;" />
         <h2>🗂 Panel Coordinador — RAT</h2>
-        <p>Gestiona las preguntas RAT de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+        <p>Gestiona las preguntas RAT de <strong>{{ empresa.nombre_empresa }}</strong>.</p>
     </header>
 
     {% if not preguntas %}

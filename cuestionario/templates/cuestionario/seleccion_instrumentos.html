@@ -203,7 +203,9 @@
         <p id="rat-detalle-desc"></p>
       </div>
       <div id="rat-detalle-actions">
+        {% if not user.is_superuser %}
         <a id="btn-responder" href="#" class="button primary small" style="margin:0;">Responder</a>
+        {% endif %}
         {% if user.is_superuser or es_coordinador %}
         <a id="btn-editar" href="#" class="button small" style="margin:0;">✏️ Editar preguntas</a>
         {% endif %}
@@ -267,7 +269,8 @@
       const d = ratData[id];
       document.getElementById('rat-detalle-nombre').textContent = d.nombre;
       document.getElementById('rat-detalle-desc').textContent   = d.desc;
-      document.getElementById('btn-responder').href = d.urlResponder;
+      const btnResponder = document.getElementById('btn-responder');
+      if (btnResponder) btnResponder.href = d.urlResponder;
       const btnEditar = document.getElementById('btn-editar');
       if (btnEditar) btnEditar.href = d.urlEditar;
       detalle.classList.add('visible');

@@ -572,7 +572,7 @@ class InstrumentoEmpresa(models.Model):
         return f"{self.instrumento} → {self.empresa}"
     
 # =========================
-# Tabla RAT Preguntas
+# Tabla RAT Preguntas  ← FK cambia de Instrumento a InstrumentoEmpresa
 # =========================
 class RATPreguntas(models.Model):
     BASE_LEGITIMIDAD_CHOICES = [
@@ -581,7 +581,7 @@ class RATPreguntas(models.Model):
         ('obligacion_legal', 'Obligación legal'),
         ('interes_legitimo', 'Interés legítimo'),
     ]
-
+ 
     id_rat_pregunta = models.AutoField(primary_key=True)
     actividad_tratamiento = models.CharField(max_length=255)
     categorias_datos = models.TextField()
@@ -590,58 +590,93 @@ class RATPreguntas(models.Model):
     base_legitimidad = models.CharField(max_length=50, choices=BASE_LEGITIMIDAD_CHOICES)
     periodo_conservacion = models.PositiveIntegerField()
     fuente_datos = models.CharField(max_length=255)
-
-    instrumento = models.ForeignKey(
-        'Instrumento',
-        on_delete=models.DO_NOTHING,
-        db_column='instrumento_id'
+ 
+    # ← CAMBIO: antes Instrumento, ahora InstrumentoEmpresa
+    instrumento_empresa = models.ForeignKey(
+        'InstrumentoEmpresa',
+        on_delete=models.CASCADE,
+        db_column='instrumento_empresa_id',
+        related_name='preguntas',
     )
     responsable = models.ForeignKey(
         'Trabajador',
         on_delete=models.DO_NOTHING,
         db_column='trabajador_id_responsable',
-        related_name='preguntas_rat_responsable'
+        related_name='preguntas_rat_responsable',
     )
     version = models.ForeignKey(
         'RegistroVersiones',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        db_column='registro_versiones_id'
+        db_column='registro_versiones_id',
     )
-
+ 
     class Meta:
         managed = True
         db_table = 'RAT_PREGUNTAS'
-
+ 
     def __str__(self):
         return self.actividad_tratamiento
-
-
+ 
+ 
 # =========================
-# Tabla RAT Respuestas
+# Tabla RAT Respuestas  (sin cambios estructurales)
 # =========================
 class RATRespuestas(models.Model):
     id_rat_respuesta = models.AutoField(primary_key=True)
     respuesta = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+ 
     pregunta = models.ForeignKey(
         'RATPreguntas',
         on_delete=models.CASCADE,
         db_column='rat_preguntas_id_rat_pregunta',
-        related_name='respuestas'
+        related_name='respuestas',
     )
     trabajador = models.ForeignKey(
         'Trabajador',
         on_delete=models.DO_NOTHING,
-        db_column='trabajador_id_trabajador'
+        db_column='trabajador_id_trabajador',
     )
-
+ 
     class Meta:
         managed = True
         db_table = 'RAT_RESPUESTAS'
-
+ 
     def __str__(self):
         return f"{self.trabajador} → {self.pregunta}"
+ 
+ 
+# =========================
+# Plantilla base de preguntas RAT (NUEVA)
+# =========================
+class RATPlantillaPregunta(models.Model):
+    """Preguntas base globales de un instrumento RAT.
+    Al habilitar el instrumento para una empresa se clonan a RATPreguntas."""
+ 
+    TIPO_CHOICES = [
+        ('texto', 'Texto libre'),
+        ('sino', 'Sí / No'),
+        ('escala', 'Escala 1-5'),
+    ]
+ 
+    id_plantilla = models.AutoField(primary_key=True)
+    instrumento = models.ForeignKey(
+        'Instrumento',
+        on_delete=models.CASCADE,
+        db_column='instrumento_id',
+        related_name='plantilla_preguntas',
+    )
+    orden = models.PositiveSmallIntegerField(default=0)
+    enunciado = models.TextField()
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='texto')
+ 
+    class Meta:
+        managed = True
+        db_table = 'RAT_PLANTILLA_PREGUNTA'
+        ordering = ['orden']
+ 
+    def __str__(self):
+        return f"[{self.instrumento}] {self.enunciado[:60]}"
