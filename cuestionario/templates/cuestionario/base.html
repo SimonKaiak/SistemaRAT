@@ -6,33 +6,22 @@
    sidebar, contenedor principal y footer.
 
    Bloques disponibles para los templates hijos:
-     {% block title %}   → Título de la pestaña del navegador.
-                           Default: "Sistema RAT".
-     {% block content %} → Contenido principal de cada página.
+     block title   -> Titulo de la pestana del navegador.
+                      Default: "Sistema RAT".
+     block content -> Contenido principal de cada pagina.
 
    Estructura del layout:
-     #sidebar  → Barra lateral fija con enlace a inicio y botón
-                 de cerrar sesión (solo si el usuario está
-                 autenticado). El enlace a inicio usa el id del
-                 trabajador si está disponible.
-     #wrapper  → Contenedor principal con la sección #main donde
-                 se inyecta el {% block content %}.
-     #footer   → Pie de página con copyright 2026 Sistema RAT.
-
-   Header dinámico (dentro de #main):
-     Muestra el nombre de la empresa activa si están disponibles
-     las variables empresa_actual o empresa_seleccionada en el
-     contexto. Si empresa_seleccionada está presente y la ruta
-     actual no es /gestion-usuarios/, muestra botones para
-     editar (→ panel_poblador) y eliminar la empresa con
-     confirmación.
+     #sidebar  -> Barra lateral fija con enlace a inicio y boton
+                  de cerrar sesion (solo si el usuario esta
+                  autenticado).
+     #wrapper  -> Contenedor principal con la seccion #main donde
+                  se inyecta el block content.
+     #footer   -> Pie de pagina con copyright 2026 Sistema RAT.
 
    CSS cargado:
-     main.css     → Estilos principales (Hyperspace).
-     noscript.css → Fallback sin JavaScript.
-     mohala.css   → Estilos personalizados del sistema.
+     main.css, noscript.css, mohala.css
 
-   JS cargado (en este orden):
+   JS cargado:
      jquery.min.js, jquery.scrollex.min.js, jquery.scrolly.min.js,
      browser.min.js, breakpoints.min.js, util.js, main.js.
    ================================================================ #}
