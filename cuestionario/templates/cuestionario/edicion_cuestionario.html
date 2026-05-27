@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    edicion_cuestionario.html
    Extiende: cuestionario/base.html
@@ -35,8 +37,6 @@
    El botón volver usa request.GET.next o history.back() como fallback.
    Los mensajes de éxito se muestran con borde verde al inicio.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}Edición de Cuestionario{% endblock %}
 

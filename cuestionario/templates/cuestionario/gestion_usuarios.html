@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    gestion_usuarios.html
    Extiende: cuestionario/base.html
@@ -46,8 +48,6 @@
    Cierra modales con tecla Escape.
    Ajusta el ancho del wrapper para aprovechar el espacio completo.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}Gestión de Usuarios — {{ empresa_seleccionada.nombre_empresa|default:"Sin empresa" }}{% endblock %}
 

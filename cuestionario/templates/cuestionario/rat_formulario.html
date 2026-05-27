@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    rat_formulario.html
    Extiende: cuestionario/base.html
@@ -21,8 +23,6 @@
    El botón cancelar vuelve a rat_panel_coordinador.
    El texto del botón submit cambia según editando.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – {% if editando %}Editar pregunta{% else %}Nueva pregunta{% endif %}{% endblock %}
 

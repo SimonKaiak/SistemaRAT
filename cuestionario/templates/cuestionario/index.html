@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    index.html
    Extiende: cuestionario/base.html
@@ -45,8 +47,6 @@
        Cards de acceso a Seguimiento, Edición de Niveles y
        Panel RAT de la empresa.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}
     {% if es_admin_sistema %}Inicio - Administración{% else %}Inicio - {{ trabajador.nombre }}{% endif %}

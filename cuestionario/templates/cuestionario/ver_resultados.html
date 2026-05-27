@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    ver_resultados.html
    Extiende: cuestionario/base.html
@@ -35,7 +37,6 @@
    Si no hay dimensiones muestra mensaje vacío.
    ================================================================ #}
 
-{% extends "cuestionario/base.html" %}
 {% load dict_extras %}
 
 {% block title %}Resultados de Evaluación - {{ trabajador.nombre }}{% endblock %}

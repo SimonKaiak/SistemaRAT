@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    detalle_seguimiento.html
    Extiende: cuestionario/base.html
@@ -40,7 +42,6 @@
    resto → azul (#2196F3).
    ================================================================ #}
 
-{% extends "cuestionario/base.html" %}
 {% load dict_extras %}
 
 {% block title %}Detalle de Evaluación - {{ trabajador.nombre }}{% endblock %}

@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    evaluacion_jefe_seleccion.html
    Extiende: cuestionario/base.html
@@ -31,8 +33,6 @@
                            con botón de confirmación en rojo/rosa.
      - ninguno          → mensaje indicando dimensiones faltantes.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}Selección de Dimensión - {{ evaluado.nombre }}{% endblock %}
 

@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    evaluacion_jefe.html
    Extiende: cuestionario/base.html
@@ -31,8 +33,6 @@
    la dimensión y nivel jerárquico del evaluado.
    El textarea y el botón guardar solo aparecen si hay preguntas.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}Evaluando a {{ evaluado.nombre }} - {{ dimension.nombre_dimension }}{% endblock %}
 

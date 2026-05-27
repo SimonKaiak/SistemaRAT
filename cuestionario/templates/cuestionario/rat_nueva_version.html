@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    rat_nueva_version.html
    Extiende: cuestionario/base.html
@@ -16,8 +18,6 @@
    Botón cancelar vuelve a rat_versiones.
    El texto del botón submit y el título cambian según editando.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – {% if editando %}Editar versión{% else %}Nueva versión{% endif %}{% endblock %}
 

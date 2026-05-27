@@ -1,3 +1,5 @@
+{% extends "cuestionario/base.html" %}
+
 {# ================================================================
    autoevaluacion.html
    Extiende: cuestionario/base.html
@@ -30,8 +32,6 @@
    El botón de guardar y el textarea solo se muestran si hay
    preguntas disponibles.
    ================================================================ #}
-
-{% extends "cuestionario/base.html" %}
 
 {% block title %}Autoevaluación - {{ dimension.nombre_dimension }}{% endblock %}
 
