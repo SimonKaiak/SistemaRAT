@@ -1,34 +1,3 @@
-{# ================================================================
-   reporte_individual_template.html
-   Template HTML para generación de PDF individual con WeasyPrint
-   o similar. No extiende base.html — es un documento HTML
-   independiente diseñado para impresión en formato A4.
-   ----------------------------------------------------------------
-   Genera el reporte de evaluación de desempeño de un trabajador
-   con sus resultados por dimensión.
-
-   Nota: al igual que reporte_global_template.html, este template
-   es una versión alternativa HTML/CSS. La generación activa del
-   PDF individual se hace con ReportLab en vistas_pdf.py.
-
-   Contexto esperado:
-     trabajador              → instancia de Trabajador.
-     timestamp_auto          → datetime autoevaluación o None.
-     timestamp_jefe          → datetime ev. jefatura o None.
-     resultados_organizacionales → lista de ResultadoConsolidado
-                                   de la dimensión Organizacional.
-     resultados_funcionales  → lista de ResultadoConsolidado
-                               de la dimensión Funcional.
-
-   Estructura del PDF (A4, margen 2cm):
-     Header con datos del trabajador (cargo, nivel, timestamps).
-     Tabla dimensión Organizacional (h2 verde #51ff85).
-     Tabla dimensión Funcional (h2 azul #2196F3, clase .funcional).
-     Columnas: Código, Competencia/Indicador, AutoEv, Ev.Jefe,
-     Diferencia. Diferencia coloreada: verde (.positivo), roja
-     (.negativo) o gris (.neutro).
-   ================================================================ #}
-
 <!DOCTYPE html>
 <html>
 <head>

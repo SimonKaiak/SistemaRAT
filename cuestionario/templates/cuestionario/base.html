@@ -1,31 +1,3 @@
-{# ================================================================
-   base.html
-   Template base del que extienden todos los demás templates.
-   ----------------------------------------------------------------
-   Define la estructura HTML completa del sistema incluyendo
-   sidebar, contenedor principal y footer.
-
-   Bloques disponibles para los templates hijos:
-     block title   -> Titulo de la pestana del navegador.
-                      Default: "Sistema RAT".
-     block content -> Contenido principal de cada pagina.
-
-   Estructura del layout:
-     #sidebar  -> Barra lateral fija con enlace a inicio y boton
-                  de cerrar sesion (solo si el usuario esta
-                  autenticado).
-     #wrapper  -> Contenedor principal con la seccion #main donde
-                  se inyecta el block content.
-     #footer   -> Pie de pagina con copyright 2026 Sistema RAT.
-
-   CSS cargado:
-     main.css, noscript.css, mohala.css
-
-   JS cargado:
-     jquery.min.js, jquery.scrollex.min.js, jquery.scrolly.min.js,
-     browser.min.js, breakpoints.min.js, util.js, main.js.
-   ================================================================ #}
-
 {% load static %}
 <!DOCTYPE HTML>
 <html lang="es">
