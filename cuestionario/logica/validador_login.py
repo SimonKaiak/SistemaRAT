@@ -1,3 +1,28 @@
+"""
+validador_login.py
+--------------
+Vistas de autenticación del sistema: login y logout.
+
+login_view(request)
+    Maneja el inicio de sesión permitiendo el acceso a superusuarios
+    y trabajadores con perfil asociado.
+
+    Flujo:
+    - Si el usuario ya está autenticado, redirige a index.
+    - Recibe correo y contraseña por POST.
+    - Busca el User por email para obtener su username, ya que
+      Django autentica por username internamente.
+    - Si las credenciales son válidas:
+        - Superusuario: accede directamente a index.
+        - Usuario con perfil Trabajador: accede a index.
+        - Usuario sin perfil Trabajador: se hace logout y se
+          muestra error "no tiene perfil de Trabajador asociado".
+    - Si las credenciales son inválidas, muestra error.
+    Template: login.html
+
+logout_view(request)
+    Cierra la sesión del usuario y redirige a la vista de login.
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from cuestionario.models import Trabajador

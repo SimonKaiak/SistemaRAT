@@ -1,3 +1,45 @@
+{# ================================================================
+   detalle_seguimiento.html
+   Extiende: cuestionario/base.html
+   Vista asociada: detalle_seguimiento (vistas_seguimiento.py)
+   ----------------------------------------------------------------
+   Muestra el detalle completo de la evaluación de un trabajador,
+   con resultados consolidados agrupados por dimensión.
+   Accesible por superusuarios y coordinadores.
+
+   Contexto recibido:
+     trabajador           → instancia del Trabajador evaluado.
+     dimensiones_data     → dict {dim_nombre: [ResultadoConsolidado]}
+                            con r.texto_eval anotado en cada item.
+     timestamp_auto       → datetime de finalización autoevaluación
+                            o None si pendiente.
+     timestamp_jefe       → datetime de finalización ev. jefatura
+                            o None si N/A o pendiente.
+     comentarios_auto     → dict {dim_nombre: comentario} de
+                            autoevaluación por dimensión.
+     comentarios_jefe     → dict {dim_nombre: comentario} de
+                            jefatura por dimensión.
+
+   Filtro de template personalizado:
+     |get_item: → accede a valores de un dict por clave variable
+                  (requiere templatetag dict_extras).
+
+   Estructura:
+     - Header con botones para volver, imprimir PDF y descargar Excel.
+     - Bloque de info del trabajador (cargo, nivel, jefe directo).
+     - Timestamps de ambas evaluaciones.
+     - Por cada dimensión una tabla con columnas:
+         Código | Competencia/Indicador | AutoEv | Ev.Jefe | Diferencia
+       Diferencia coloreada: verde si positiva, roja si negativa,
+       gris si cero. Puntaje jefe muestra N/A si es 0.
+     - Bajo cada tabla, si existen, se muestran los comentarios
+       de autoevaluación (verde) y jefatura (azul) de esa dimensión.
+     - Si no hay resultados consolidados muestra mensaje vacío.
+
+   Colores por dimensión: primera → verde (#51ff85),
+   resto → azul (#2196F3).
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 {% load dict_extras %}
 

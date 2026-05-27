@@ -1,3 +1,37 @@
+{# ================================================================
+   evaluacion_jefe.html
+   Extiende: cuestionario/base.html
+   Vista asociada: cuestionario_jefatura (con dimension_id)
+   ----------------------------------------------------------------
+   Formulario de evaluación de jefatura para una dimensión
+   específica. Muestra las preguntas del nivel jerárquico del
+   evaluado filtradas por la dimensión seleccionada.
+
+   Contexto recibido:
+     evaluador          → Trabajador que realiza la evaluación.
+     evaluado           → Trabajador siendo evaluado.
+     dimension          → instancia de Dimension actual.
+     preguntas          → QuerySet de TextosEvaluacion filtrados
+                          por nivel jerárquico del evaluado,
+                          empresa y dimensión.
+     descripciones      → QuerySet de Escala ordenado por valor.
+     dimension_es_primera → bool, determina color de la dimensión
+                            (verde si es primera, azul si no).
+
+   Estructura del formulario (POST → evaluacion_jefe):
+     Header con datos del evaluador y evaluado (nivel jerárquico).
+     Por cada pregunta genera 4 radio buttons (puntaje_<id>)
+     con descripciones de escala. Todos son required.
+     Al submit deshabilita el botón y muestra 'Guardando...'
+     para evitar doble envío.
+     Campo textarea para feedback de jefatura sobre la dimensión.
+     Botón volver a evaluacion_jefe_inicio del par evaluador/evaluado.
+
+   Si no hay preguntas muestra mensaje de error indicando
+   la dimensión y nivel jerárquico del evaluado.
+   El textarea y el botón guardar solo aparecen si hay preguntas.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Evaluando a {{ evaluado.nombre }} - {{ dimension.nombre_dimension }}{% endblock %}

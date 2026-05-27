@@ -1,3 +1,18 @@
+{# ================================================================
+   rat_confirmar_eliminar_version.html
+   Extiende: cuestionario/base.html
+   Vista asociada: rat_eliminar_version (rat.py)
+   ----------------------------------------------------------------
+   Pantalla de confirmación antes de eliminar una versión del RAT.
+
+   Contexto recibido:
+     version → instancia de RegistroVersiones a eliminar.
+
+   Muestra el número de versión y avisa que la acción es
+   irreversible. El formulario POST vacío confirma la eliminación.
+   El botón cancelar vuelve a rat_versiones sin hacer cambios.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – Confirmar eliminación de versión{% endblock %}

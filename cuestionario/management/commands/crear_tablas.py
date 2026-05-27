@@ -1,3 +1,34 @@
+"""
+management/commands/crear_tablas.py
+------------------------------------
+Comando de gestión de Django para crear las tablas del sistema en
+PostgreSQL de forma segura durante el despliegue.
+
+Uso:
+    python manage.py crear_tablas
+
+Comportamiento:
+- Ejecuta un bloque SQL con CREATE TABLE IF NOT EXISTS para cada
+  tabla del sistema, por lo que es seguro ejecutarlo múltiples veces
+  sin riesgo de duplicar o perder datos.
+- Las tablas creadas son (en orden de dependencias):
+    EMPRESA, BIBLIOTECA, REPORTE_GLOBAL, PROMPT_GEMINI,
+    DEPARTAMENTO, NIVEL_JERARQUICO, ESCALA, DIMENSION,
+    COMPETENCIA, CARGO, TEXTOS_EVALUACION, CODIGO_EVALUACION,
+    TRABAJADOR, AUTOEVALUACION, EVALUACION_JEFATURA,
+    RESULTADO_CONSOLIDADO.
+
+Nota importante:
+- La FK de TRABAJADOR hacia auth_user(id) requiere que la tabla
+  auth_user ya exista. Por eso este comando debe ejecutarse después
+  de python manage.py migrate, que es quien crea auth_user.
+- Las tablas INSTRUMENTO, INSTRUMENTO_EMPRESA, RAT_PREGUNTAS,
+  RAT_RESPUESTAS, REGISTRO_VERSIONES y RAT_PLANTILLA_PREGUNTA
+  son gestionadas directamente por Django (managed=True) y las
+  crea el migrate, por lo que no están incluidas aquí.
+- En caso de error lanza la excepción para que el deploy falle
+  visiblemente en lugar de continuar con tablas faltantes.
+"""
 from django.core.management.base import BaseCommand
 from django.db import connection
 

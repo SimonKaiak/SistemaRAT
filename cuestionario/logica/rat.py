@@ -1,3 +1,97 @@
+"""
+rat.py
+------
+Vistas y formularios para el módulo RAT (Registro de Actividades
+de Tratamiento). Gestiona el flujo completo para trabajadores,
+coordinadores y superusuarios.
+
+Helpers internos:
+
+_get_trabajador_o_none(request)
+    Retorna el Trabajador del usuario autenticado o None si no existe.
+
+_get_instrumento_empresa(request, empresa)
+    Obtiene el InstrumentoEmpresa activo para la empresa, usando el
+    query param instrumento_id. Si no se especifica, retorna el primer
+    instrumento RAT habilitado de la empresa.
+
+_get_empresa_y_trabajador(request)
+    Retorna (empresa, trabajador) según sea superusuario (empresa por
+    sesión/query param) o coordinador (empresa propia).
+
+Formularios:
+
+RATRespuestaForm     → Formulario para que el trabajador ingrese su
+                       respuesta a una pregunta RAT (campo textarea).
+RATPreguntaForm      → Formulario completo para crear/editar una
+                       RATPreguntas. Filtra responsable y versión por
+                       empresa. El campo versión es opcional.
+RegistroVersionesForm → Formulario para crear/editar versiones del RAT.
+
+Vistas del trabajador:
+
+rat_panel_usuario(request)
+    Muestra al trabajador sus preguntas RAT y respuestas existentes
+    para el instrumento habilitado de su empresa.
+    Template: rat_usuario.html
+
+rat_responder(request, pregunta_id)
+    Permite al trabajador crear o editar su respuesta a una pregunta
+    RAT específica. Redirige al panel tras guardar.
+    Template: rat_responder.html
+
+Vistas del coordinador/superusuario:
+
+rat_panel_coordinador(request)
+    Muestra todas las preguntas RAT del instrumento activo con sus
+    respuestas por trabajador.
+    Template: rat_coordinador.html
+
+rat_nueva_pregunta(request)
+    Crea una nueva RATPreguntas asociada al InstrumentoEmpresa activo.
+    Template: rat_formulario.html
+
+rat_editar_pregunta(request, pregunta_id)
+    Edita una RATPreguntas existente del instrumento activo.
+    Template: rat_formulario.html
+
+rat_eliminar_pregunta(request, pregunta_id)
+    Elimina una RATPreguntas tras confirmación POST.
+    Template: rat_confirmar_eliminar.html
+
+Vistas de versiones (solo coordinador):
+
+rat_versiones(request)
+    Lista las versiones del RAT de la empresa del coordinador.
+    Template: rat_versiones.html
+
+rat_nueva_version(request)
+    Crea un nuevo RegistroVersiones para la empresa.
+    Template: rat_nueva_version.html
+
+rat_editar_version(request, version_id)
+    Edita un RegistroVersiones existente de la empresa.
+    Template: rat_nueva_version.html
+
+rat_eliminar_version(request, version_id)
+    Elimina un RegistroVersiones tras confirmación POST.
+    Template: rat_confirmar_eliminar_version.html
+
+Vistas de instrumentos:
+
+seleccion_instrumentos(request)
+    Muestra los instrumentos habilitados de la empresa separados en
+    dos listas: instrumentos RAT e instrumentos de otro tipo (ej:
+    Eval Desempeño). Punto de entrada principal tras el login.
+    Template: seleccion_instrumentos.html
+
+rat_crear_instrumento(request)
+    Crea un nuevo Instrumento global y lo asigna a la empresa via
+    InstrumentoEmpresa (habilitado=True). Usa get_or_create para
+    evitar duplicados. Al crear un instrumento nuevo se dispara
+    automáticamente la señal clonar_preguntas_rat.
+    Template: rat_crear_instrumento.html
+"""
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django import forms

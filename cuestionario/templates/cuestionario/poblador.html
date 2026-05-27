@@ -1,3 +1,60 @@
+{# ================================================================
+   poblador.html
+   Extiende: cuestionario/base.html
+   Vista asociada: panel_poblador (vistas_poblador.py)
+   ----------------------------------------------------------------
+   Panel de carga inicial de datos de una empresa. Permite crear
+   y poblar todos los datos maestros del sistema en orden secuencial.
+   Solo accesible por superusuarios.
+
+   Contexto recibido:
+     empresa_actual  → Empresa activa o None.
+     departamentos, niveles, escalas, dimensiones, competencias,
+     cargos, textos, trabajadores → QuerySets de cada entidad
+     filtrados por empresa_actual.
+
+   Secciones en orden (las secciones 2-9 se bloquean si no hay
+   empresa_actual mediante opacity:0.4 y pointer-events:none):
+     ① Empresa          → Crear o mostrar empresa activa con
+                          botón para editar. Al crear redirige
+                          a ?empresa_id=<id>.
+     ② Departamentos    → CRUD inline. Agrega opciones al select
+                          de departamento en Trabajadores.
+     ③ Niveles          → CRUD inline. Actualiza selects de cargo
+                          y nivel en Trabajadores.
+     ④ Escala           → 4 valores fijos (título + descripción).
+                          Si ya existe muestra edición inline.
+     ⑤ Dimensiones      → CRUD inline. Actualiza selects de
+                          competencia y texto de evaluación.
+     ⑥ Competencias     → CRUD inline con selector de dimensión.
+                          Filtro dinámico por dimensión en textos.
+     ⑦ Cargos           → CRUD inline con selector de nivel.
+                          Filtro dinámico por nivel en trabajadores.
+     ⑧ Textos Evaluación → CRUD inline con selects de dimensión,
+                           competencia y nivel. Crea CodigoEvaluacion
+                           automáticamente al guardar.
+     ⑨ Trabajadores     → CRUD inline. Crea usuario Django
+                          automáticamente con contraseña Mohala2026.
+                          Jefe directo opcional. Checkbox coordinador.
+
+   JavaScript (inline):
+     - Estado global: empresaId, arrays de datos para selects.
+     - post(url, data) → fetch POST con CSRF y JSON.
+     - guardarInline(tipo, id) → edita nombre de entidad vía AJAX.
+     - eliminarFila(tipo, id)  → elimina entidad y remueve el <tr>.
+     - guardarEscalaInline()   → edita título+descripción de escala.
+     - guardarTextoInline()    → edita código+texto de evaluación.
+     - guardarTrabajadorInline() → edita nombre del trabajador.
+     - guardar<Entidad>()      → crea nueva entidad y agrega <tr>
+                                 dinámicamente sin recargar página.
+     - filtrarCompetencias()   → filtra competencias por dimensión.
+     - filtrarCargos()         → filtra cargos por nivel jerárquico.
+     - msg(id, texto, ok)      → muestra mensaje temporal verde/rojo.
+     - habilitarSecciones()    → habilita secciones bloqueadas.
+     - mostrarTabla(wrapperId) → muestra tabla oculta al agregar
+                                 el primer elemento.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block content %}

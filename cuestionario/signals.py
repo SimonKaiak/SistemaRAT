@@ -6,6 +6,49 @@ Señales del sistema:
                                   clona las preguntas base (RATPlantillaPregunta)
                                   a RATPreguntas para esa empresa.
 """
+"""
+signals.py
+----------
+Señales Django del sistema. Se importa desde apps.py (ready())
+para registrar los handlers al iniciar la aplicación.
+
+Helper:
+    get_password_por_empresa(trabajador)
+        Retorna la contraseña por defecto según la empresa del
+        trabajador. Empresas conocidas:
+            1 (Mohala)  → 'Mohala2026'
+            2 (Permify) → 'Permify2026'
+            otras       → 'DefaultPass2026'
+
+Señal 1: crear_usuario_automatico
+    Receptor: post_save en Trabajador.
+    Condición: solo si es creación (created=True) y no tiene
+               user asignado.
+    Acción: crea un User de Django con username=email y
+            contraseña según get_password_por_empresa, y lo
+            vincula al Trabajador.
+
+    Nota: existe una versión similar en models.py con contraseña
+    fija 'Mohala2026'. Esta versión en signals.py asigna la
+    contraseña correcta por empresa y es la que está activa
+    gracias a la importación en apps.py ready().
+
+Señal 2: clonar_preguntas_rat
+    Receptor: post_save en InstrumentoEmpresa.
+    Condición: solo si es creación (created=True), el instrumento
+               tiene plantillas base (RATPlantillaPregunta) y aún
+               no hay preguntas en ese InstrumentoEmpresa.
+    Acción: clona cada RATPlantillaPregunta del instrumento como
+            RATPreguntas asociada al InstrumentoEmpresa creado,
+            mapeando enunciado → actividad_tratamiento con valores
+            por defecto en los campos restantes.
+    Responsable: primer coordinador de la empresa, o primer
+                 trabajador disponible. Si no hay trabajadores
+                 registrados aún, no clona (se crean manualmente).
+    Usa bulk_create para eficiencia.
+    Import de RATPlantillaPregunta y RATPreguntas dentro de la
+    función para evitar importación circular al arrancar Django.
+"""
 
 from django.db import models
 from django.contrib.auth.models import User

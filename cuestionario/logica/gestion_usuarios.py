@@ -1,3 +1,53 @@
+"""
+gestion_usuarios.py
+--------------------------
+Vistas para la gestión administrativa de usuarios y trabajadores.
+Solo accesible por superusuarios (devuelve 403 o redirige en caso contrario).
+
+Vistas:
+
+panel_gestion_usuarios(request)
+    Muestra el panel de gestión con la lista de coordinadores y
+    trabajadores de la empresa seleccionada. La empresa se obtiene
+    por query param o desde la sesión. Template: gestion_usuarios.html
+
+agregar_coordinador(request, trabajador_id)
+    Marca a un trabajador como coordinador (es_coordinador=True).
+    Responde JSON {ok, error}.
+
+quitar_coordinador(request, trabajador_id)
+    Quita el rol de coordinador a un trabajador (es_coordinador=False).
+    Responde JSON {ok, error}.
+
+modificar_usuario(request, trabajador_id)
+    Actualiza los datos de un trabajador vía JSON en el body:
+    nombre, apellidos, email, RUT, género, coordinador,
+    departamento, nivel jerárquico y cargo.
+    Si cambia el email, actualiza también el User de Django asociado.
+    Valida que el nuevo RUT no esté duplicado.
+    Responde JSON {ok, nombre_completo, email}.
+
+resetear_clave(request, trabajador_id)
+    Resetea la contraseña del usuario asociado al trabajador a
+    'Mohala2026' y envía un correo de notificación al trabajador.
+    Si el correo falla, igual devuelve ok=True pero indica
+    correo_enviado=False con el detalle del error.
+    Responde JSON {ok, correo_enviado}.
+
+eliminar_usuario_panel(request, trabajador_id)
+    Elimina el Trabajador y su User de Django asociado.
+    Responde JSON {ok, error}.
+
+crear_usuario_panel(request)
+    Crea un nuevo Trabajador y su User de Django vía JSON en el body.
+    Valida RUT, username y email duplicados.
+    Asigna nivel jerárquico, cargo y departamento verificando que
+    pertenezcan a la empresa indicada.
+    Contraseña inicial: 'Mohala2026'.
+    Si falla la creación del Trabajador, elimina el User creado
+    para evitar usuarios huérfanos.
+    Responde JSON {ok, id, nombre_completo, email, departamento}.
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User

@@ -1,3 +1,58 @@
+"""
+poblador.py
+------------------
+Vistas para la carga y gestión inicial de datos maestros del sistema.
+Solo accesible por superusuarios. Permite construir desde cero la
+estructura de una empresa: organización, cuestionario y trabajadores.
+
+Vista principal:
+
+panel_poblador(request)
+    Muestra el panel de poblado con todos los datos actuales de la
+    empresa seleccionada (niveles, departamentos, escalas, dimensiones,
+    competencias, cargos, textos y trabajadores).
+    Template: poblador.html
+
+Vistas de creación (responden JSON):
+
+guardar_empresa          → Crea una Empresa (valida RUT único).
+guardar_departamento     → Crea un Departamento vinculado a empresa.
+guardar_nivel            → Crea un NivelJerarquico vinculado a empresa.
+guardar_escala           → Crea los 4 valores de Escala de una empresa
+                           (falla si ya existen o si no son exactamente 4).
+guardar_dimension        → Crea una Dimension vinculada a empresa.
+guardar_competencia      → Crea una Competencia vinculada a dimensión y empresa.
+guardar_cargo            → Crea un Cargo vinculado a nivel jerárquico y empresa.
+guardar_texto            → Crea un TextosEvaluacion y su CodigoEvaluacion
+                           asociado (valida código único por empresa).
+guardar_trabajador       → Crea un Trabajador sin usuario Django asociado,
+                           con jefe directo opcional.
+
+Vistas de edición/eliminación inline (responden JSON):
+Cada entidad tiene su par editar_*/eliminar_*:
+
+- editar_departamento / eliminar_departamento
+- editar_nivel / eliminar_nivel
+- editar_escala_poblador (solo edita título y descripción)
+- editar_dimension_poblador / eliminar_dimension
+- editar_competencia_poblador / eliminar_competencia
+  (permite reasignar dimensión)
+- editar_cargo_poblador / eliminar_cargo
+  (permite reasignar nivel jerárquico)
+- editar_texto_poblador / eliminar_texto
+- editar_trabajador_poblador / eliminar_trabajador
+  (permite reasignar nivel, cargo y departamento)
+
+Vistas de empresa (redirigen):
+
+editar_empresa(request, empresa_id)
+    Actualiza nombre y RUT de una empresa vía formulario POST.
+    Template: editar_empresa.html
+
+eliminar_empresa(request, empresa_id)
+    Elimina una empresa y todos sus datos asociados en cascada.
+    Redirige al panel_poblador tras eliminar.
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse

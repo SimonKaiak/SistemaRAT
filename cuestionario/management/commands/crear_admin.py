@@ -1,3 +1,26 @@
+"""
+management/commands/crear_admin.py
+----------------------------------
+Comando de gestión de Django para crear el superusuario administrador
+de forma segura durante el despliegue en producción.
+
+Uso:
+    python manage.py crear_admin
+
+Comportamiento:
+- Lee las credenciales desde variables de entorno:
+    DJANGO_ADMIN_USER     → username (por defecto: 'admin')
+    DJANGO_ADMIN_EMAIL    → email (por defecto: 'admin@sistemarat.cl')
+    DJANGO_ADMIN_PASSWORD → contraseña (obligatoria)
+- Si DJANGO_ADMIN_PASSWORD no está definida, omite la creación
+  y muestra una advertencia sin lanzar error.
+- Si el usuario ya existe, no realiza ningún cambio.
+- Si no existe, crea el superusuario con create_superuser.
+
+Este comando es ejecutado automáticamente en el Start Command de
+Render después del migrate, evitando hardcodear credenciales en el
+código fuente.
+"""
 import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User

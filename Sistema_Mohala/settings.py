@@ -1,3 +1,56 @@
+"""
+settings.py
+-----------
+Configuración principal del proyecto Django Sistema_Mohala.
+
+Variables de entorno (via python-dotenv):
+    SECRET_KEY          → clave secreta Django (con fallback inseguro
+                          para desarrollo).
+    DATABASE_URL        → URL de conexión PostgreSQL en producción
+                          (Render). Si no está definida usa localhost.
+    EMAIL_HOST_USER     → cuenta Gmail para envío de correos.
+    EMAIL_HOST_PASSWORD → contraseña de aplicación Gmail.
+
+Configuración destacada:
+
+DEBUG
+    True en todas las instancias actualmente. Pendiente separar
+    configuración de producción.
+
+ALLOWED_HOSTS
+    ['*'] — simplificado para evitar errores de dominio en deploy.
+
+CSRF_TRUSTED_ORIGINS
+    Incluye dominios de Railway (legacy) y Render (actual).
+
+Base de datos:
+    Producción  → PostgreSQL via DATABASE_URL (dj-database-url,
+                  conn_max_age=600 para connection pooling).
+    Desarrollo  → PostgreSQL local (SistemaRAT_BD, postgres/admin123).
+
+Archivos estáticos:
+    Servidos por WhiteNoise (CompressedManifestStaticFilesStorage).
+    STATICFILES_DIRS solo se agrega si el directorio /static existe.
+
+Localización:
+    LANGUAGE_CODE → 'es-cl'
+    TIME_ZONE     → 'America/Santiago'
+    USE_TZ        → True
+
+Email:
+    Backend SMTP Gmail, puerto 587 con TLS.
+    Credenciales leídas desde variables de entorno.
+
+Seguridad:
+    CSRF_COOKIE_SECURE y SESSION_COOKIE_SECURE en False
+    (pendiente activar en producción con HTTPS).
+
+Redirecciones de autenticación:
+    LOGIN_URL           → 'login'
+    LOGIN_REDIRECT_URL  → 'index'
+    LOGOUT_REDIRECT_URL → 'login'
+"""
+
 import os
 from dotenv import load_dotenv
 load_dotenv()

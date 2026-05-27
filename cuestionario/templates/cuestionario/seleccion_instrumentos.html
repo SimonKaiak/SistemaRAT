@@ -1,3 +1,41 @@
+{# ================================================================
+   seleccion_instrumentos.html
+   Extiende: cuestionario/base.html
+   Vista asociada: seleccion_instrumentos (rat.py)
+   ----------------------------------------------------------------
+   Pantalla de selección de instrumentos habilitados para la
+   empresa activa. Punto de entrada principal tras el login para
+   acceder a los distintos tipos de instrumentos.
+
+   Contexto recibido:
+     empresa_actual    → Empresa activa.
+     instrumentos_rat  → lista de InstrumentoEmpresa de tipo RAT.
+     instrumentos_otros → lista de InstrumentoEmpresa de otros
+                          tipos (ej: Eval Desempeño).
+     es_coordinador    → bool.
+     next_url          → URL de retorno para el botón volver.
+
+   Secciones:
+
+   Bloque RAT (selector desplegable):
+     Select con todos los instrumentos RAT habilitados.
+     Al seleccionar uno muestra un panel con nombre, descripción
+     y botones de acción (JS con ratData dict):
+       - Responder → rat_panel_usuario?instrumento_id=<id>
+                     (oculto para superusuarios).
+       - Editar preguntas → rat_panel_coordinador?instrumento_id=<id>
+                            (solo superusuario o coordinador).
+     Opción especial "＋ Crear nuevo RAT" redirige a
+     rat_crear_instrumento con empresa_id y next_url.
+
+   Bloque otros instrumentos (tarjetas grid):
+     Cada instrumento no-RAT se muestra como tarjeta con badge
+     "Evaluación" (verde). Botón editar para coordinadores/admin
+     apunta a panel_edicion con empresa_id y next codificado.
+
+   Si no hay instrumentos de ningún tipo muestra aviso amarillo.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Instrumentos — {{ empresa_actual.nombre_empresa }}{% endblock %}

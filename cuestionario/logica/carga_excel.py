@@ -1,3 +1,41 @@
+"""
+carga_excel.py
+---------------------
+Vista para la carga masiva de trabajadores mediante un archivo Excel.
+
+Endpoint: cargar_usuarios_excel(request)
+- Solo accesible por superusuarios (devuelve 403 si no lo es).
+- Recibe por POST el ID de empresa y un archivo .xlsx.
+- Lee el archivo fila por fila (desde la fila 2) esperando las
+  siguientes columnas en orden:
+    0: RUT
+    1: Nombre
+    2: Apellido Paterno
+    3: Apellido Materno
+    4: Email
+    5: Género
+    6: Departamento
+    7: Nivel Jerárquico
+    8: Cargo
+
+Validaciones por fila:
+- Omite filas vacías.
+- Verifica que todos los campos obligatorios estén presentes.
+- Verifica que el RUT no exista ya en la BD.
+- Verifica que el username (parte del email antes del @) no esté tomado.
+- Verifica que el email no esté registrado.
+- Busca Departamento, NivelJerárquico y Cargo por nombre dentro
+  de la empresa (case-insensitive). Si no existen, omite la fila.
+
+Por cada fila válida:
+- Crea un User de Django con contraseña por defecto 'Mohala2026'.
+- Crea el Trabajador vinculado al usuario y a la empresa.
+
+Respuesta JSON:
+- ok: true/false
+- creados: cantidad de trabajadores creados exitosamente.
+- omitidos: lista de mensajes explicando las filas que no se procesaron.
+"""
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST

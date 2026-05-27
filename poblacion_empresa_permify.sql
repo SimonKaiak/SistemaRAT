@@ -4,6 +4,59 @@
 -- Ejecutar DESPUÉS de: poblacion_empresa1_postgresql.sql
 -- =============================================================
 
+-- =========================
+-- poblacion_empresa_permify.sql
+-- =========================
+-- Script de poblamiento inicial para Permify SpA (EMPRESA ID=2).
+-- Debe ejecutarse DESPUÉS de poblacion_empresa_mohala.sql.
+--
+-- Datos que inserta:
+--   Empresa   → Permify SpA (RUT 74.123.456-7, activa).
+--
+--   Departamentos (3, IDs 4-6):
+--     Gerencia General, Recursos Humanos, TI.
+--
+--   Niveles Jerárquicos (3, IDs 4-6):
+--     Colaborador (4), Supervisor (5), Directivo (6).
+--
+--   Escala (4 valores, IDs 5-8):
+--     1=Desempeño Insuficiente, 2=En Desarrollo,
+--     3=Satisfactorio, 4=Sobresaliente.
+--
+--   Dimensiones (2, IDs 3-4):
+--     Corporativas (3), Técnicas (4).
+--
+--   Competencias (15, IDs 16-30):
+--     Corporativas: Innovación y Creatividad, Orientación al
+--     Cliente, Cultura Organizacional, Colaboración,
+--     Pensamiento Estratégico.
+--     Técnicas: Resolución de Problemas, Aprendizaje Continuo,
+--     Comunicación Efectiva, Gestión de la Innovación,
+--     Liderazgo de Equipos, Desarrollo de Personas, Gestión
+--     de Resultados, Logro de Objetivos, Planificación y
+--     Control, Iniciativa.
+--
+--   Cargos (6, IDs 7-12):
+--     Colaborador: Analista, Asistente Administrativo.
+--     Supervisor: Jefe de RRHH, Coordinador de Proyectos.
+--     Directivo: Gerente General, Gerente de Innovación.
+--
+--   TextosEvaluacion (27, IDs 28-54):
+--     Solo para competencias 16, 17 y 21 con textos de prueba.
+--     3 indicadores por nivel jerárquico (Colaborador/Supervisor/
+--     Directivo). Pendiente reemplazar por textos reales.
+--
+--   CodigoEvaluacion (27, IDs 28-54):
+--     Una fila por TextosEvaluacion.
+--
+--   Trabajadores (6, IDs 7-12, sin usuario Django):
+--     Directivos (sin jefe): Carlos Fuentes, Daniela Vega (coord).
+--     Supervisores: Felipe Rojas (jefe=7), Camila Núñez (jefe=8).
+--     Colaboradores: Ignacio Pérez (jefe=9), Javiera Muñoz (jefe=10).
+--
+-- Al final sincroniza las secuencias SERIAL de todas las tablas.
+-- =========================
+
 SET session_replication_role = 'replica';
 
 -- =========================

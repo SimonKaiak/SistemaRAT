@@ -1,3 +1,22 @@
+{# ================================================================
+   rat_nueva_version.html
+   Extiende: cuestionario/base.html
+   Vistas asociadas: rat_nueva_version, rat_editar_version (rat.py)
+   ----------------------------------------------------------------
+   Formulario para registrar o editar una versión del RAT.
+   Reutilizado por ambas vistas controlado por la variable editando.
+
+   Contexto recibido:
+     form        → instancia de RegistroVersionesForm
+                   (campos: version, motivo_modificacion).
+     editando    → bool, True si es edición, False si es nueva.
+     trabajador  → Trabajador coordinador autenticado.
+
+   Renderiza cada campo del formulario con su label y errores.
+   Botón cancelar vuelve a rat_versiones.
+   El texto del botón submit y el título cambian según editando.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – {% if editando %}Editar versión{% else %}Nueva versión{% endif %}{% endblock %}

@@ -1,3 +1,39 @@
+"""
+reporte_excel.py
+---------------
+Vista para la exportación del reporte de evaluación de desempeño
+de un trabajador en formato Excel (.xlsx).
+Accesible por superusuarios y coordinadores de la misma empresa.
+
+generar_excel_detalle(request, trabajador_id)
+    Genera y descarga un archivo Excel con el detalle completo de
+    la evaluación del trabajador solicitado.
+
+    Control de acceso:
+    - Superusuario: acceso total.
+    - Coordinador: solo puede exportar trabajadores de su empresa.
+    - Trabajador regular: redirige a index.
+
+    Estructura del Excel generado (hoja "Reporte Evaluación"):
+    1. Título: "Reporte de Evaluación de Desempeño" (fusionado A1:E1).
+    2. Bloque de información del trabajador: nombre, empresa, cargo,
+       nivel, jefatura directa, timestamps de autoevaluación y
+       evaluación de jefatura.
+    3. Por cada dimensión, una sección con:
+       - Encabezado de dimensión con color alternado.
+       - Tabla con columnas: Código, Competencia/Indicador, AutoEv,
+         Ev. Jefe, Diferencia.
+       - Filas coloreadas según diferencia: verde si positiva
+         (jefe > auto), roja si negativa (jefe < auto).
+
+    Estilos aplicados:
+    - Fuente y color corporativo (#5e42a6) en título y encabezados.
+    - Bordes en todas las celdas de datos.
+    - Anchos de columna fijos para legibilidad.
+
+    El archivo se descarga como:
+    reporte_{nombre}_{apellido_paterno}.xlsx
+"""
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse

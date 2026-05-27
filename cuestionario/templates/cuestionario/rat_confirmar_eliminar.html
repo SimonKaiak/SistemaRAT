@@ -1,3 +1,19 @@
+{# ================================================================
+   rat_confirmar_eliminar.html
+   Extiende: cuestionario/base.html
+   Vista asociada: rat_eliminar_pregunta (rat.py)
+   ----------------------------------------------------------------
+   Pantalla de confirmación antes de eliminar una pregunta RAT.
+
+   Contexto recibido:
+     pregunta → instancia de RATPreguntas a eliminar.
+
+   Muestra el nombre de la actividad de tratamiento y advierte
+   que se eliminarán también todas las respuestas asociadas.
+   El formulario POST vacío confirma la eliminación.
+   El botón cancelar vuelve a rat_panel_coordinador.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – Confirmar eliminación{% endblock %}

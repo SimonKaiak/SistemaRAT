@@ -1,3 +1,40 @@
+{# ================================================================
+   ver_resultados.html
+   Extiende: cuestionario/base.html
+   Vista asociada: ver_resultados (vistas_generales.py)
+   ----------------------------------------------------------------
+   Muestra los resultados finalizados de una evaluación
+   (autoevaluación o evaluación de jefatura) agrupados por
+   dimensión. Accesible por el propio trabajador o su evaluador.
+
+   Contexto recibido:
+     trabajador              → Trabajador evaluado.
+     dimensiones             → dict {dim_nombre: [respuestas]}
+                               con r.texto_eval anotado.
+     comentarios_por_dimension → dict {dim_nombre: comentario}.
+     fecha_cierre            → datetime de la primera respuesta.
+     visor_id                → id del evaluador (para jefatura)
+                               o del trabajador (para auto).
+     tipo_evaluacion         → 'auto' o 'jefe'.
+
+   Filtro personalizado:
+     |get_item → accede a valores de dict por clave variable
+                 (requiere templatetag dict_extras).
+
+   Botón volver:
+     - tipo 'auto' → autoevaluacion_inicio del trabajador.
+     - tipo 'jefe' → evaluacion_jefe_inicio del par visor/evaluado.
+
+   Por cada dimensión muestra:
+     - Título con color según nombre: "Funcional" → azul (#2196F3),
+       resto → verde (#51ff85).
+     - Tabla con código, competencia, indicador y calificación
+       (badge coloreado según dimensión).
+     - Bloque de comentarios de la dimensión (o mensaje vacío).
+
+   Si no hay dimensiones muestra mensaje vacío.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 {% load dict_extras %}
 

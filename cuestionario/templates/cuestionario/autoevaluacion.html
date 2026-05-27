@@ -1,3 +1,36 @@
+{# ================================================================
+   autoevaluacion.html
+   Extiende: cuestionario/base.html
+   Vista asociada: cuestionario_autoevaluacion (con dimension_id)
+   ----------------------------------------------------------------
+   Formulario de respuesta de autoevaluación para una dimensión
+   específica. Muestra todas las preguntas del nivel jerárquico
+   del trabajador filtradas por la dimensión seleccionada.
+
+   Contexto recibido:
+     trabajador         → instancia del Trabajador autenticado.
+     dimension          → instancia de Dimension actual.
+     preguntas          → QuerySet de TextosEvaluacion filtrados
+                          por nivel jerárquico, empresa y dimensión.
+     descripciones      → QuerySet de Escala ordenado por valor,
+                          usado para mostrar títulos y descripciones
+                          de cada opción de respuesta (1-4).
+     dimension_es_primera → bool, determina el color de la dimensión
+                            (verde si es primera, azul si no).
+
+   Estructura del formulario (POST → autoevaluacion):
+     Por cada pregunta genera un grupo de 4 radio buttons
+     (puntaje_<id>) con las descripciones de la escala.
+     Todos los radio son required para forzar respuesta completa.
+     Al submit deshabilita el botón y muestra 'Guardando...'
+     para evitar doble envío.
+     Campo textarea opcional para comentarios de la dimensión.
+
+   Si no hay preguntas cargadas muestra mensaje de error en rojo.
+   El botón de guardar y el textarea solo se muestran si hay
+   preguntas disponibles.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Autoevaluación - {{ dimension.nombre_dimension }}{% endblock %}

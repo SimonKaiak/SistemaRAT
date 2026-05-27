@@ -1,3 +1,45 @@
+"""
+reporte_global.py
+------------------------
+Vistas para la generación y visualización del reporte global de
+evaluaciones de desempeño en formato PDF.
+Accesible por superusuarios y coordinadores de empresa.
+
+generar_reporte_global_pdf(request)
+    Genera un PDF con el reporte consolidado de todos los trabajadores
+    de una empresa que tengan evaluaciones completadas.
+
+    Control de acceso:
+    - Superusuario: filtra por empresa vía query param empresa_id.
+    - Coordinador: genera solo el reporte de su propia empresa.
+    - Trabajador regular: redirige a index.
+
+    Proceso:
+    1. Crea un registro ReporteGlobal temporal con contenido vacío
+       para obtener un ID antes de generar el PDF.
+    2. Genera una portada con: título, ID de reporte, empresa,
+       total de colaboradores, fecha y período.
+    3. Por cada trabajador con resultados consolidados genera una
+       sección con:
+       - Tabla de información personal (cargo, nivel, jefe, timestamps).
+       - Por cada dimensión una tabla con: código, competencia,
+         indicador, puntaje autoevaluación, puntaje jefe y diferencia.
+       - Colores alternados por dimensión (verde/azul).
+       - Separador PageBreak entre trabajadores.
+    4. Guarda el PDF generado en el campo contenido_pdf del
+       ReporteGlobal y lo devuelve como respuesta inline.
+
+    Estilos:
+    - Color corporativo #5e42a6 en encabezados de tablas y título.
+    - Verde (#51ff85) para primera dimensión, azul (#2196F3) para
+      las siguientes.
+    - Diferencia positiva con prefijo '+', negativa sin prefijo.
+
+ver_reporte_global_pdf(request, reporte_id)
+    Recupera y devuelve inline un ReporteGlobal ya generado por su ID.
+    El coordinador solo puede ver reportes de su propia empresa.
+    Devuelve 404 si el reporte no existe o no tiene PDF guardado.
+"""
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse

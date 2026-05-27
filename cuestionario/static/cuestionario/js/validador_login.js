@@ -1,3 +1,21 @@
+/*
+ * validator_login.js
+ * ------------------
+ * Validación del formulario de login en el lado del cliente,
+ * ejecutada antes de enviar las credenciales al servidor.
+ *
+ * Se activa al hacer submit del formulario de login y valida:
+ *   - Email: formato válido (algo@dominio.ext) mediante regex.
+ *   - Contraseña: largo entre 6 y 20 caracteres.
+ *   - Contraseña: al menos una letra mayúscula.
+ *   - Contraseña: al menos un número.
+ *
+ * Si hay errores, cancela el submit con preventDefault() y
+ * muestra un alert con la lista de requisitos no cumplidos.
+ *
+ * Nota: esta validación es solo una primera capa de UX — la
+ * validación real y segura ocurre en el servidor (vistas_auth.py).
+ */
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.querySelector('form');
 

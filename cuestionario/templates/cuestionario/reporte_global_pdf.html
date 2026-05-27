@@ -1,3 +1,40 @@
+{# ================================================================
+   reporte_global_template.html
+   Template HTML para generación de PDF con WeasyPrint o similar.
+   No extiende base.html — es un documento HTML independiente
+   diseñado para impresión en formato A4.
+   ----------------------------------------------------------------
+   Genera el reporte global de evaluaciones de desempeño con una
+   portada y una sección por cada trabajador.
+
+   Nota: este template está desacoplado del sistema de vistas
+   Django actual. La generación del PDF global se hace mediante
+   ReportLab directamente en vistas_reporte_global.py, por lo
+   que este template es una versión alternativa HTML/CSS para
+   impresión que no está activamente en uso en producción.
+
+   Contexto esperado:
+     total_trabajadores → número total de colaboradores.
+     fecha_generacion   → datetime de generación del reporte.
+     trabajadores_data  → lista de dicts con:
+         trabajador              → instancia de Trabajador.
+         timestamp_auto          → datetime autoevaluación o None.
+         timestamp_jefe          → datetime ev. jefatura o None.
+         resultados_organizacionales → lista de ResultadoConsolidado
+                                       de la dimensión Organizacional.
+         resultados_funcionales  → lista de ResultadoConsolidado
+                                   de la dimensión Funcional.
+
+   Estructura del PDF:
+     Portada → título, total colaboradores, fecha y período.
+     Por cada trabajador (page-break-before):
+       - Header con datos personales y timestamps.
+       - Tabla dimensión Organizacional (verde #51ff85).
+       - Tabla dimensión Funcional (azul #2196F3).
+       Diferencia coloreada: verde (positiva), roja (negativa),
+       gris (neutra).
+   ================================================================ #}
+
 <!DOCTYPE html>
 <html>
 <head>

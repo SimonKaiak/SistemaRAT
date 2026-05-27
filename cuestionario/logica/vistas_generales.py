@@ -1,3 +1,49 @@
+"""
+vistas_generales.py
+-------------------
+Vistas principales del sistema: panel de inicio y visualización de
+resultados de evaluación.
+
+index(request)
+    Vista de inicio con comportamiento distinto según el tipo de usuario:
+
+    Superusuario:
+    - Muestra el panel de administración con selector de empresa.
+    - La empresa se obtiene por query param empresa_id o desde sesión.
+    - No tiene equipo ni evaluaciones propias.
+    - Template: index.html con es_admin_sistema=True.
+
+    Trabajador:
+    - Verifica si completó su autoevaluación.
+    - Obtiene su equipo de subordinados directos.
+    - Por cada subordinado calcula:
+        - autoevaluacion_terminada: si finalizó su autoevaluación.
+        - ya_evaluado: si el trabajador actual ya lo evaluó como jefe.
+    - Template: index.html con es_admin_sistema=False.
+
+ver_resultados(request, trabajador_id, tipo_evaluacion)
+    Muestra los resultados de una evaluación (autoevaluación o
+    evaluación de jefatura) agrupados por dimensión.
+
+    Parámetros:
+    - trabajador_id: trabajador cuyas respuestas se visualizan.
+    - tipo_evaluacion: 'auto' para autoevaluación, cualquier otro
+      valor para evaluación de jefatura (requiere evaluador_id en
+      query param).
+    - dimension_id (query param opcional): filtra por dimensión.
+
+    Lógica:
+    - Obtiene las respuestas según el tipo de evaluación.
+    - Mapea cada respuesta a su TextosEvaluacion para obtener
+      dimensión y competencia.
+    - Agrupa las respuestas por dimensión en dimensiones_data.
+    - Recoge el primer comentario de cada dimensión en
+      comentarios_por_dimension.
+
+    Contexto enviado al template (ver_resultados.html):
+    trabajador, dimensiones, comentarios_por_dimension,
+    fecha_cierre, visor_id, tipo_evaluacion.
+"""
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, TextosEvaluacion, Empresa

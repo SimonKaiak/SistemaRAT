@@ -1,3 +1,86 @@
+"""
+urls.py
+-------
+Definición de todas las rutas URL de la aplicación cuestionario.
+
+Autenticación:
+    /login/   → login_view
+    /logout/  → LogoutView (redirige a login)
+
+Panel principal:
+    /         → index
+
+Seguimiento:
+    /seguimiento/                              → panel_seguimiento
+    /seguimiento/detalle/<id>/                 → detalle_seguimiento
+    /seguimiento/detalle/<id>/pdf/             → generar_pdf_detalle
+    /seguimiento/detalle/<id>/excel/           → generar_excel_detalle
+    /seguimiento/reporte-global/               → generar_reporte_global_pdf
+    /seguimiento/ver-reporte-global/<id>/      → ver_reporte_global_pdf
+
+Biblioteca y Gemini:
+    /biblioteca/ver-archivo/<id>/              → ver_archivo_biblioteca
+    /gemini/                                   → panel_gemini
+    /gemini/editar-prompt/                     → editar_prompt
+    /gemini/eliminar-prompt/<id>/              → eliminar_prompt
+    /gemini/generar/<id>/                      → generar_informe_gemini
+    /gemini/listar-modelos/                    → listar_modelos
+    /gemini/ver-informe/<id>/                  → ver_informe_gemini
+
+Evaluaciones:
+    /autoevaluacion/<tid>/                     → autoevaluacion_inicio
+    /autoevaluacion/<tid>/<did>/               → autoevaluacion (con dimensión)
+    /autoevaluacion/finalizar/<tid>/           → finalizar_autoevaluacion
+    /evaluacion_jefe/<eid>/<evid>/             → evaluacion_jefe_inicio
+    /evaluacion_jefe/<eid>/<evid>/<did>/       → evaluacion_jefe (con dimensión)
+    /evaluacion_jefe/finalizar/<eid>/<evid>/   → finalizar_evaluacion_jefe
+    /resultados/<tid>/<tipo>/                  → ver_resultados
+
+Edición de cuestionario:
+    /edicion/                                  → panel_edicion
+    /edicion/dimension/editar/<id>/            → editar_dimension
+    /edicion/competencia/editar/<id>/          → editar_competencia
+    /edicion/nivel/editar/<id>/                → editar_nivel
+    /edicion/texto/editar/<id>/                → editar_texto
+    /edicion/escala/editar/<id>/               → editar_escala
+    /edicion/niveles/                          → panel_edicion_niveles
+
+Poblador (CRUD de datos maestros, todos POST JSON):
+    /poblador/                                 → panel_poblador
+    /poblador/empresa/                         → guardar_empresa
+    /poblador/empresa/editar/<id>/             → editar_empresa
+    /poblador/empresa/eliminar/<id>/           → eliminar_empresa
+    /poblador/<entidad>/                       → guardar_<entidad>
+    /poblador/<entidad>/editar/<pk>/           → editar_<entidad>_poblador
+    /poblador/<entidad>/eliminar/<pk>/         → eliminar_<entidad>
+    Entidades: departamento, nivel, escala, dimension,
+               competencia, cargo, texto, trabajador.
+
+Gestión de usuarios (POST JSON, solo superusuario):
+    /gestion-usuarios/                         → panel_gestion_usuarios
+    /gestion-usuarios/modificar/<id>/          → modificar_usuario
+    /gestion-usuarios/resetear-clave/<id>/     → resetear_clave_usuario
+    /gestion-usuarios/eliminar/<id>/           → eliminar_usuario_panel
+    /gestion-usuarios/agregar-coordinador/<id>/ → agregar_coordinador
+    /gestion-usuarios/quitar-coordinador/<id>/  → quitar_coordinador
+    /gestion-usuarios/crear/                   → crear_usuario_panel
+    /gestion-usuarios/cargar-excel/            → cargar_usuarios_excel
+
+RAT:
+    /rat/                                      → rat_panel_usuario
+    /rat/responder/<id>/                       → rat_responder
+    /rat/coordinador/                          → rat_panel_coordinador
+    /rat/coordinador/nueva/                    → rat_nueva_pregunta
+    /rat/coordinador/editar/<id>/              → rat_editar_pregunta
+    /rat/coordinador/eliminar/<id>/            → rat_eliminar_pregunta
+    /rat/versiones/                            → rat_versiones
+    /rat/versiones/nueva/                      → rat_nueva_version
+    /rat/version/<id>/editar/                  → rat_editar_version
+    /rat/version/<id>/eliminar/                → rat_eliminar_version
+    /instrumentos/                             → seleccion_instrumentos
+    /rat/crear-instrumento/                    → rat_crear_instrumento
+"""
+
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import logica as views

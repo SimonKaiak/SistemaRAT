@@ -1,3 +1,102 @@
+"""
+models.py
+---------
+Definición de todos los modelos del sistema. Mezcla de modelos
+managed=False (tablas existentes en PostgreSQL) y managed=True
+(tablas gestionadas por Django via migraciones).
+
+Modelos managed=False (tablas creadas con creacion_tablas.sql):
+
+Empresa
+    Empresa cliente del sistema. Punto central del que dependen
+    todos los demás modelos. __str__ incluye estado activo/inactivo.
+
+Biblioteca
+    Documentos PDF almacenados como BinaryField, vinculados a una
+    empresa. Usados como contexto para los informes de Gemini.
+
+Departamento, NivelJerarquico, Cargo
+    Datos organizacionales de la empresa. Todos vinculados por FK
+    a Empresa con DO_NOTHING.
+
+Escala
+    Valores de calificación (1-4) con título y descripción por
+    empresa. PK es IntegerField (no AutoField).
+
+Dimension, Competencia
+    Estructura del cuestionario de evaluación. Competencia tiene
+    FK a Dimension y Empresa.
+
+TextosEvaluacion
+    Indicadores del cuestionario identificados por codigo_excel.
+    unique_together (codigo_excel, empresa). FK a Dimension,
+    Competencia y NivelJerarquico.
+
+CodigoEvaluacion
+    Denormalización de TextosEvaluacion con FKs explícitas a
+    Dimension, Competencia y NivelJerarquico.
+    unique_together (empresa, textos_evaluacion_codigo_excel).
+
+Trabajador
+    Colaborador de la empresa. FK a Empresa, NivelJerarquico,
+    Cargo, Departamento y User (OneToOne nullable).
+    FK self-referencial id_jefe_directo con related_name='subordinados'.
+    Propiedad es_jefe: True si tiene subordinados.
+    Signal post_save: crea User de Django automáticamente con
+    contraseña 'Mohala2026' al crear un Trabajador sin user.
+
+Autoevaluacion
+    Respuesta del trabajador a un indicador. FK compuesta
+    (codigo_excel + empresa) a TextosEvaluacion. FK a Escala.
+
+EvaluacionJefatura
+    Respuesta del evaluador sobre un evaluado. Dos FK a Trabajador:
+    evaluador (related_name='evaluaciones_como_jefe') y
+    trabajador_evaluado (related_name='evaluaciones_recibidas').
+
+ResultadoConsolidado
+    Cruce de autoevaluación y evaluación de jefatura por código.
+    unique_together (trabajador, codigo_excel, periodo).
+    evaluacion_jefatura es nullable para trabajadores sin jefe.
+
+Modelos managed=True (gestionados por Django):
+
+ReporteGlobal
+    PDF de reporte global por empresa y período. BinaryField.
+
+PromptGemini
+    Prompt e informe generado por Gemini AI. Ordering por
+    timestamp descendente. FK a ReporteGlobal y Empresa.
+
+RegistroVersiones
+    Historial de versiones del RAT por empresa.
+
+Instrumento
+    Catálogo global de instrumentos RAT disponibles.
+    nombre_instrumento único.
+
+InstrumentoEmpresa
+    Tabla pivote entre Instrumento y Empresa.
+    unique_together (instrumento, empresa).
+    habilitado controla si está activo para la empresa.
+
+RATPreguntas
+    Preguntas RAT vinculadas a InstrumentoEmpresa (no a Empresa
+    directamente). choices para base_legitimidad:
+    consentimiento, contrato, obligacion_legal, interes_legitimo.
+    FK a Trabajador (responsable) y RegistroVersiones (version).
+
+RATRespuestas
+    Respuesta de un trabajador a una RATPreguntas.
+    related_name='respuestas' en FK a RATPreguntas.
+    Timestamps created_at y updated_at automáticos.
+
+RATPlantillaPregunta
+    Preguntas base globales de un Instrumento. Al habilitar el
+    instrumento para una empresa se clonan a RATPreguntas via señal.
+    choices de tipo: texto, sino, escala. Ordering por orden.
+"""
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save 

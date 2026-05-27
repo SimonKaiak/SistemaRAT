@@ -1,3 +1,25 @@
+{# ================================================================
+   login.html
+   Extiende: cuestionario/base.html
+   Vista asociada: login_view (vistas_auth.py)
+   ----------------------------------------------------------------
+   Formulario de inicio de sesión del sistema.
+
+   Contexto recibido:
+     error → Mensaje de error si las credenciales son inválidas
+             o el usuario no tiene perfil de Trabajador asociado.
+
+   Campos del formulario (POST → login):
+     username → email del usuario (input type="email").
+     password → contraseña.
+
+   Si hay error lo muestra en rojo con fondo semitransparente.
+   Botón reset limpia los campos del formulario.
+
+   Incluye validador_login.js para validación del lado del cliente
+   antes de enviar el formulario al servidor.
+   ================================================================ #}
+
 {% extends 'cuestionario/base.html' %}
 {% load static %}
 

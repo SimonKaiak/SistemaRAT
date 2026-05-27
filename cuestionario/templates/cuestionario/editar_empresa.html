@@ -1,3 +1,21 @@
+{# ================================================================
+   editar_empresa.html
+   Extiende: cuestionario/base.html
+   Vista asociada: editar_empresa (vistas_poblador.py)
+   ----------------------------------------------------------------
+   Formulario simple para editar el nombre y RUT de una empresa.
+
+   Contexto recibido:
+     empresa → instancia de Empresa a editar.
+
+   Campos editables:
+     nombre_empresa → nombre de la empresa (requerido).
+     rut_empresa    → RUT de la empresa (requerido).
+
+   Al guardar hace POST a la misma URL (editar_empresa).
+   El botón volver regresa al panel_poblador con empresa_id.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block content %}

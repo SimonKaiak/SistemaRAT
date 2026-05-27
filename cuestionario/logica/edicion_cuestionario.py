@@ -1,3 +1,52 @@
+"""
+edicion_cuestionario.py
+-----------------
+Vistas para la edición del cuestionario de evaluación de desempeño,
+accesibles por superusuarios y coordinadores de empresa.
+
+Helper interno:
+- _get_trabajador_o_redirigir(request): valida si el usuario es
+  coordinador y retorna su instancia de Trabajador, None si es
+  superusuario, o 'redirect' si no tiene permisos.
+
+Vistas principales:
+
+panel_edicion(request)
+    Muestra el panel completo de edición del cuestionario para una
+    empresa. El superusuario selecciona la empresa por query param
+    o sesión; el coordinador ve solo su empresa. Carga dimensiones,
+    competencias, niveles jerárquicos, textos de evaluación y escalas.
+    Template: edicion_cuestionario.html
+
+panel_edicion_niveles(request)
+    Vista auxiliar que muestra únicamente los niveles jerárquicos
+    de una empresa, con la misma lógica de acceso que panel_edicion.
+    Template: edicion_niveles.html
+
+editar_dimension(request, dimension_id)
+    Actualiza el nombre de una dimensión. Verifica que pertenezca
+    a la empresa del coordinador antes de guardar.
+
+editar_competencia(request, competencia_id)
+    Actualiza el nombre de una competencia. Verifica que pertenezca
+    a la empresa del coordinador antes de guardar.
+
+editar_nivel(request, nivel_id)
+    Actualiza el nombre de un nivel jerárquico. Verifica que
+    pertenezca a la empresa del coordinador antes de guardar.
+
+editar_texto(request, texto_id)
+    Actualiza el texto de evaluación identificado por su código Excel.
+    Verifica que pertenezca a la empresa del coordinador.
+
+editar_escala(request, escala_id)
+    Actualiza título y/o descripción de un valor de escala.
+    Verifica que pertenezca a la empresa del coordinador.
+
+Nota general: todas las vistas de edición redirigen de vuelta al
+panel correspondiente con el empresa_id en la URL tras guardar,
+y muestran un mensaje de éxito con messages.success.
+"""
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages  

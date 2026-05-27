@@ -1,3 +1,25 @@
+{# ================================================================
+   edicion_niveles.html
+   Extiende: cuestionario/base.html
+   Vista asociada: panel_edicion_niveles (vistas_edicion.py)
+   ----------------------------------------------------------------
+   Panel de edición de niveles jerárquicos de una empresa.
+   Vista auxiliar de edicion_cuestionario.html enfocada
+   exclusivamente en los niveles jerárquicos.
+
+   Contexto recibido:
+     empresa_actual  → Empresa seleccionada (o None).
+     niveles         → QuerySet de NivelJerarquico de la empresa.
+     es_coordinador  → bool.
+     messages        → Mensajes de éxito/error de Django messages.
+
+   Cada nivel tiene un formulario POST independiente que apunta
+   a editar_nivel con el nombre_nivel_jerarquico actualizable.
+   Los mensajes de éxito se muestran con borde verde.
+   Si no hay empresa_actual muestra mensaje de error.
+   Color de sección: lila (#ce93d8).
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Edición de Niveles Jerárquicos{% endblock %}

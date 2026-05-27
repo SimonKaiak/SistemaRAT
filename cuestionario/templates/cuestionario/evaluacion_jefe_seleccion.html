@@ -1,3 +1,37 @@
+{# ================================================================
+   evaluacion_jefe_seleccion.html
+   Extiende: cuestionario/base.html
+   Vista asociada: cuestionario_jefatura (sin dimension_id)
+   ----------------------------------------------------------------
+   Pantalla de selección de dimensiones para la evaluación de
+   jefatura. Permite al evaluador ver el avance por dimensión
+   y navegar a cada bloque para evaluar a su subordinado.
+
+   Contexto recibido:
+     evaluador          → Trabajador que realiza la evaluación.
+     evaluado           → Trabajador siendo evaluado.
+     dimensiones_estado → lista de dicts {dimension, hecho}.
+     listo_para_enviar  → bool, todas las dimensiones completadas
+                          y aún no finalizado.
+     ya_finalizado      → bool, evaluación ya enviada.
+
+   Comportamiento por dimensión:
+     - Si hecho=False → botón para ir a evaluar esa dimensión.
+     - Si hecho=True  → mensaje de completado + botón para ver
+                        calificaciones filtradas por dimension_id
+                        y evaluador_id.
+
+   Colores alternados: primera dimensión verde (#51ff85),
+   resto azul (#2196F3).
+
+   Estado final (zona inferior):
+     - ya_finalizado    → banner verde de confirmación con nombre
+                          del evaluado.
+     - listo_para_enviar → formulario POST a finalizar_evaluacion_jefe
+                           con botón de confirmación en rojo/rosa.
+     - ninguno          → mensaje indicando dimensiones faltantes.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Selección de Dimensión - {{ evaluado.nombre }}{% endblock %}

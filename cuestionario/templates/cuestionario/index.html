@@ -1,3 +1,51 @@
+{# ================================================================
+   index.html
+   Extiende: cuestionario/base.html
+   Vista asociada: index (vistas_generales.py)
+   ----------------------------------------------------------------
+   Pantalla de inicio del sistema. Muestra contenido distinto
+   según el tipo de usuario autenticado.
+
+   Contexto recibido (superusuario):
+     es_admin_sistema    → True.
+     nombre_usuario      → username del admin.
+     empresas_activas    → QuerySet de empresas activas.
+     empresa_seleccionada → Empresa activa o None.
+
+   Contexto recibido (trabajador):
+     trabajador          → instancia del Trabajador autenticado.
+     ya_hizo_autoevaluacion → bool.
+     es_jefe             → bool, tiene subordinados.
+     equipo              → lista de subordinados con anotaciones:
+                           autoevaluacion_terminada, ya_evaluado.
+     es_coordinador      → bool.
+
+   Panel Administrador (es_admin_sistema=True):
+     Selector de empresa que redirige a /?empresa_id=<id> o al
+     panel_poblador si se elige "Crear nueva empresa".
+     Si hay empresa seleccionada muestra accesos rápidos a:
+       - Seguimiento general.
+       - Gestión de usuarios.
+       - Edición de instrumentos RAT.
+       - Edición de niveles jerárquicos.
+
+   Panel Trabajador (es_admin_sistema=False):
+     Sección de bienvenida con cargo.
+     Cards de acceso a:
+       - Mi Autoevaluación: muestra estado completado o botón inicio.
+       - RAT Protección de Datos: enlace al panel RAT del usuario.
+       - Información general del proceso.
+
+     Panel de Jefatura (si es_jefe=True):
+       Tabla con subordinados mostrando estado de autoevaluación
+       y botón para evaluar (bloqueado si el subordinado no ha
+       finalizado su autoevaluación).
+
+     Panel de Coordinador (si es_coordinador=True):
+       Cards de acceso a Seguimiento, Edición de Niveles y
+       Panel RAT de la empresa.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}

@@ -1,3 +1,37 @@
+"""
+seguimiento.py
+---------------------------
+Vista para el panel de seguimiento general del estado de evaluaciones
+de todos los trabajadores de una empresa.
+Accesible por superusuarios y coordinadores.
+
+panel_seguimiento(request)
+    Muestra el estado de avance de autoevaluaciones y evaluaciones
+    de jefatura para cada trabajador de la empresa seleccionada.
+
+    Control de acceso:
+    - Superusuario: filtra por empresa vía query param empresa_id.
+    - Coordinador: ve solo los trabajadores de su propia empresa.
+    - Trabajador regular: redirige a index.
+
+    Por cada trabajador calcula:
+    - auto_lista: si tiene autoevaluación finalizada.
+    - tiene_jefe / jefe_lista: si tiene jefe asignado y si su
+      evaluación de jefatura está finalizada.
+    - diff_promedio: promedio de diferencia entre puntaje jefe y
+      autoevaluación (solo si ambas evaluaciones están completas).
+
+    Contadores globales enviados al template:
+    - autos_listas / autos_pendientes
+    - jefaturas_listas / jefaturas_pendientes
+    - total_pendientes: suma de autoevaluaciones y jefaturas aún
+      sin completar.
+
+    Contexto enviado al template (seguimiento.html):
+    trabajadores, total_pendientes, autos_listas, autos_pendientes,
+    jefaturas_listas, jefaturas_pendientes, empresa_actual,
+    es_coordinador.
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg

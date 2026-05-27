@@ -1,3 +1,28 @@
+{# ================================================================
+   rat_responder.html
+   Extiende: cuestionario/base.html
+   Vista asociada: rat_responder (rat.py)
+   ----------------------------------------------------------------
+   Formulario para que el trabajador responda o edite su respuesta
+   a una pregunta RAT específica.
+
+   Contexto recibido:
+     pregunta   → instancia de RATPreguntas con los detalles
+                  de la actividad de tratamiento.
+     form       → instancia de RATRespuestaForm (campo respuesta).
+     editando   → bool, True si ya existe una respuesta previa.
+     trabajador → Trabajador autenticado.
+     instrumento    → instancia de Instrumento activo.
+     instrumento_id → id del instrumento (para URLs).
+
+   Muestra los detalles de la pregunta en una tabla de solo
+   lectura: finalidad, categorías de datos, base de legitimidad
+   (display legible), período de conservación y fuente de datos.
+   Luego el textarea de respuesta con sus errores si los hay.
+   El título y botón submit cambian según editando.
+   El botón volver regresa a rat_panel_usuario.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – Responder{% endblock %}

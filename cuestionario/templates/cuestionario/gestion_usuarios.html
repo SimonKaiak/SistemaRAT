@@ -1,3 +1,52 @@
+{# ================================================================
+   gestion_usuarios.html
+   Extiende: cuestionario/base.html
+   Vista asociada: panel_gestion_usuarios (vistas_gestion_usuarios.py)
+   ----------------------------------------------------------------
+   Panel de administración de usuarios de una empresa. Solo
+   accesible por superusuarios. Gestiona coordinadores y
+   trabajadores mediante modales y llamadas AJAX (fetch + JSON).
+
+   Contexto recibido:
+     empresa_seleccionada → Empresa activa (o None).
+     coordinadores        → QuerySet de Trabajador con es_coordinador=True.
+     trabajadores         → QuerySet de Trabajador con es_coordinador=False.
+
+   Secciones principales:
+     Coordinadores → tabla con botones Modificar, Resetear Clave,
+                     Eliminar y botón para promover trabajador.
+     Trabajadores  → tabla con mismos botones + Crear nuevo usuario
+                     y Cargar usuarios desde Excel (.xlsx).
+
+   Modales (todos movidos al body con JS para que position:fixed
+   funcione correctamente fuera del sidebar):
+     modal-editar         → Editar datos de un usuario existente
+                            (RUT, nombre, apellidos, email, género,
+                            departamento, nivel, cargo, rol).
+                            Llama a /gestion-usuarios/modificar/<id>/.
+     modal-crear          → Crear nuevo usuario con todos sus datos.
+                            Llama a /gestion-usuarios/crear/.
+     modal-agregar-coord  → Promover trabajador existente a coordinador.
+                            Llama a /gestion-usuarios/agregar-coordinador/<id>/.
+     modal-excel-result   → Muestra resultado de carga masiva Excel
+                            (creados y omitidos con motivo).
+
+   Funciones JavaScript principales:
+     abrirModalEditar()   → Precarga datos desde data-* del <tr>.
+     guardarEdicion()     → PATCH de datos del usuario vía JSON.
+     resetearClave()      → Resetea clave a 'Mohala2026' y envía correo.
+     eliminarUsuario()    → Elimina usuario con confirmación.
+     quitarCoordinador()  → Quita rol coordinador.
+     agregarCoordinador() → Promueve trabajador a coordinador.
+     crearUsuario()       → Crea nuevo usuario vía JSON.
+     cargarExcel()        → Sube archivo .xlsx con FormData.
+     toast()              → Notificación flotante (ok/err).
+
+   Filtro personalizado: |formato_rut (templatetag dict_extras).
+   Cierra modales con tecla Escape.
+   Ajusta el ancho del wrapper para aprovechar el espacio completo.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Gestión de Usuarios — {{ empresa_seleccionada.nombre_empresa|default:"Sin empresa" }}{% endblock %}

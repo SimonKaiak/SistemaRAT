@@ -1,3 +1,46 @@
+/*
+ * util.js
+ * -------
+ * Librería de utilidades jQuery de la plantilla Hyperspace de HTML5 UP.
+ * Define tres plugins/funciones reutilizables usados en el layout.
+ *
+ * $.fn.navList()
+ *   Genera una lista HTML plana de enlaces a partir de un nav,
+ *   con clases de indentación (depth-N, indent-N) según el nivel
+ *   de anidamiento en la estructura li. Usado para alimentar panel().
+ *
+ * $.fn.panel(userConfig)
+ *   Convierte un elemento en un panel lateral deslizable.
+ *   Opciones:
+ *     delay        → Retardo en ms para acciones post-hide.
+ *     hideOnClick  → Ocultar al hacer click en un enlace interno.
+ *     hideOnEscape → Ocultar al presionar ESC.
+ *     hideOnSwipe  → Ocultar al deslizar en la dirección opuesta
+ *                    al lado (left/right/top/bottom).
+ *     resetScroll  → Resetear scroll al ocultar.
+ *     resetForms   → Resetear formularios al ocultar.
+ *     side         → Lado del viewport donde aparece el panel.
+ *     target       → Elemento al que se agrega la visibleClass.
+ *     visibleClass → Clase CSS que indica visibilidad (default: 'visible').
+ *   Comportamientos:
+ *   - Oculta el panel al hacer click fuera (body click/tap).
+ *   - Alterna visibilidad al hacer click en a[href="#id"].
+ *   - Detecta swipe táctil para cerrar según el lado configurado.
+ *   - Previene scroll fuera de los límites del panel en touch.
+ *
+ * $.fn.placeholder()
+ *   Polyfill del atributo placeholder para navegadores que no lo
+ *   soportan nativamente. Maneja inputs text, textarea y password.
+ *   Para password crea un campo de texto espejo que muestra el
+ *   placeholder y se oculta al enfocar el campo real.
+ *   Limpia los campos polyfill al hacer submit y reset del form.
+ *
+ * $.prioritize($elements, condition)
+ *   Mueve elementos al inicio de su contenedor padre cuando condition
+ *   es true, y los devuelve a su posición original cuando es false.
+ *   Usa un placeholder guardado en data() para recordar la posición
+ *   original. Usado para reorganizar el layout en breakpoints móviles.
+ */
 (function($) {
 
 	/**

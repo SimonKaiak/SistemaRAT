@@ -1,3 +1,34 @@
+{# ================================================================
+   autoevaluacion_seleccion.html
+   Extiende: cuestionario/base.html
+   Vista asociada: cuestionario_autoevaluacion (sin dimension_id)
+   ----------------------------------------------------------------
+   Pantalla de selección de dimensiones para la autoevaluación.
+   Muestra al trabajador el estado de avance por dimensión y
+   le permite navegar a cada bloque o ver sus respuestas.
+
+   Contexto recibido:
+     trabajador          → instancia del Trabajador autenticado.
+     dimensiones_estado  → lista de dicts {dimension, hecho}.
+     listo_para_enviar   → bool, todas las preguntas respondidas
+                           y aún no finalizado.
+     ya_finalizado       → bool, autoevaluación ya enviada.
+
+   Comportamiento por dimensión:
+     - Si hecho=False → botón para ir a responder esa dimensión.
+     - Si hecho=True  → mensaje de completado + botón para ver
+                        respuestas filtradas por dimension_id.
+
+   Colores alternados: primera dimensión verde (#51ff85),
+   resto azul (#2196F3).
+
+   Estado final (zona inferior):
+     - ya_finalizado     → banner verde de confirmación.
+     - listo_para_enviar → formulario POST a finalizar_autoevaluacion
+                           con botón de confirmación en rojo/rosa.
+     - ninguno           → mensaje indicando dimensiones faltantes.
+   ================================================================ #}
+   
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Selección de Dimensión - Autoevaluación{% endblock %}

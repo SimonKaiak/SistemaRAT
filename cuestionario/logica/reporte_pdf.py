@@ -1,3 +1,44 @@
+"""
+reporte_pdf.py
+-------------
+Vista para la generación del reporte individual de evaluación de
+desempeño de un trabajador en formato PDF.
+Accesible por superusuarios y coordinadores de la misma empresa.
+
+generar_pdf_detalle(request, trabajador_id)
+    Genera y devuelve inline un PDF con el detalle completo de la
+    evaluación del trabajador solicitado.
+
+    Control de acceso:
+    - Superusuario: acceso total.
+    - Coordinador: solo puede generar reportes de su empresa.
+    - Trabajador regular: redirige a index.
+
+    Estructura del PDF generado:
+    1. Título: "Reporte de Evaluación de Desempeño" centrado.
+    2. Tabla de información del trabajador: nombre, empresa, cargo,
+       nivel jerárquico, jefatura directa y timestamps de
+       autoevaluación y evaluación de jefatura.
+    3. Por cada dimensión una sección con:
+       - Encabezado de dimensión (verde para la primera, azul
+         para las siguientes).
+       - Tabla con columnas: Código, Competencia/Indicador,
+         AutoEv, Ev. Jefe, Diferencia.
+       - Competencia en negrita con color por dimensión.
+       - Indicador (texto evaluación) en fuente pequeña gris.
+       - Diferencia con prefijo '+' si es positiva.
+
+    Estilos:
+    - Color corporativo #5e42a6 en título y encabezados de tabla.
+    - Verde (#51ff85) y azul (#2196F3) alternados por dimensión.
+    - Encabezados de tabla en blanco sobre fondo morado.
+
+    El archivo se devuelve como PDF inline con nombre:
+    reporte_{nombre}_{apellido_paterno}.pdf
+
+Nota: esta vista genera el reporte de un solo trabajador. Para el
+reporte consolidado de toda la empresa ver vistas_reporte_global.py.
+"""
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse

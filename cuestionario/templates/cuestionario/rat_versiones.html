@@ -1,3 +1,27 @@
+{# ================================================================
+   rat_versiones.html
+   Extiende: cuestionario/base.html
+   Vista asociada: rat_versiones (rat.py)
+   ----------------------------------------------------------------
+   Historial de versiones del RAT de la empresa del coordinador.
+
+   Contexto recibido:
+     trabajador → Trabajador coordinador autenticado.
+     versiones  → QuerySet de RegistroVersiones ordenado por
+                  fecha_modificacion descendente.
+
+   Por cada versión muestra:
+     - Número de versión (v<version>).
+     - Motivo de modificación.
+     - Fecha de modificación formateada.
+     - Botón editar (rat_editar_version) y eliminar
+       (rat_eliminar_version).
+
+   Si no hay versiones muestra aviso amarillo.
+   Botón cabecera para volver al panel coordinador y crear
+   nueva versión (rat_nueva_version).
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – Registro de Versiones{% endblock %}

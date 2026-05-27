@@ -1,3 +1,63 @@
+-- =========================
+-- poblacion_empresa_mohala.sql
+-- =========================
+-- Script de poblamiento inicial para Mohala SpA (EMPRESA ID=1).
+-- Debe ejecutarse DESPUÉS de creacion_tablas.sql y DESPUÉS de
+-- python manage.py migrate.
+--
+-- Datos que inserta:
+--   Empresa   → Mohala SpA (RUT 76.123.456-7, activa).
+--
+--   Departamentos (3):
+--     Gerencia General, Recursos Humanos, TI.
+--
+--   Niveles Jerárquicos (3):
+--     Operativo (1), Táctico (2), Estratégico (3).
+--
+--   Escala (4 valores):
+--     1=No Logra, 2=Logra Parcialmente, 3=Logra, 4=Supera.
+--
+--   Dimensiones (2):
+--     Organizacionales (1), Funcionales (2).
+--
+--   Competencias (15):
+--     Organizacionales: Creatividad e Innovación, Enfoque de
+--     Negocio, Identificación Cultural, Trabajo en Equipo,
+--     Visión Global y Sistemática.
+--     Funcionales: Análisis y Solución de Problemas, Aprendizaje
+--     e Innovación, Comunicación, Innovación, Liderazgo,
+--     Liderazgo y Desarrollo de Equipos, Orientación a la
+--     Rentabilidad, Orientación al Logro, Planificación
+--     Estratégica, Proactividad.
+--
+--   Cargos (6):
+--     Operativos: Analista, Asistente Administrativo.
+--     Tácticos: Jefe de RRHH, Coordinador de Proyectos.
+--     Estratégicos: Gerente General, Gerente de Innovación.
+--
+--   TextosEvaluacion (27):
+--     Solo para competencias 1 (Creatividad e Innovación),
+--     2 (Enfoque de Negocio) y 6 (Análisis y Solución de
+--     Problemas), con 3 indicadores por nivel jerárquico.
+--     Código Excel: prefijo(2 letras)+nivel(O/T/E)+competencia+punto+indicador.
+--
+--   CodigoEvaluacion (27):
+--     Una fila por cada TextosEvaluacion, denormalizando
+--     dimension, competencia y nivel jerárquico.
+--
+--   Trabajadores (6, sin usuario Django — se crean via señal):
+--     Estratégicos (sin jefe): Roberto Méndez, Patricia Lorca (coordinadora).
+--     Tácticos: Mónica Sánchez (jefe=1), Andrés Tapia (jefe=2).
+--     Operativos: Valeria Cáceres (jefe=3), Sebastián Marín (jefe=4).
+--
+-- Al final sincroniza las secuencias SERIAL de todas las tablas
+-- con setval para evitar errores de duplicate key al insertar
+-- nuevos registros desde Django.
+--
+-- Nota: usa session_replication_role='replica' para deshabilitar
+-- verificación de FK durante la inserción (requiere superusuario).
+-- =========================
+
 -- =============================================================
 -- Poblamiento Empresa 1: Mohala SpA
 -- PostgreSQL — SistemaRAT

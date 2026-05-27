@@ -1,3 +1,42 @@
+/*
+ * main.css
+ * --------
+ * Hoja de estilos principal del sistema. Basada en la plantilla
+ * "Hyperspace" de HTML5 UP (html5up.net | @ajlkn), adaptada para
+ * el Sistema RAT.
+ *
+ * Paleta de colores principal:
+ *   Fondo oscuro:   #1e2a35
+ *   Sidebar:        #152028
+ *   Acento cyan:    #00d4ff
+ *   Texto:          rgba(255, 255, 255, 0.55)
+ *   Texto activo:   #ffffff
+ *
+ * Secciones que cubre:
+ *   - Reset CSS global (márgenes, padding, box model).
+ *   - Tipografía: fuente Arial, tamaños responsivos por breakpoint
+ *     (1680px, 1280px, 736px, 480px, 360px), headings h1-h6.
+ *   - Grid system: clase .row con columnas .col-N y offsets .off-N
+ *     (1-12), con variantes de gutter (gtr-0, gtr-25, gtr-50,
+ *     gtr-150, gtr-200) replicadas en cada breakpoint.
+ *   - Componentes: .box, .button (con variantes .primary, .small,
+ *     .large, .fit, .disabled), .features (grid de iconos con
+ *     animaciones de entrada escalonadas), .icon, .image,
+ *     .spotlights, .split, .table-wrapper.
+ *   - Formularios: inputs, select (con flecha SVG), textarea,
+ *     checkbox y radio customizados con Font Awesome, placeholders.
+ *   - Listas: ul.actions, ul.contact, ul.icons, ul.menu.
+ *   - Layout estructural: #header, #sidebar (fijo a la izquierda en
+ *     desktop, barra superior en tablet, oculto en móvil), #wrapper,
+ *     #footer, #intro.
+ *   - Animaciones: fade-up, fade-down, fade en .wrapper; entrada
+ *     progresiva del sidebar y sus items con is-preload.
+ *   - Wrappers de color: .wrapper.style1/2/3 y sus variantes -alt.
+ *
+ * Breakpoints responsivos:
+ *   ≤1680px → xlarge  ≤1280px → large  ≤980px → medium
+ *   ≤736px  → small   ≤480px  → xsmall ≤360px → xxsmall
+ */
 @import url(fontawesome-all.min.css);
 
 /*

@@ -1,3 +1,36 @@
+{# ================================================================
+   rat_coordinador.html
+   Extiende: cuestionario/base.html
+   Vista asociada: rat_panel_coordinador (rat.py)
+   ----------------------------------------------------------------
+   Panel de gestión RAT para coordinadores y superusuarios.
+   Muestra todas las preguntas RAT del instrumento activo con
+   sus detalles y las respuestas de los trabajadores.
+
+   Contexto recibido:
+     empresa         → instancia de Empresa activa.
+     preguntas       → QuerySet de RATPreguntas con
+                       prefetch_related('respuestas__trabajador').
+     instrumento     → instancia de Instrumento activo.
+     instrumento_id  → id del instrumento (para URLs).
+     trabajador      → Trabajador del coordinador (o None si admin).
+     empresa_actual  → alias de empresa para el header de base.html.
+
+   Por cada pregunta muestra:
+     - Actividad de tratamiento (título).
+     - Botones editar (rat_editar_pregunta) y eliminar
+       (rat_eliminar_pregunta).
+     - Tabla con: responsable, finalidad, base de legitimidad
+       (display legible), período de conservación, fuente de datos
+       y versión.
+     - Lista de respuestas por trabajador con fecha de última
+       actualización. Si no hay respuestas muestra mensaje vacío.
+
+   Si no hay preguntas muestra aviso amarillo.
+   Botones de cabecera: volver a seleccion_instrumentos,
+   ver versiones (rat_versiones) y crear nueva pregunta.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – Panel Coordinador{% endblock %}

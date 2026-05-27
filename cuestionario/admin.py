@@ -1,3 +1,71 @@
+"""
+admin.py
+--------
+Configuración del panel de administración Django para el sistema.
+
+Personalización general:
+    site_header → "Administración Sistema Mohala"
+    index_title → "Panel de Control Evaluación 2026"
+
+Modelos registrados con configuración personalizada:
+
+User (reemplaza UserAdmin base)
+    Agrega columnas RUT, apellido paterno y materno obtenidos
+    desde el Trabajador relacionado (si existe).
+
+EmpresaAdmin
+    Filtros por empresa_activa. Búsqueda por nombre y RUT.
+
+EscalaAdmin
+    Listado ordenado por id con empresa.
+
+TrabajadorAdmin
+    Listado completo con filtros por nivel, departamento y cargo.
+    Búsqueda por nombre, apellido, RUT y email.
+
+CargoAdmin
+    Filtros por nivel jerárquico y empresa.
+
+CompetenciaAdmin
+    Filtros por dimensión y empresa.
+
+CodigoEvaluacionAdmin
+    Filtros por dimensión, competencia, nivel y empresa.
+    Búsqueda por código Excel.
+
+TextosEvaluacionAdmin
+    Muestra texto completo como columna. Filtros por empresa.
+
+AutoevaluacionAdmin
+    Filtros por estado, fecha y escala.
+    Búsqueda por nombre/apellido del trabajador y código Excel.
+
+EvaluacionJefaturaAdmin
+    Filtros por estado, evaluador, evaluado y escala.
+
+ResultadoConsolidadoAdmin
+    Campo diferencia como readonly. Filtros por período y trabajador.
+
+PromptGeminiAdmin
+    Excluye archivo_pdf del formulario. Columna con enlace
+    para ver el PDF generado en nueva pestaña.
+
+ReporteGlobalAdmin
+    Excluye contenido_pdf del formulario. Enlace para ver
+    el PDF del reporte global en nueva pestaña.
+
+BibliotecaAdmin
+    Usa BibliotecaForm personalizado que lee el archivo subido
+    como bytes y lo guarda en el campo BinaryField, marcando
+    estado_carga=True si la lectura es exitosa.
+    Enlace para ver el PDF en nueva pestaña.
+
+Registros simples (sin configuración extra):
+    Dimension, Departamento, NivelJerarquico,
+    RATPreguntas, RATRespuestas, RegistroVersiones,
+    Instrumento, InstrumentoEmpresa, RATPlantillaPregunta.
+"""
+
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin

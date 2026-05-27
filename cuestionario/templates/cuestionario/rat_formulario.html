@@ -1,3 +1,27 @@
+{# ================================================================
+   rat_formulario.html
+   Extiende: cuestionario/base.html
+   Vistas asociadas: rat_nueva_pregunta, rat_editar_pregunta (rat.py)
+   ----------------------------------------------------------------
+   Formulario para crear o editar una pregunta RAT.
+   Reutilizado por ambas vistas controlado por la variable editando.
+
+   Contexto recibido:
+     form        → instancia de RATPreguntaForm (con campos
+                   filtrados por empresa).
+     editando    → bool, True si es edición, False si es nueva.
+     trabajador  → Trabajador del coordinador (o None si admin).
+     empresa_actual → empresa del instrumento activo.
+     instrumento    → instancia de Instrumento activo.
+     instrumento_id → id del instrumento (para URLs).
+
+   Renderiza cada campo del formulario con su label, widget,
+   help_text y errores de validación.
+   Los campos requeridos muestran asterisco rojo (*).
+   El botón cancelar vuelve a rat_panel_coordinador.
+   El texto del botón submit cambia según editando.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – {% if editando %}Editar pregunta{% else %}Nueva pregunta{% endif %}{% endblock %}

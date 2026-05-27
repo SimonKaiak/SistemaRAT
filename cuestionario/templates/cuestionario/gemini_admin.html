@@ -1,3 +1,38 @@
+{# ================================================================
+   gemini_admin.html
+   Extiende: cuestionario/base.html
+   Vista asociada: panel_gemini (vistas_gemini.py)
+   ----------------------------------------------------------------
+   Panel de generación de informes con Gemini AI. Permite crear
+   prompts, generarlos como PDF y gestionar el historial.
+   Accesible por superusuarios y coordinadores.
+
+   Contexto recibido:
+     empresa_actual  → Empresa activa para el panel.
+     ultimo_prompt   → PromptGemini más reciente (para prellenar
+                       el textarea del formulario).
+     historial       → Últimos 20 PromptGemini de la empresa.
+     es_coordinador  → bool.
+
+   Secciones:
+
+   Editar Prompt:
+     Formulario POST a editar_prompt con empresa_id oculto y
+     textarea prellenado con el último prompt guardado.
+     Crea un nuevo PromptGemini cada vez que se guarda.
+
+   Historial de Prompts (tabla):
+     Columnas: ID, Fecha, Empresa, Prompt (preview), Estado,
+     Generar, Ver, Eliminar.
+     - Estado: "✓ Generado" (verde) o "⏳ Pendiente".
+     - Generar: enlace a generar_informe_gemini en nueva pestaña.
+                Deshabilitado si ya fue generado.
+     - Ver: enlace a ver_informe_gemini si tiene PDF generado.
+     - Eliminar: formulario POST a eliminar_prompt con confirmación.
+
+   Si no hay historial muestra mensaje vacío.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Panel de Generación IA{% endblock %}

@@ -1,3 +1,26 @@
+{# ================================================================
+   rat_crear_instrumento.html
+   Extiende: cuestionario/base.html
+   Vista asociada: rat_crear_instrumento (rat.py)
+   ----------------------------------------------------------------
+   Formulario para crear un nuevo instrumento RAT y asignarlo
+   automáticamente a la empresa activa.
+
+   Contexto recibido:
+     empresa  → instancia de Empresa a la que se asignará.
+     next_url → URL de retorno tras crear (pasada como campo
+                oculto en el formulario y en el botón volver).
+
+   Campos del formulario (POST → rat_crear_instrumento):
+     nombre_instrumento → nombre del nuevo instrumento (requerido).
+     descripcion        → descripción opcional.
+     next               → hidden, URL de redirección post-creación.
+
+   Al guardar usa get_or_create en Instrumento y en
+   InstrumentoEmpresa, habilitando el instrumento para la empresa.
+   Si el instrumento es nuevo dispara la señal clonar_preguntas_rat.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 {% block title %}Crear Instrumento RAT{% endblock %}
 {% block content %}

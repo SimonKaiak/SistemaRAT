@@ -1,3 +1,34 @@
+"""
+vistas_seguimiento.py
+---------------------
+Vista para el detalle de seguimiento individual de un trabajador,
+accesible por superusuarios y coordinadores de la misma empresa.
+
+Endpoint: detalle_seguimiento(request, trabajador_id)
+
+Control de acceso:
+- Superusuario: acceso total.
+- Coordinador: solo puede ver trabajadores de su propia empresa.
+- Trabajador regular: redirige a index.
+
+Lógica principal:
+1. Obtiene el trabajador solicitado con sus relaciones (cargo,
+   nivel jerárquico, jefe directo).
+2. Recupera sus ResultadoConsolidado ordenados por código Excel.
+3. Mapea cada resultado a su TextosEvaluacion correspondiente
+   para obtener dimensión y competencia.
+4. Agrupa los resultados por dimensión en dimensiones_data
+   (usado por el template para renderizar secciones).
+5. Calcula el promedio total de diferencia entre autoevaluación
+   y evaluación de jefatura.
+6. Recopila comentarios por dimensión separados en dos diccionarios:
+   - comentarios_auto: primer comentario de autoevaluación por dimensión.
+   - comentarios_jefe: primer comentario de jefatura por dimensión.
+
+Contexto enviado al template (detalle_seguimiento.html):
+- trabajador, dimensiones_data, diff_promedio_total,
+  timestamp_auto, timestamp_jefe, comentarios_auto, comentarios_jefe.
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg

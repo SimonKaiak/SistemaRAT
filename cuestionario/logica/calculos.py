@@ -1,3 +1,27 @@
+"""
+calculos.py
+--------------
+Módulo utilitario encargado de generar o actualizar el resultado
+consolidado de un trabajador para un período determinado.
+
+Función principal: generar_consolidado(trabajador, periodo)
+- Cruza las respuestas de autoevaluación con las de evaluación de
+  jefatura (si existe jefe asignado) pregunta por pregunta.
+- Para cada pregunta calcula el puntaje del jefe y la diferencia
+  respecto a la autoevaluación.
+- Si el trabajador no tiene jefe, el puntaje jefe y la diferencia
+  se registran como 0.
+- Navega por CodigoEvaluacion para obtener dimensión, competencia
+  y nivel jerárquico asociados a cada respuesta.
+- Guarda o actualiza el resultado en ResultadoConsolidado
+  (update_or_create por trabajador + código + período).
+
+Notas:
+- Los cálculos de promedios por dimensión, competencia y general
+  están comentados y pendientes de implementación futura.
+- El campo evaluacion_jefatura en ResultadoConsolidado acepta null
+  para cubrir el caso de trabajadores sin jefe directo.
+"""
 from django.db.models import Avg
 from datetime import datetime
 from cuestionario.models import (

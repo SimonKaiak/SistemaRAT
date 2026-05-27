@@ -1,3 +1,22 @@
+"""
+templatetags/dict_extras.py
+---------------------------
+Filtros de template personalizados para el sistema.
+
+get_item(dictionary, key)
+    Accede a un valor de un diccionario por clave variable en
+    templates Django, donde la sintaxis dictionary[key] no está
+    disponible directamente.
+    Uso: {{ mi_dict|get_item:variable }}
+    Retorna cadena vacía si la clave no existe.
+
+formato_rut(rut)
+    Formatea un RUT chileno al formato estándar XX.XXX.XXX-Y,
+    eliminando puntos y guiones previos antes de reformatear.
+    Uso: {{ trabajador.rut|formato_rut }}
+    Retorna cadena vacía si el rut es None o vacío.
+"""
+
 from django import template
 
 register = template.Library()

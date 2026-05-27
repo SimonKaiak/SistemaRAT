@@ -1,4 +1,49 @@
 /*
+ * main.js
+ * -------
+ * Script principal de la interfaz. Basado en la plantilla Hyperspace
+ * de HTML5 UP, inicializa y coordina todos los comportamientos
+ * interactivos de la página.
+ *
+ * Breakpoints definidos:
+ *   xlarge: 1281-1680px | large: 981-1280px | medium: 737-980px
+ *   small: 481-736px    | xsmall: hasta 480px
+ *
+ * Comportamientos que inicializa:
+ *
+ * 1. Animaciones de carga:
+ *    Remueve la clase 'is-preload' del body 100ms después del load,
+ *    disparando las animaciones CSS de entrada definidas en main.css.
+ *    Agrega 'is-ie' al body si el navegador es Internet Explorer.
+ *
+ * 2. Formularios:
+ *    Activa el submit del formulario al hacer click en elementos
+ *    con clase .submit que no sean inputs nativos.
+ *
+ * 3. Sidebar:
+ *    Convierte los enlaces del sidebar en scrolly (scroll suave).
+ *    Por cada enlace vincula su sección con scrollex en modo 'middle':
+ *    - Al entrar a la sección: activa el enlace correspondiente y
+ *      remueve 'inactive' de la sección.
+ *    - Maneja un sistema de bloqueo (active-locked) para que el
+ *      enlace clickeado no sea desactivado por scrollex mientras
+ *      se anima el scroll hacia la sección destino.
+ *
+ * 4. Scrolly global:
+ *    Aplica scroll suave (1000ms) a todos los .scrolly de la página.
+ *    En breakpoint <=large y >small con sidebar presente, usa la
+ *    altura del sidebar como offset para compensar la barra superior.
+ *
+ * 5. Spotlights:
+ *    Activa animaciones de entrada con scrollex (modo 'middle').
+ *    Convierte el <img> de cada spotlight en background-image del
+ *    contenedor .image, respetando el atributo data-position si existe.
+ *
+ * 6. Features:
+ *    Activa animaciones de entrada con scrollex (modo 'middle')
+ *    agregando/removiendo la clase 'inactive'.
+ */
+/*
 	Hyperspace by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)

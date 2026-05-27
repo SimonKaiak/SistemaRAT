@@ -1,3 +1,12 @@
+/*
+ * mohala.css
+ * --------------------
+ * Sobrescrituras de ancho del sidebar y márgenes del layout principal.
+ * Fuerza con !important el ancho fijo del sidebar (13em) y los
+ * márgenes correspondientes del wrapper y footer para evitar que
+ * breakpoints responsivos del main.css reduzcan o eliminen el sidebar
+ * en vistas donde se quiere mantener visible.
+ */
 #sidebar {
     width: 13em !important;
 }

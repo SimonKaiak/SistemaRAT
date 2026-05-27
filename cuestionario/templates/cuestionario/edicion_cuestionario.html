@@ -1,3 +1,41 @@
+{# ================================================================
+   edicion_cuestionario.html
+   Extiende: cuestionario/base.html
+   Vista asociada: panel_edicion (vistas_edicion.py)
+   ----------------------------------------------------------------
+   Panel de edición inline del cuestionario de evaluación de
+   desempeño. Permite editar dimensiones, competencias, textos
+   de evaluación y escala para la empresa activa.
+   Accesible por superusuarios y coordinadores.
+
+   Contexto recibido:
+     empresa_actual  → Empresa seleccionada (o None).
+     dimensiones     → QuerySet de Dimension de la empresa.
+     competencias    → QuerySet de Competencia con select_related
+                       a dimension.
+     textos          → QuerySet de TextosEvaluacion con
+                       select_related a dimension, competencia
+                       y nivel_jerarquico.
+     escalas         → QuerySet de Escala ordenado por valor.
+     es_coordinador  → bool, afecta permisos en la vista.
+     messages        → Mensajes de éxito/error de Django messages.
+
+   Secciones del formulario (cada una es un POST independiente):
+     Dimensiones       → editar_dimension (nombre).
+                         Color: verde (#51ff85).
+     Competencias      → editar_competencia (nombre).
+                         Muestra dimensión padre. Color: azul.
+     Textos evaluación → editar_texto (textarea con el texto).
+                         Muestra código, dimensión, competencia
+                         y nivel. Color: naranja (#ff9800).
+     Escala            → editar_escala (titulo + descripcion).
+                         Color: rosa (#f48fb1).
+
+   Si no hay empresa_actual muestra mensaje para seleccionar empresa.
+   El botón volver usa request.GET.next o history.back() como fallback.
+   Los mensajes de éxito se muestran con borde verde al inicio.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}Edición de Cuestionario{% endblock %}

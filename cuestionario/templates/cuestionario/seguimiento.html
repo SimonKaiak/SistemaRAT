@@ -1,3 +1,38 @@
+{# ================================================================
+   seguimiento.html
+   Extiende: cuestionario/base.html
+   Vista asociada: panel_seguimiento (vistas_seguimiento_admin.py)
+   ----------------------------------------------------------------
+   Panel de seguimiento del estado de evaluaciones de todos los
+   trabajadores de la empresa. Accesible por superusuarios y
+   coordinadores.
+
+   Contexto recibido:
+     trabajadores         → QuerySet de Trabajador con anotaciones:
+                            auto_lista, tiene_jefe, jefe_lista,
+                            diff_promedio.
+     autos_listas         → int, autoevaluaciones finalizadas.
+     autos_pendientes     → int, autoevaluaciones pendientes.
+     jefaturas_listas     → int, evaluaciones de jefatura listas.
+     jefaturas_pendientes → int, evaluaciones de jefatura pendientes.
+     empresa_actual       → Empresa activa o None.
+     es_coordinador       → bool.
+
+   Resumen numérico en 2 columnas:
+     Autoevaluaciones listas/pendientes |
+     Evaluaciones de jefatura listas/pendientes.
+
+   Tabla de trabajadores con columnas:
+     Colaborador (nombre + cargo), Empresa, Nivel,
+     Autoevaluación (✅/⏳), Ev. Jefatura (✅/⏳/N/A si sin jefe),
+     Ver Detalle → botón a detalle_seguimiento solo si
+     diff_promedio no es None (ambas evaluaciones completas).
+
+   Botones cabecera (solo superusuario o coordinador con empresa):
+     Generar Reporte Respuestas → generar_reporte_global_pdf.
+     Panel Informe con IA       → panel_gemini.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block content %}

@@ -1,3 +1,53 @@
+"""
+gemini_admin.py
+----------------
+Vistas para la integración con Gemini AI, permitiendo crear prompts,
+generar informes en PDF y gestionar el historial de consultas.
+Accesible por superusuarios y coordinadores de empresa.
+
+Configuración:
+- Carga la API key de Gemini desde variables de entorno (GEMINI_API_KEY).
+- Modelo activo: gemini-2.5-flash (modificable en generar_informe_gemini).
+
+Vistas:
+
+panel_gemini(request)
+    Muestra el panel principal de Gemini con el historial de prompts
+    (últimos 20) y el último prompt generado para la empresa activa.
+    Superusuario filtra por empresa vía query param; coordinador
+    ve solo su empresa. Template: gemini_admin.html
+
+editar_prompt(request)
+    Crea un nuevo PromptGemini a partir del texto enviado por POST.
+    El coordinador solo puede crear prompts de su propia empresa.
+    Redirige al panel tras guardar.
+
+generar_informe_gemini(request, prompt_id)
+    Genera un informe PDF a partir de un prompt existente usando
+    la API de Gemini. Si el PDF ya existe lo devuelve directamente.
+    Proceso:
+    1. Recopila documentos de la Biblioteca (estado_carga=True)
+       y el último ReporteGlobal de la empresa como contexto.
+    2. Envía todo a Gemini y obtiene la respuesta en texto.
+    3. Construye el PDF con ReportLab (título, fecha, empresa,
+       prompt usado e informe generado) con estilos personalizados.
+    4. Guarda el PDF en el campo archivo_pdf del PromptGemini.
+    5. Devuelve el PDF como respuesta HTTP inline.
+    En caso de error muestra una página HTML con el detalle.
+
+ver_informe_gemini(request, prompt_id)
+    Muestra el informe de un prompt. Si tiene PDF guardado lo
+    devuelve directamente. Si solo tiene texto, lo renderiza como
+    HTML con formato básico e indica que se genere el PDF completo.
+
+eliminar_prompt(request, prompt_id)
+    Elimina un PromptGemini via POST. Redirige al panel tras borrar.
+
+listar_modelos(request)
+    Solo superusuario. Lista todos los modelos Gemini disponibles
+    con la API key que soporten generateContent. Útil para depuración
+    y para saber qué modelo usar en generar_informe_gemini.
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse

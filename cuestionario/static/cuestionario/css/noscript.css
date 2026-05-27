@@ -1,4 +1,21 @@
 /*
+ * noscript.css
+ * ------------
+ * Estilos de fallback para cuando JavaScript está deshabilitado.
+ * Basado en la plantilla Hyperspace de HTML5 UP.
+ *
+ * El sistema usa JavaScript para animar la entrada de elementos
+ * (spotlights, wrappers, sidebar) mediante clases .inactive e
+ * is-preload. Sin JS esas animaciones nunca se disparan y los
+ * elementos quedarían invisibles u ocultos.
+ *
+ * Este archivo fuerza con !important que todos esos elementos
+ * sean visibles y sin transformaciones desde el inicio:
+ *   - Spotlights: overlay de imagen transparente, contenido visible.
+ *   - Wrappers: opacidad 1, sin translateY.
+ *   - Sidebar y sus items de navegación: visibles, sin translateY.
+ */
+/*
 	Hyperspace by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)

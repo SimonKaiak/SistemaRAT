@@ -1,4 +1,35 @@
 -- =========================
+-- creacion_tablas.sql
+-- =========================
+-- Script DDL para crear las tablas del sistema en PostgreSQL.
+-- Debe ejecutarse sobre la BD SistemaRAT_BD DESPUÉS de correr
+-- python manage.py migrate (para que auth_user ya exista).
+--
+-- Tablas creadas (en orden de dependencias):
+--   EMPRESA → BIBLIOTECA, REPORTE_GLOBAL, PROMPT_GEMINI,
+--   DEPARTAMENTO, NIVEL_JERARQUICO, ESCALA, DIMENSION,
+--   COMPETENCIA, CARGO, TEXTOS_EVALUACION, CODIGO_EVALUACION,
+--   TRABAJADOR, AUTOEVALUACION, EVALUACION_JEFATURA,
+--   RESULTADO_CONSOLIDADO.
+--
+-- Notas importantes:
+--   - Las tablas INSTRUMENTO, INSTRUMENTO_EMPRESA, RAT_PREGUNTAS,
+--     RAT_RESPUESTAS, REGISTRO_VERSIONES y RAT_PLANTILLA_PREGUNTA
+--     son managed=True y las crea Django con migrate.
+--   - TRABAJADOR tiene FK a auth_user(id) ON DELETE SET NULL,
+--     por eso migrate debe correr primero.
+--   - RESULTADO_CONSOLIDADO tiene EVALUACION_JEFATURA nullable
+--     para trabajadores sin jefe directo.
+--   - TEXTOS_EVALUACION y CODIGO_EVALUACION usan FK compuesta
+--     (codigo_excel, empresa_id) como referencia.
+--   - session_replication_role = 'replica' deshabilita la
+--     verificación de FK durante la creación para evitar
+--     errores de orden. Requiere permisos de superusuario
+--     (no disponible en Render free tier — usar el script
+--     sin esas líneas en ese caso).
+-- =========================
+
+-- =========================
 -- Script de creación de tablas para PostgreSQL
 -- Compatible con Django + SistemaRAT
 -- Ejecutar en psql o pgAdmin sobre la BD: SistemaRAT_BD

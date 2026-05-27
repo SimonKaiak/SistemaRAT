@@ -1,5 +1,25 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
+
+"""
+manage.py
+---------
+Punto de entrada de la línea de comandos de Django.
+Generado automáticamente por Django.
+
+Configura DJANGO_SETTINGS_MODULE a 'Sistema_Mohala.settings'
+y delega la ejecución a django.core.management.
+
+Uso:
+    python manage.py <comando>
+
+Comandos más usados en el proyecto:
+    migrate           → aplica migraciones.
+    crear_admin       → crea el superusuario desde variables de entorno.
+    poblar_usuarios   → vincula usuarios Django a trabajadores.
+    crear_tablas      → crea tablas managed=False en PostgreSQL.
+    runserver         → inicia el servidor de desarrollo.
+"""
 import os
 import sys
 

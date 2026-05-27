@@ -1,3 +1,34 @@
+"""
+management/commands/poblar_usuarios.py
+--------------------------------------
+Comando de gestión de Django para crear y vincular usuarios de
+Django a los trabajadores existentes en la base de datos.
+
+Uso:
+    python manage.py poblar_usuarios
+
+Comportamiento:
+- Itera sobre todos los Trabajador registrados en la BD.
+- Por cada trabajador usa get_or_create para crear o recuperar
+  su User de Django usando el email como username.
+- Actualiza siempre nombre, apellido y contraseña del usuario,
+  independientemente de si ya existía.
+- Si el trabajador no tiene User vinculado, lo asigna.
+- Es seguro ejecutarlo múltiples veces: no duplica usuarios,
+  solo actualiza los existentes.
+
+Contraseñas asignadas por empresa (get_password_por_empresa):
+    Empresa 1 (Mohala)   → 'Mohala2026'
+    Empresa 2 (Permify)  → 'Permify2026'
+    Empresa 3 (Redgroup) → 'Redgroup2026'
+    Cualquier otra       → 'DefaultPass2026'
+    Para agregar nuevas empresas, añadir su id y contraseña
+    al diccionario passwords dentro de get_password_por_empresa.
+
+Este comando es ejecutado automáticamente en el Start Command de
+Render después de crear_admin, asegurando que todos los trabajadores
+puedan iniciar sesión tras cada deploy.
+"""
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from cuestionario.models import Trabajador

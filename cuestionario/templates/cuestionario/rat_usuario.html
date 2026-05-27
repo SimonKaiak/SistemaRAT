@@ -1,3 +1,32 @@
+{# ================================================================
+   rat_usuario.html
+   Extiende: cuestionario/base.html
+   Vista asociada: rat_panel_usuario (rat.py)
+   ----------------------------------------------------------------
+   Panel RAT del trabajador. Muestra todas las preguntas RAT del
+   instrumento activo con su estado de respuesta.
+
+   Contexto recibido:
+     trabajador           → Trabajador autenticado.
+     preguntas            → QuerySet de RATPreguntas del instrumento.
+     respuestas_existentes → dict {id_rat_pregunta: RATRespuesta}
+                             con las respuestas ya dadas por el
+                             trabajador.
+     instrumento          → instancia de Instrumento activo.
+     instrumento_id       → id del instrumento.
+     sin_instrumento      → bool, True si no hay instrumento
+                            habilitado para la empresa.
+
+   Por cada pregunta muestra:
+     - Actividad de tratamiento y finalidad (resumen).
+     - Badge de estado: verde "Respondida" o amarillo "Pendiente".
+     - Botón "Responder" o "Editar" según si existe respuesta,
+       ambos apuntan a rat_responder con el id de la pregunta.
+
+   Si no hay preguntas muestra aviso amarillo indicando que el
+   coordinador debe crearlas primero.
+   ================================================================ #}
+
 {% extends "cuestionario/base.html" %}
 
 {% block title %}RAT – Mis Preguntas{% endblock %}
