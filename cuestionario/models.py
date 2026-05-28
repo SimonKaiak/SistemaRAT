@@ -631,10 +631,20 @@ class RegistroVersiones(models.Model):
 # Tabla Instrumento (catálogo global)
 # =========================
 class Instrumento(models.Model):
+    TIPO_CHOICES = [
+        ('rat', 'Registro de Actividad de Tratamiento (RAT)'),
+        ('evaluacion', 'Evaluación de Desempeño'),
+    ]
+
     id_instrumento = models.AutoField(primary_key=True)
     nombre_instrumento = models.CharField(max_length=100, unique=True)
     descripcion = models.TextField(null=True, blank=True)
     activo = models.BooleanField(default=True)
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPO_CHOICES,
+        default='rat',
+    )
 
     class Meta:
         managed = True

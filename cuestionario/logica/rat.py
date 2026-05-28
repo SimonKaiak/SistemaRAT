@@ -512,8 +512,8 @@ def seleccion_instrumentos(request):
         empresa=empresa, habilitado=True
     ).select_related('instrumento')
 
-    instrumentos_rat   = [ie for ie in instrumentos_empresa if 'RAT' in ie.instrumento.nombre_instrumento.upper()]
-    instrumentos_otros = [ie for ie in instrumentos_empresa if 'RAT' not in ie.instrumento.nombre_instrumento.upper()]
+    instrumentos_rat   = [ie for ie in instrumentos_empresa if ie.instrumento.tipo == 'rat']
+    instrumentos_otros = [ie for ie in instrumentos_empresa if ie.instrumento.tipo != 'rat']
 
     return render(request, 'cuestionario/seleccion_instrumentos.html', {
         'trabajador':         trabajador,
