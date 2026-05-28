@@ -42,9 +42,12 @@ def login_view(request):
         clave = request.POST.get('password')
         
         try:
-            user_obj = User.objects.get(email=correo)
-            user = authenticate(request, username=user_obj.username, password=clave)
-        except User.DoesNotExist:
+            user_obj = User.objects.filter(email=correo).first()
+            if user_obj:
+                user = authenticate(request, username=user_obj.username, password=clave)
+            else:
+                user = None
+        except Exception:
             user = None
         
         if user is not None:
