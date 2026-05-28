@@ -699,6 +699,16 @@ class RATPreguntas(models.Model):
     base_legitimidad = models.CharField(max_length=50, choices=BASE_LEGITIMIDAD_CHOICES)
     periodo_conservacion = models.PositiveIntegerField()
     fuente_datos = models.CharField(max_length=255)
+    TIPO_PREGUNTA_CHOICES = [
+        ('texto', 'Texto libre'),
+        ('sino', 'Sí / No'),
+        ('escala', 'Escala 1-5'),
+    ]
+    tipo = models.CharField(
+        max_length=10,
+        choices=TIPO_PREGUNTA_CHOICES,
+        default='texto',
+    )
  
     # ← CAMBIO: antes Instrumento, ahora InstrumentoEmpresa
     instrumento_empresa = models.ForeignKey(

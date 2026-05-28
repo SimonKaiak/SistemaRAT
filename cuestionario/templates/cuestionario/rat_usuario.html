@@ -59,7 +59,7 @@
                     {% else %}
                         <span style="background:#f0c040;color:#000;padding:0.25em 0.8em;border-radius:20px;font-size:0.82em;font-weight:bold;">⏳ Pendiente</span>
                     {% endif %}
-                    <a href="{% url 'rat_responder' pregunta.id_rat_pregunta %}" class="button primary small" style="margin:0;">
+                    <a href="{% url 'rat_responder' pregunta.id_rat_pregunta %}?instrumento_id={{ instrumento_id }}" class="button primary small" style="margin:0;">
                         {% if pregunta.id_rat_pregunta in respuestas_existentes %}Editar{% else %}Responder{% endif %}
                     </a>
                 </div>

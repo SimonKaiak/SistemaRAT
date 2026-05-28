@@ -9,20 +9,17 @@
    a una pregunta RAT específica.
 
    Contexto recibido:
-     pregunta   → instancia de RATPreguntas con los detalles
-                  de la actividad de tratamiento.
-     form       → instancia de RATRespuestaForm (campo respuesta).
-     editando   → bool, True si ya existe una respuesta previa.
-     trabajador → Trabajador autenticado.
+     pregunta       → instancia de RATPreguntas.
+     form           → instancia de RATRespuestaForm (campo respuesta).
+     editando       → bool, True si ya existe una respuesta previa.
+     trabajador     → Trabajador autenticado.
      instrumento    → instancia de Instrumento activo.
      instrumento_id → id del instrumento (para URLs).
 
-   Muestra los detalles de la pregunta en una tabla de solo
-   lectura: finalidad, categorías de datos, base de legitimidad
-   (display legible), período de conservación y fuente de datos.
-   Luego el textarea de respuesta con sus errores si los hay.
-   El título y botón submit cambian según editando.
-   El botón volver regresa a rat_panel_usuario.
+   Comportamiento según pregunta.tipo:
+     texto   → textarea libre (RAT clásico muestra tabla de detalles)
+     sino    → radio buttons Sí / No
+     escala  → radio buttons 1-5
    ================================================================ #}
 
 {% block title %}RAT – Responder{% endblock %}
@@ -33,13 +30,15 @@
         {% csrf_token %}
         <header>
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-                <a href="{% url 'rat_panel_usuario' %}" class="button">← Volver</a>
+                <a href="{% url 'rat_panel_usuario' %}?instrumento_id={{ instrumento_id }}" class="button">← Volver</a>
             </div>
             <hr style="margin-top:1.5em;" />
             <h2>{% if editando %}✏️ Editar respuesta{% else %}📝 Responder pregunta{% endif %}</h2>
             <p><strong>{{ pregunta.actividad_tratamiento }}</strong></p>
         </header>
 
+        {# Tabla de detalles solo para RAT clásico (tipo texto con campos llenos) #}
+        {% if pregunta.finalidad_tratamiento or pregunta.categorias_datos %}
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;margin-bottom:0;">
             <table style="width:100%;border-collapse:collapse;font-size:0.92em;margin:0;">
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -64,12 +63,65 @@
                 </tr>
             </table>
         </div>
+        {% endif %}
 
         <hr style="margin-top:1.5em;margin-bottom:0.5em;" />
 
         <div style="margin-top:0.8em;margin-bottom:1.2em;">
             <label style="display:block;margin-bottom:0.5em;font-weight:bold;">Tu respuesta:</label>
-            {{ form.respuesta }}
+
+            {% if pregunta.tipo == 'sino' %}
+                <div style="display:flex;gap:1em;">
+                    <div class="opcion-sino" onclick="seleccionarOpcion(this, 'Sí')"
+                        style="padding:0.7em 2em;border-radius:8px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);font-size:1em;cursor:pointer;transition:all 0.2s;{% if form.respuesta.value == 'Sí' %}border-color:#4fc3f7;background:rgba(79,195,247,0.15);{% endif %}">
+                        <input type="radio" name="respuesta" value="Sí" {% if form.respuesta.value == 'Sí' %}checked{% endif %} style="display:none;">
+                        Sí
+                    </div>
+                    <div class="opcion-sino" onclick="seleccionarOpcion(this, 'No')"
+                        style="padding:0.7em 2em;border-radius:8px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);font-size:1em;cursor:pointer;transition:all 0.2s;{% if form.respuesta.value == 'No' %}border-color:#4fc3f7;background:rgba(79,195,247,0.15);{% endif %}">
+                        <input type="radio" name="respuesta" value="No" {% if form.respuesta.value == 'No' %}checked{% endif %} style="display:none;">
+                        No
+                    </div>
+                </div>
+                <script>
+                function seleccionarOpcion(div, valor) {
+                    document.querySelectorAll('.opcion-sino').forEach(d => {
+                        d.style.borderColor = 'rgba(255,255,255,0.2)';
+                        d.style.background = 'rgba(255,255,255,0.05)';
+                    });
+                    div.style.borderColor = '#4fc3f7';
+                    div.style.background = 'rgba(79,195,247,0.15)';
+                    div.querySelector('input[type="radio"]').checked = true;
+                }
+                </script>
+
+            {% elif pregunta.tipo == 'escala' %}
+                <div style="display:flex;gap:1em;flex-wrap:wrap;">
+                    {% for i in "12345" %}
+                    <div class="opcion-escala" onclick="seleccionarEscala(this, '{{ i }}')"
+                         style="display:flex;flex-direction:column;align-items:center;gap:0.4em;cursor:pointer;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.7em 1.2em;transition:all 0.2s;{% if form.respuesta.value == i %}border-color:#4fc3f7;background:rgba(79,195,247,0.15);{% endif %}">
+                        <input type="radio" name="respuesta" value="{{ i }}" {% if form.respuesta.value == i %}checked{% endif %} style="display:none;">
+                        <span style="font-size:1.1em;font-weight:600;">{{ i }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p style="font-size:0.85em;opacity:0.6;margin-top:0.6em;">1 = Nada familiarizado/a &nbsp;|&nbsp; 5 = Muy familiarizado/a</p>
+                <script>
+                function seleccionarEscala(div, valor) {
+                    document.querySelectorAll('.opcion-escala').forEach(d => {
+                        d.style.borderColor = 'rgba(255,255,255,0.15)';
+                        d.style.background = 'rgba(255,255,255,0.05)';
+                    });
+                    div.style.borderColor = '#4fc3f7';
+                    div.style.background = 'rgba(79,195,247,0.15)';
+                    div.querySelector('input[type="radio"]').checked = true;
+                }
+                </script>
+
+            {% else %}
+                {{ form.respuesta }}
+            {% endif %}
+
             {% if form.respuesta.errors %}
                 <p style="color:#ff6b6b;margin-top:0.4em;font-size:0.88em;">{{ form.respuesta.errors }}</p>
             {% endif %}

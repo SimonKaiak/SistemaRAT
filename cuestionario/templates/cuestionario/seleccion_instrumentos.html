@@ -231,7 +231,9 @@
           {{ ie.instrumento.nombre_instrumento }}
         </option>
         {% endfor %}
+        {% if user.is_superuser or es_coordinador %}
         <option value="__nuevo__">＋ Crear nuevo RAT</option>
+        {% endif %}
       </select>
     </div>
 

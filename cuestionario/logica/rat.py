@@ -227,6 +227,28 @@ class RegistroVersionesForm(forms.ModelForm):
             }),
         }
 
+class RATPreguntaSimpleForm(forms.ModelForm):
+    """Formulario simplificado para preguntas de tipo sino/escala/texto
+    del Kick Off — solo muestra enunciado y responsable."""
+    class Meta:
+        model = RATPreguntas
+        fields = ['actividad_tratamiento', 'responsable']
+        widgets = {
+            'actividad_tratamiento': forms.Textarea(attrs={
+                'rows': 3,
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+            }),
+            'responsable': forms.Select(attrs={
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
+            }),
+        }
+
+    def __init__(self, *args, empresa=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if empresa:
+            self.fields['responsable'].queryset = Trabajador.objects.filter(empresa=empresa)
+        else:
+            self.fields['responsable'].queryset = Trabajador.objects.all()
 
 # ─── VISTAS TRABAJADOR ────────────────────────────────────────────────────────
 
@@ -236,15 +258,13 @@ def rat_panel_usuario(request):
     if not trabajador:
         return redirect('index')
 
+    instrumento_id = request.GET.get('instrumento_id')
+    if not instrumento_id:
+        return redirect('seleccion_instrumentos')
+
     ie = _get_instrumento_empresa(request, trabajador.empresa)
     if not ie:
-        return render(request, 'cuestionario/rat_usuario.html', {
-            'trabajador': trabajador,
-            'preguntas': [],
-            'respuestas_existentes': {},
-            'instrumento': None,
-            'sin_instrumento': True,
-        })
+        return redirect('seleccion_instrumentos')
 
     preguntas = RATPreguntas.objects.filter(instrumento_empresa=ie)
     respuestas_existentes = {
@@ -369,13 +389,15 @@ def rat_editar_pregunta(request, pregunta_id):
     ie = _get_instrumento_empresa(request, empresa)
     pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, instrumento_empresa=ie)
 
+    FormClass = RATPreguntaSimpleForm if pregunta.tipo in ('sino', 'escala', 'texto') and not pregunta.finalidad_tratamiento else RATPreguntaForm
+
     if request.method == 'POST':
-        form = RATPreguntaForm(request.POST, instance=pregunta, empresa=empresa)
+        form = FormClass(request.POST, instance=pregunta, empresa=empresa)
         if form.is_valid():
             form.save()
             return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
-        form = RATPreguntaForm(instance=pregunta, empresa=empresa)
+        form = FormClass(instance=pregunta, empresa=empresa)
 
     return render(request, 'cuestionario/rat_formulario.html', {
         'trabajador': trabajador,
@@ -383,6 +405,7 @@ def rat_editar_pregunta(request, pregunta_id):
         'form': form,
         'editando': True,
         'pregunta': pregunta,
+        'tipo_pregunta': pregunta.tipo,
         'instrumento': ie.instrumento,
         'instrumento_id': ie.instrumento.id_instrumento,
     })

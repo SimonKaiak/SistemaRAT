@@ -137,6 +137,7 @@ def clonar_preguntas_rat(sender, instance, created, **kwargs):
             base_legitimidad='consentimiento',
             periodo_conservacion=0,
             fuente_datos='',
+            tipo=plantilla.tipo,
             responsable=responsable,
             version=None,
         ))

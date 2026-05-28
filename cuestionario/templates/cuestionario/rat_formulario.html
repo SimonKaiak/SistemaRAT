@@ -1,29 +1,5 @@
 {% extends "cuestionario/base.html" %}
 
-{# ================================================================
-   rat_formulario.html
-   Extiende: cuestionario/base.html
-   Vistas asociadas: rat_nueva_pregunta, rat_editar_pregunta (rat.py)
-   ----------------------------------------------------------------
-   Formulario para crear o editar una pregunta RAT.
-   Reutilizado por ambas vistas controlado por la variable editando.
-
-   Contexto recibido:
-     form        → instancia de RATPreguntaForm (con campos
-                   filtrados por empresa).
-     editando    → bool, True si es edición, False si es nueva.
-     trabajador  → Trabajador del coordinador (o None si admin).
-     empresa_actual → empresa del instrumento activo.
-     instrumento    → instancia de Instrumento activo.
-     instrumento_id → id del instrumento (para URLs).
-
-   Renderiza cada campo del formulario con su label, widget,
-   help_text y errores de validación.
-   Los campos requeridos muestran asterisco rojo (*).
-   El botón cancelar vuelve a rat_panel_coordinador.
-   El texto del botón submit cambia según editando.
-   ================================================================ #}
-
 {% block title %}RAT – {% if editando %}Editar pregunta{% else %}Nueva pregunta{% endif %}{% endblock %}
 
 {% block content %}
@@ -32,32 +8,75 @@
         {% csrf_token %}
         <header>
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-                <a href="{% url 'rat_panel_coordinador' %}" class="button">← Cancelar</a>
+                <a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ instrumento_id }}" class="button">← Cancelar</a>
             </div>
             <hr style="margin-top:1.5em;" />
             <h2>{% if editando %}✏️ Editar pregunta RAT{% else %}📋 Nueva pregunta RAT{% endif %}</h2>
-            <p>Completa los campos para <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+            <p>Completa los campos para <strong>{{ empresa_actual.nombre_empresa }}</strong>.</p>
         </header>
 
         <div style="display:flex;flex-direction:column;gap:1em;max-width:700px;">
-            {% for field in form %}
-            <div>
-                <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">
-                    {{ field.label }}{% if field.field.required %} <span style="color:#ff6b6b;">*</span>{% endif %}
-                </label>
-                {{ field }}
-                {% if field.help_text %}
-                    <small style="display:block;margin-top:0.25em;opacity:0.6;">{{ field.help_text }}</small>
-                {% endif %}
-                {% if field.errors %}
-                    <p style="color:#ff6b6b;margin-top:0.3em;font-size:0.85em;">{{ field.errors }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
+
+            {# Si es pregunta de Kick Off (sino/escala/texto sin finalidad) #}
+            {% if tipo_pregunta == 'sino' or tipo_pregunta == 'escala' or tipo_pregunta == 'texto' and not pregunta.finalidad_tratamiento %}
+
+                {# Enunciado #}
+                <div>
+                    <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">
+                        Enunciado de la pregunta <span style="color:#ff6b6b;">*</span>
+                    </label>
+                    {{ form.actividad_tratamiento }}
+                    {% if form.actividad_tratamiento.errors %}
+                        <p style="color:#ff6b6b;margin-top:0.3em;font-size:0.85em;">{{ form.actividad_tratamiento.errors }}</p>
+                    {% endif %}
+                </div>
+
+                {# Tipo de pregunta (solo lectura) #}
+                <div>
+                    <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">Tipo</label>
+                    <p style="margin:0;padding:0.5em;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:6px;font-size:0.9em;opacity:0.7;">
+                        {% if tipo_pregunta == 'sino' %}Sí / No
+                        {% elif tipo_pregunta == 'escala' %}Escala 1-5
+                        {% else %}Texto libre
+                        {% endif %}
+                        <em style="font-size:0.85em;"> — no editable</em>
+                    </p>
+                </div>
+
+                {# Responsable #}
+                <div>
+                    <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">
+                        Responsable <span style="color:#ff6b6b;">*</span>
+                    </label>
+                    {{ form.responsable }}
+                    {% if form.responsable.errors %}
+                        <p style="color:#ff6b6b;margin-top:0.3em;font-size:0.85em;">{{ form.responsable.errors }}</p>
+                    {% endif %}
+                </div>
+
+            {% else %}
+                {# RAT clásico — todos los campos #}
+                {% for field in form %}
+                <div>
+                    <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">
+                        {{ field.label }}{% if field.field.required %} <span style="color:#ff6b6b;">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="display:block;margin-top:0.25em;opacity:0.6;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <p style="color:#ff6b6b;margin-top:0.3em;font-size:0.85em;">{{ field.errors }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% endif %}
+
         </div>
 
         <hr style="margin-top:2em;" />
-        <div style="display:flex;justify-content:flex-start;padding:1.5em 0;">
+        <div style="display:flex;justify-content:flex-end;padding:1.5em 0;">
+            <a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ instrumento_id }}" class="button" style="margin-right:1em;">Cancelar</a>
             <button type="submit" class="button primary">
                 {% if editando %}Guardar cambios{% else %}Guardar pregunta{% endif %}
             </button>
