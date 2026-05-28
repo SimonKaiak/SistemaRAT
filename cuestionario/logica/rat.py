@@ -124,11 +124,11 @@ def _get_instrumento_empresa(request, empresa):
             empresa=empresa,
             habilitado=True,
         )
-    # fallback: primer RAT habilitado de la empresa
+    # fallback: primer instrumento de tipo RAT habilitado de la empresa
     return InstrumentoEmpresa.objects.filter(
         empresa=empresa,
         habilitado=True,
-        instrumento__nombre_instrumento__icontains='RAT',
+        instrumento__tipo='rat',
     ).select_related('instrumento').first()
 
 
