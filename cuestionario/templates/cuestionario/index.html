@@ -169,10 +169,14 @@
 
         <section>
             <span class="icon solid major fa-shield-alt"></span>
-            <h3>RAT – Protección de Datos</h3>
+            <h3>RAT 1 – Protección de Datos</h3>
             <p>Completa el Registro de Actividad de Tratamiento de datos de tu empresa.</p>
             <ul class="actions">
+                {% if rat1_instrumento_id %}
+                <li><a href="{% url 'rat_panel_usuario' %}?instrumento_id={{ rat1_instrumento_id }}" class="button primary">Ir al RAT 1</a></li>
+                {% else %}
                 <li><a href="{% url 'seleccion_instrumentos' %}" class="button primary">Ir al RAT</a></li>
+                {% endif %}
             </ul>
         </section>
 
