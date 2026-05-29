@@ -22,119 +22,200 @@
      escala  → radio buttons 1-5
    ================================================================ #}
 
-{% block title %}RAT – Responder{% endblock %}
+Perfecto. El plan es: al hacer clic en "Editar", en vez de navegar a otra página, se abre un modal encima con el formulario de respuesta (sino/escala/texto según el tipo de pregunta), y al guardar hace POST por AJAX y cierra el modal.
+Esto requiere modificar rat_usuario.html para agregar el modal y el JS. Reemplaza todo el contenido de rat_usuario.html con esto:
+html{% extends "cuestionario/base.html" %}
+
+{% block title %}RAT – Mis Preguntas{% endblock %}
 
 {% block content %}
+<style>
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal-box {
+    background: #1a1a2e;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 2em;
+    max-width: 560px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .opcion-sino, .opcion-escala {
+    padding: 0.7em 2em;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .opcion-sino.selected, .opcion-escala.selected {
+    border-color: #4fc3f7;
+    background: rgba(79,195,247,0.15);
+  }
+</style>
+
 <section>
-    <form method="post" action="">
-        {% csrf_token %}
-        <header>
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-                <a href="{% url 'rat_panel_usuario' %}?instrumento_id={{ instrumento_id }}" class="button">← Volver</a>
-            </div>
-            <hr style="margin-top:1.5em;" />
-            <h2>{% if editando %}✏️ Editar respuesta{% else %}📝 Responder pregunta{% endif %}</h2>
-            <p><strong>{{ pregunta.actividad_tratamiento }}</strong></p>
-        </header>
+    <header>
+        <a href="{% url 'index' %}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver al inicio</a>
+        <hr style="margin-top:1.5em;" />
+        <h2>📋 Registro de Actividad de Tratamiento (RAT)</h2>
+        <p>Bienvenido/a, <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }}</strong>.
+           Responde o actualiza cada pregunta RAT de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+    </header>
 
-        {# Tabla de detalles solo para RAT clásico (tipo texto con campos llenos) #}
-        {% if pregunta.finalidad_tratamiento or pregunta.categorias_datos %}
-        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;margin-bottom:0;">
-            <table style="width:100%;border-collapse:collapse;font-size:0.92em;margin:0;">
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-                    <th style="text-align:left;padding:0.5em 0.8em;opacity:0.7;width:220px;">Finalidad</th>
-                    <td style="padding:0.5em 0;">{{ pregunta.finalidad_tratamiento }}</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-                    <th style="text-align:left;padding:0.5em 0.8em;opacity:0.7;">Categorías de datos</th>
-                    <td style="padding:0.5em 0;">{{ pregunta.categorias_datos }}</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-                    <th style="text-align:left;padding:0.5em 0.8em;opacity:0.7;">Base de legitimidad</th>
-                    <td style="padding:0.5em 0;">{{ pregunta.get_base_legitimidad_display }}</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-                    <th style="text-align:left;padding:0.5em 0.8em;opacity:0.7;">Período de conservación</th>
-                    <td style="padding:0.5em 0;">{{ pregunta.periodo_conservacion }} meses</td>
-                </tr>
-                <tr>
-                    <th style="text-align:left;padding:0.5em 0.8em;opacity:0.7;">Fuente de datos</th>
-                    <td style="padding:0.5em 0;">{{ pregunta.fuente_datos }}</td>
-                </tr>
-            </table>
+    {% if not preguntas %}
+        <div style="background:rgba(255,200,50,0.15);border-left:4px solid #f0c040;padding:1em 1.5em;border-radius:6px;margin-bottom:1.5em;">
+            ⚠️ Aún no hay preguntas RAT creadas. El coordinador debe crearlas primero.
         </div>
-        {% endif %}
+    {% else %}
+        <div style="display:flex;flex-direction:column;gap:1em;">
+            {% for pregunta in preguntas %}
 
-        <hr style="margin-top:1.5em;margin-bottom:0.5em;" />
-
-        <div style="margin-top:0.8em;margin-bottom:1.2em;">
-            <label style="display:block;margin-bottom:0.5em;font-weight:bold;">Tu respuesta:</label>
-
-            {% if pregunta.tipo == 'sino' %}
-                <div style="display:flex;gap:1em;">
-                    <div class="opcion-sino" onclick="seleccionarOpcion(this, 'Sí')"
-                        style="padding:0.7em 2em;border-radius:8px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);font-size:1em;cursor:pointer;transition:all 0.2s;{% if form.respuesta.value == 'Sí' %}border-color:#4fc3f7;background:rgba(79,195,247,0.15);{% endif %}">
-                        <input type="radio" name="respuesta" value="Sí" {% if form.respuesta.value == 'Sí' %}checked{% endif %} style="display:none;">
-                        Sí
-                    </div>
-                    <div class="opcion-sino" onclick="seleccionarOpcion(this, 'No')"
-                        style="padding:0.7em 2em;border-radius:8px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);font-size:1em;cursor:pointer;transition:all 0.2s;{% if form.respuesta.value == 'No' %}border-color:#4fc3f7;background:rgba(79,195,247,0.15);{% endif %}">
-                        <input type="radio" name="respuesta" value="No" {% if form.respuesta.value == 'No' %}checked{% endif %} style="display:none;">
-                        No
-                    </div>
-                </div>
-                <script>
-                function seleccionarOpcion(div, valor) {
-                    document.querySelectorAll('.opcion-sino').forEach(d => {
-                        d.style.borderColor = 'rgba(255,255,255,0.2)';
-                        d.style.background = 'rgba(255,255,255,0.05)';
-                    });
-                    div.style.borderColor = '#4fc3f7';
-                    div.style.background = 'rgba(79,195,247,0.15)';
-                    div.querySelector('input[type="radio"]').checked = true;
-                }
-                </script>
-
-            {% elif pregunta.tipo == 'escala' %}
-                <div style="display:flex;gap:1em;flex-wrap:wrap;">
-                    {% for i in "12345" %}
-                    <div class="opcion-escala" onclick="seleccionarEscala(this, '{{ i }}')"
-                         style="display:flex;flex-direction:column;align-items:center;gap:0.4em;cursor:pointer;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.7em 1.2em;transition:all 0.2s;{% if form.respuesta.value == i %}border-color:#4fc3f7;background:rgba(79,195,247,0.15);{% endif %}">
-                        <input type="radio" name="respuesta" value="{{ i }}" {% if form.respuesta.value == i %}checked{% endif %} style="display:none;">
-                        <span style="font-size:1.1em;font-weight:600;">{{ i }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-                <p style="font-size:0.85em;opacity:0.6;margin-top:0.6em;">1 = Nada familiarizado/a &nbsp;|&nbsp; 5 = Muy familiarizado/a</p>
-                <script>
-                function seleccionarEscala(div, valor) {
-                    document.querySelectorAll('.opcion-escala').forEach(d => {
-                        d.style.borderColor = 'rgba(255,255,255,0.15)';
-                        d.style.background = 'rgba(255,255,255,0.05)';
-                    });
-                    div.style.borderColor = '#4fc3f7';
-                    div.style.background = 'rgba(79,195,247,0.15)';
-                    div.querySelector('input[type="radio"]').checked = true;
-                }
-                </script>
+            {% if pregunta.tipo == 'texto' and 'Presentación' in pregunta.actividad_tratamiento %}
+            <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);border-radius:10px;padding:1.4em 1.6em;">
+                <h4 style="margin:0 0 0.6em;color:#4fc3f7;">Presentación: ¿Qué se entiende por datos personales?</h4>
+                <p style="margin:0;line-height:1.6;opacity:0.85;">{{ pregunta.actividad_tratamiento|slice:"14:" }}</p>
+            </div>
 
             {% else %}
-                {{ form.respuesta }}
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;display:flex;justify-content:space-between;align-items:center;gap:1em;flex-wrap:wrap;">
+                <div style="flex:1;min-width:200px;">
+                    <h4 style="margin:0 0 0.3em;">{{ pregunta.actividad_tratamiento }}</h4>
+                    <p style="margin:0;font-size:0.9em;opacity:0.7;">Finalidad: {{ pregunta.finalidad_tratamiento }}</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.8em;flex-shrink:0;">
+                    {% if pregunta.id_rat_pregunta in respuestas_existentes %}
+                        <span style="background:#51ff85;color:#000;padding:0.25em 0.8em;border-radius:20px;font-size:0.82em;font-weight:bold;">✅ Respondida</span>
+                        <button onclick="abrirModal({{ pregunta.id_rat_pregunta }}, '{{ pregunta.tipo }}', '{{ respuestas_existentes[pregunta.id_rat_pregunta].respuesta|escapejs }}')"
+                                class="button small" style="margin:0;font-weight:900;background:#f0c040;color:#000 !important;border-color:#f0c040;cursor:pointer;">
+                            Editar
+                        </button>
+                    {% else %}
+                        <span style="background:#f0c040;color:#000;padding:0.25em 0.8em;border-radius:20px;font-size:0.82em;font-weight:bold;">⏳ Pendiente</span>
+                        <button onclick="abrirModal({{ pregunta.id_rat_pregunta }}, '{{ pregunta.tipo }}', '')"
+                                class="button small" style="margin:0;font-weight:900;background:#51ff85;color:#000 !important;border-color:#51ff85;cursor:pointer;">
+                            Responder
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
             {% endif %}
 
-            {% if form.respuesta.errors %}
-                <p style="color:#ff6b6b;margin-top:0.4em;font-size:0.88em;">{{ form.respuesta.errors }}</p>
-            {% endif %}
+            {% endfor %}
         </div>
-
-        <hr />
-        <div style="display:flex;justify-content:flex-start;padding:0em 0;">
-            <button type="submit" class="button primary">
-                {% if editando %}Guardar cambios{% else %}Guardar respuesta{% endif %}
-            </button>
-        </div>
-        <hr />
-
-    </form>
+    {% endif %}
 </section>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="cerrarModalFuera(event)">
+    <div class="modal-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2em;">
+            <h3 id="modal-titulo" style="margin:0;">Editar respuesta</h3>
+            <button onclick="cerrarModal()" style="background:none;border:none;color:#fff;font-size:1.4em;cursor:pointer;">✕</button>
+        </div>
+        <form id="modal-form">
+            {% csrf_token %}
+            <div id="modal-campos"></div>
+            <div style="margin-top:1.5em;display:flex;gap:0.8em;">
+                <button type="submit" class="button primary" style="font-weight:700;">Guardar</button>
+                <button type="button" onclick="cerrarModal()" class="button">Cancelar</button>
+            </div>
+        </form>
+        <div id="modal-mensaje" style="margin-top:1em;display:none;"></div>
+    </div>
+</div>
+
+<script>
+let preguntaIdActual = null;
+
+function abrirModal(preguntaId, tipo, valorActual) {
+    preguntaIdActual = preguntaId;
+    const campos = document.getElementById('modal-campos');
+    const titulo = document.getElementById('modal-titulo');
+    titulo.textContent = valorActual ? 'Editar respuesta' : 'Responder pregunta';
+
+    if (tipo === 'sino') {
+        campos.innerHTML = `
+            <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta:</label>
+            <div style="display:flex;gap:1em;">
+                <div class="opcion-sino ${valorActual === 'Sí' ? 'selected' : ''}" onclick="seleccionarSino(this, 'Sí')">
+                    <input type="radio" name="respuesta" value="Sí" ${valorActual === 'Sí' ? 'checked' : ''} style="display:none;"> Sí
+                </div>
+                <div class="opcion-sino ${valorActual === 'No' ? 'selected' : ''}" onclick="seleccionarSino(this, 'No')">
+                    <input type="radio" name="respuesta" value="No" ${valorActual === 'No' ? 'checked' : ''} style="display:none;"> No
+                </div>
+            </div>`;
+    } else if (tipo === 'escala') {
+        let ops = '';
+        for (let i = 1; i <= 5; i++) {
+            ops += `<div class="opcion-escala ${valorActual == i ? 'selected' : ''}" onclick="seleccionarEscala(this, '${i}')">
+                        <input type="radio" name="respuesta" value="${i}" ${valorActual == i ? 'checked' : ''} style="display:none;">
+                        <span style="font-size:1.1em;font-weight:600;">${i}</span>
+                    </div>`;
+        }
+        campos.innerHTML = `
+            <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta:</label>
+            <div style="display:flex;gap:1em;flex-wrap:wrap;">${ops}</div>
+            <p style="font-size:0.85em;opacity:0.6;margin-top:0.6em;">1 = Nada familiarizado/a &nbsp;|&nbsp; 5 = Muy familiarizado/a</p>`;
+    } else {
+        campos.innerHTML = `
+            <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta:</label>
+            <textarea name="respuesta" rows="4" style="width:100%;padding:0.6em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:0.95em;">${valorActual}</textarea>`;
+    }
+
+    document.getElementById('modal-mensaje').style.display = 'none';
+    document.getElementById('modal-overlay').classList.add('visible');
+}
+
+function cerrarModal() {
+    document.getElementById('modal-overlay').classList.remove('visible');
+}
+
+function cerrarModalFuera(e) {
+    if (e.target === document.getElementById('modal-overlay')) cerrarModal();
+}
+
+function seleccionarSino(div, valor) {
+    document.querySelectorAll('.opcion-sino').forEach(d => d.classList.remove('selected'));
+    div.classList.add('selected');
+    div.querySelector('input[type="radio"]').checked = true;
+}
+
+function seleccionarEscala(div, valor) {
+    document.querySelectorAll('.opcion-escala').forEach(d => d.classList.remove('selected'));
+    div.classList.add('selected');
+    div.querySelector('input[type="radio"]').checked = true;
+}
+
+document.getElementById('modal-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const csrfToken = formData.get('csrfmiddlewaretoken');
+    const respuesta = formData.get('respuesta');
+
+    fetch(`/rat/responder/${preguntaIdActual}/?instrumento_id={{ instrumento_id }}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `respuesta=${encodeURIComponent(respuesta)}&csrfmiddlewaretoken=${encodeURIComponent(csrfToken)}`,
+        redirect: 'manual',
+    }).then(response => {
+        cerrarModal();
+        window.location.reload();
+    });
+});
+</script>
 {% endblock %}

@@ -272,6 +272,10 @@ def rat_panel_usuario(request):
         for r in RATRespuestas.objects.filter(trabajador=trabajador, pregunta__instrumento_empresa=ie)
     }
 
+    # Anotar cada pregunta con su respuesta para el template
+    for p in preguntas:
+        p.respuesta_actual = respuestas_existentes.get(p.id_rat_pregunta)
+
     return render(request, 'cuestionario/rat_usuario.html', {
         'trabajador': trabajador,
         'preguntas': preguntas,

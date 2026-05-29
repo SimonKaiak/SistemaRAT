@@ -91,13 +91,22 @@ def index(request):
             estado_finalizacion=True
         ).exists()
 
+    # Detectar instrumento RAT 1 asignado al trabajador
+    ie_rat1 = InstrumentoEmpresa.objects.filter(
+        empresa=trabajador.empresa,
+        habilitado=True,
+        instrumento__tipo='rat',
+    ).select_related('instrumento').first()
+    rat1_instrumento_id = ie_rat1.instrumento.id_instrumento if ie_rat1 else None
+
     context = {
         'trabajador': trabajador,
         'es_jefe': trabajador.subordinados.exists(),
         'equipo': equipo,
         'ya_hizo_autoevaluacion': autoeval_completada,
         'es_admin_sistema': False,
-        'es_coordinador': trabajador.es_coordinador, 
+        'es_coordinador': trabajador.es_coordinador,
+        'rat1_instrumento_id': rat1_instrumento_id,
     }
     return render(request, 'cuestionario/index.html', context)
 
