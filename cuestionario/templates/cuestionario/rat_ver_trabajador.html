@@ -1,0 +1,37 @@
+{% extends "cuestionario/base.html" %}
+{% block title %}RAT – {{ trabajador.nombre }}{% endblock %}
+{% block content %}
+<section>
+    <header>
+        <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
+        <a href="{% url 'seguimiento_rat' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver a Seguimiento RAT</a>
+        <hr style="margin-top:1.5em;" />
+        <h2>RAT – {{ trabajador.nombre }} {{ trabajador.apellido_paterno }}</h2>
+        <p>{{ trabajador.cargo.nombre_cargo }} — {{ trabajador.empresa.nombre_empresa }}</p>
+    </header>
+
+    <div style="display:flex;flex-direction:column;gap:1em;">
+        {% for pregunta in preguntas %}
+        {% if not pregunta.tipo == 'texto' or not 'Presentación' in pregunta.actividad_tratamiento %}
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1em;">
+                <div style="flex:1;">
+                    <h4 style="margin:0 0 0.3em;">{{ pregunta.actividad_tratamiento }}</h4>
+                    {% if pregunta.respuesta_actual %}
+                        <p style="margin:0.4em 0 0;font-size:0.88em;color:#4fc3f7;">↳ Respuesta: <strong>{{ pregunta.respuesta_actual.respuesta }}</strong></p>
+                    {% else %}
+                        <p style="margin:0.4em 0 0;font-size:0.88em;opacity:0.5;font-style:italic;">Sin respuesta aún.</p>
+                    {% endif %}
+                </div>
+                <span style="font-size:0.82em;font-weight:bold;padding:0.25em 0.8em;border-radius:20px;{% if pregunta.respuesta_actual %}background:#51ff85;color:#000;{% else %}background:#f0c040;color:#000;{% endif %}">
+                    {% if pregunta.respuesta_actual %}Respondida{% else %}Pendiente{% endif %}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+        {% empty %}
+        <p>No hay preguntas RAT para este instrumento.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -52,6 +52,10 @@ from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, 
 def index(request):
     # 1. VALIDACIÓN PARA ADMINISTRADOR
     if request.user.is_superuser:
+        if request.GET.get('salir_empresa'):
+            request.session.pop('empresa_id_admin', None)
+            from django.shortcuts import redirect
+            return redirect('/')
         empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
         empresa_seleccionada = None
         if empresa_id:

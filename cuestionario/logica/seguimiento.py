@@ -35,7 +35,7 @@ panel_seguimiento(request)
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
-from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, ResultadoConsolidado, Empresa
+from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, ResultadoConsolidado, Empresa, RATRespuestas, InstrumentoEmpresa
 
 @login_required
 def panel_seguimiento(request):
@@ -71,6 +71,12 @@ def panel_seguimiento(request):
     jefaturas_listas = 0
     jefaturas_pendientes = 0
     total_por_realizar = 0
+    rat_listos = 0
+    rat_pendientes = 0
+
+    instrumento_empresa_rat = None
+    if empresa_actual:
+        instrumento_empresa_rat = InstrumentoEmpresa.objects.filter(empresa=empresa_actual, habilitado=True, instrumento__tipo='rat').first()
 
     for t in trabajadores:
         t.auto_lista = Autoevaluacion.objects.filter(trabajador=t, estado_finalizacion=True).exists()
@@ -97,6 +103,17 @@ def panel_seguimiento(request):
             res = ResultadoConsolidado.objects.filter(trabajador=t).aggregate(Avg('diferencia'))
             t.diff_promedio = res['diferencia__avg']
 
+        if instrumento_empresa_rat:
+            total_preguntas = instrumento_empresa_rat.preguntas.count()
+            respondidas = RATRespuestas.objects.filter(trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat).values('pregunta').distinct().count()
+            t.rat_listo = total_preguntas > 0 and respondidas >= total_preguntas
+        else:
+            t.rat_listo = False
+        if t.rat_listo:
+            rat_listos += 1
+        else:
+            rat_pendientes += 1
+
     context = {
         'trabajadores': trabajadores,
         'total_pendientes': total_por_realizar,
@@ -104,7 +121,71 @@ def panel_seguimiento(request):
         'autos_pendientes': autos_pendientes,
         'jefaturas_listas': jefaturas_listas,
         'jefaturas_pendientes': jefaturas_pendientes,
+        'rat_listos': rat_listos,
+        'rat_pendientes': rat_pendientes,
         'empresa_actual': empresa_actual,
         'es_coordinador': es_coordinador,
     }
     return render(request, 'cuestionario/seguimiento.html', context)
+
+
+@login_required
+def panel_seguimiento_rat(request):
+    es_coordinador = False
+    empresa_actual = None
+
+    if not request.user.is_superuser:
+        try:
+            trabajador_actual = Trabajador.objects.get(user=request.user)
+            if not trabajador_actual.es_coordinador:
+                return redirect('index')
+            es_coordinador = True
+            empresa_actual = trabajador_actual.empresa
+        except Trabajador.DoesNotExist:
+            return redirect('index')
+    else:
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+        if empresa_id:
+            try:
+                empresa_actual = Empresa.objects.get(id_empresa=empresa_id)
+            except Empresa.DoesNotExist:
+                pass
+
+    if empresa_actual:
+        trabajadores = Trabajador.objects.filter(
+            empresa=empresa_actual
+        ).select_related('cargo', 'empresa').order_by('-nivel_jerarquico__id_nivel_jerarquico')
+    else:
+        trabajadores = Trabajador.objects.none()
+
+    rat_listos = 0
+    rat_pendientes = 0
+
+    instrumento_empresa_rat = None
+    if empresa_actual:
+        instrumento_empresa_rat = InstrumentoEmpresa.objects.filter(
+            empresa=empresa_actual, habilitado=True, instrumento__tipo='rat'
+        ).first()
+
+    for t in trabajadores:
+        if instrumento_empresa_rat:
+            total_preguntas = instrumento_empresa_rat.preguntas.count()
+            respondidas = RATRespuestas.objects.filter(
+                trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat
+            ).values('pregunta').distinct().count()
+            t.rat_listo = total_preguntas > 0 and respondidas >= total_preguntas
+        else:
+            t.rat_listo = False
+        if t.rat_listo:
+            rat_listos += 1
+        else:
+            rat_pendientes += 1
+
+    context = {
+        'trabajadores': trabajadores,
+        'rat_listos': rat_listos,
+        'rat_pendientes': rat_pendientes,
+        'empresa_actual': empresa_actual,
+        'es_coordinador': es_coordinador,
+    }
+    return render(request, 'cuestionario/seguimiento_rat.html', context)

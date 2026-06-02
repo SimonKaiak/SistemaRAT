@@ -204,7 +204,7 @@
 
 <section>
   <header>
-    <a href="{{ next_url|default:'javascript:history.back()' }}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver al panel</a>
+    <a href="{% if request.user.is_superuser %}/?empresa_id={{ empresa.id_empresa }}{% else %}{{ next_url|default:'javascript:history.back()' }}{% endif %}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver al panel</a>
     <hr style="margin-top:1em;" />
     <h2 style="margin-bottom:0.2em;">Instrumentos disponibles</h2>
     <p style="opacity:0.6;margin:0;">

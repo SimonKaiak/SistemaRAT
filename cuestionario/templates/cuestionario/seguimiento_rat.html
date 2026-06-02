@@ -30,7 +30,7 @@
      Ver Detalle → botón a detalle_seguimiento solo si
      diff_promedio no es None (ambas evaluaciones completas).
 
-   Botones cabecera (solo superusuario o coordinador con empresa): 
+   Botones cabecera (solo superusuario o coordinador con empresa):
      Generar Reporte Respuestas → generar_reporte_global_pdf.
      Panel Informe con IA       → panel_gemini.
    ================================================================ #}
@@ -53,13 +53,9 @@
     </header>
 
     <div class="row">
-        <div class="col-6 col-12-small">
-            <h3>Autoevaluaciones listas: {{ autos_listas }}</h3>
-            <h3>Autoevaluaciones pendientes: {{ autos_pendientes }}</h3>
-        </div>
-        <div class="col-6 col-12-small">
-            <h3>Evaluaciones de Jefatura listas: {{ jefaturas_listas }}</h3>
-            <h3>Evaluaciones de Jefatura pendientes: {{ jefaturas_pendientes }}</h3>
+        <div class="col-12">
+            <h3>RAT listos: {{ rat_listos }}</h3>
+            <h3>RAT pendientes: {{ rat_pendientes }}</h3>
         </div>
     </div>
 
@@ -72,8 +68,7 @@
                     <th>Colaborador</th>
                     <th style="text-align: center;">Empresa</th>
                     <th style="text-align: center;">Nivel</th>
-                    <th style="text-align: center;">Autoevaluación</th>
-                    <th style="text-align: center;">Ev. Jefatura</th>
+                    <th style="text-align: center;">RAT</th>
                     <th style="text-align: center;">Ver Detalle</th>
                 </tr>
             </thead>
@@ -91,25 +86,16 @@
                         <strong>{{ t.nivel_jerarquico }}</strong><br>
                     </td>
                     <td style="text-align: center;">
-                        {% if t.auto_lista %}
-                            <span style="color: #51ff85;">✅ Lista</span>
+                        {% if t.rat_listo %}
+                            <span style="color: #51ff85;">✅ Listo</span>
                         {% else %}
                             <span style="color: #ffc107;">⏳ Pendiente</span>
                         {% endif %}
                     </td>
                     <td style="text-align: center;">
-                        {% if not t.tiene_jefe %}
-                            <span style="opacity: 0.3;">N/A</span>
-                        {% elif t.jefe_lista %}
-                            <span style="color: #51ff85;">✅ Lista</span>
-                        {% else %}
-                            <span style="color: #ffc107;">⏳ Pendiente</span>
-                        {% endif %}
-                    </td>
-                    <td style="text-align: center;">
-                        {% if t.diff_promedio is not None %}
-                            <a href="{% url 'detalle_seguimiento' t.id_trabajador %}" class="button small primary">
-                                Ver Detalle
+                        {% if t.rat_listo %}
+                            <a href="{% url 'rat_ver_trabajador' t.id_trabajador %}" class="button small primary">
+                                Ver RAT
                             </a>
                         {% else %}
                             <small style="opacity: 0.3;">---</small>

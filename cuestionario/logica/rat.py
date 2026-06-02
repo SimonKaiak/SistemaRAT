@@ -315,6 +315,36 @@ def rat_responder(request, pregunta_id):
         'instrumento_id': ie.instrumento.id_instrumento,
     })
 
+@login_required
+def rat_ver_trabajador(request, trabajador_id):
+    if not request.user.is_superuser:
+        try:
+            coord = Trabajador.objects.get(user=request.user)
+            if not coord.es_coordinador:
+                return redirect('index')
+        except Trabajador.DoesNotExist:
+            return redirect('index')
+
+    trabajador = get_object_or_404(Trabajador, id_trabajador=trabajador_id)
+    ie = InstrumentoEmpresa.objects.filter(empresa=trabajador.empresa, habilitado=True, instrumento__tipo='rat').first()
+    if not ie:
+        return redirect('index')
+
+    preguntas = RATPreguntas.objects.filter(instrumento_empresa=ie)
+    respuestas_existentes = {
+        r.pregunta_id: r
+        for r in RATRespuestas.objects.filter(trabajador=trabajador, pregunta__instrumento_empresa=ie)
+    }
+    for p in preguntas:
+        p.respuesta_actual = respuestas_existentes.get(p.id_rat_pregunta)
+
+    return render(request, 'cuestionario/rat_ver_trabajador.html', {
+        'trabajador': trabajador,
+        'preguntas': preguntas,
+        'instrumento': ie.instrumento,
+        'empresa_actual': trabajador.empresa,
+    })
+
 
 # ─── VISTAS COORDINADOR ───────────────────────────────────────────────────────
 

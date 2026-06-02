@@ -57,6 +57,26 @@
 <!-- PANEL ADMIN -->
 {% if es_admin_sistema %}
     <section>
+{% if empresa_seleccionada %}
+        <hr style="margin:1.5em 0;border-color:rgba(255,255,255,0.1);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5em;">
+            <a href="/?salir_empresa=1" class="button">Salir</a>
+            <div style="display:flex;gap:0.5em;align-items:center;">
+                <a href="{% url 'panel_poblador' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button">✏️ Editar Empresa</a>
+                <form method="post" action="{% url 'eliminar_empresa' empresa_seleccionada.id_empresa %}" onsubmit="return confirm('¿Eliminar {{ empresa_seleccionada.nombre_empresa }}?');" style="margin:0;padding:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="button" style="background:transparent;">🗑️ Eliminar</button>
+                </form>
+            </div>
+        </div>
+        <hr style="margin:0 0 1.5em 0;border-color:rgba(255,255,255,0.1);">
+        <header>
+            <h2>Panel de Control - Administrador</h2>
+            <p>Bienvenid@, <strong>{{ nombre_usuario }}</strong>.</p>
+        </header>
+        {% endif %}
+
+{% if not empresa_seleccionada %}
         <header>
             <h2>Panel de Control - Administrador</h2>
             <p>Bienvenid@, <strong>{{ nombre_usuario }}</strong>.</p>
@@ -75,17 +95,30 @@
                 <option value="__nueva__">＋ Crear nueva empresa</option>
             </select>
         </div>
+        {% endif %}
 
         {% if empresa_seleccionada %}
         <div class="features">
             <section>
                 <span class="icon solid major fa-chart-line"></span>
-                <h3>Seguimiento General</h3>
-                <p>Visualiza el estado de las evaluaciones por empresa.</p>
+                <h3>Seguimiento Evaluación Desempeño</h3>
+                <p>Visualiza el estado de las autoevaluaciones y evaluaciones de jefatura.</p>
                 <ul class="actions">
                     <li>
                         <a href="{% url 'seguimiento_admin' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
-                            Ver Seguimiento — {{ empresa_seleccionada.nombre_empresa }}
+                            Ver Seguimiento Desempeño
+                        </a>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <span class="icon solid major fa-shield-alt"></span>
+                <h3>Seguimiento RAT</h3>
+                <p>Visualiza el estado del Registro de Actividad de Tratamiento de datos.</p>
+                <ul class="actions">
+                    <li>
+                        <a href="{% url 'seguimiento_rat' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                            Ver Seguimiento RAT
                         </a>
                     </li>
                 </ul>
@@ -110,7 +143,6 @@
                     </li>
                 </ul>
             </section>
-
             <section>
                 <span class="icon solid major fa-sitemap"></span>
                 <h3>Edición de Niveles Jerárquicos</h3>

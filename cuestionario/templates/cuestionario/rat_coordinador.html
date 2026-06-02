@@ -71,8 +71,8 @@
                 </div>
             </div>
 
+            {% if pregunta.finalidad_tratamiento or pregunta.categorias_datos %}
             <div style="padding:1em 1.3em;">
-                {% if pregunta.finalidad_tratamiento or pregunta.categorias_datos %}
                 <table style="width:100%;border-collapse:collapse;font-size:0.88em;margin-bottom:1em;">
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
                         <th style="text-align:left;padding:0.4em 0.8em 0.4em 0;opacity:0.65;width:200px;">Responsable</th>
@@ -99,25 +99,8 @@
                         <td style="padding:0.4em 0;">{{ pregunta.version|default:"Sin versión" }}</td>
                     </tr>
                 </table>
-                {% endif %}
-
-                <h5 style="margin:0 0 0.6em;opacity:0.85;">Respuestas de trabajadores:</h5>
-                {% if pregunta.respuestas.all %}
-                    <div style="display:flex;flex-direction:column;gap:0.5em;">
-                        {% for respuesta in pregunta.respuestas.all %}
-                        <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.7em 1em;">
-                            <div style="display:flex;justify-content:space-between;margin-bottom:0.3em;font-size:0.86em;">
-                                <strong>{{ respuesta.trabajador }}</strong>
-                                <span style="opacity:0.6;">{{ respuesta.updated_at|date:"d/m/Y H:i" }}</span>
-                            </div>
-                            <p style="margin:0;font-size:0.9em;">{{ respuesta.respuesta }}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p style="margin:0;opacity:0.55;font-size:0.88em;font-style:italic;">Ningún trabajador ha respondido aún.</p>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
