@@ -61,6 +61,14 @@ def index(request):
         if empresa_id:
             empresa_seleccionada = Empresa.objects.filter(id_empresa=empresa_id).first()
             request.session['empresa_id_admin'] = empresa_id
+        instrumentos_rat = []
+        if empresa_seleccionada:
+            instrumentos_rat = InstrumentoEmpresa.objects.filter(
+                empresa=empresa_seleccionada,
+                habilitado=True,
+                instrumento__tipo='rat'
+            ).select_related('instrumento')
+
         context = {
             'es_admin_sistema': True,
             'nombre_usuario': request.user.username,
@@ -70,6 +78,7 @@ def index(request):
             'ya_hizo_autoevaluacion': False,
             'empresas_activas': Empresa.objects.filter(empresa_activa=True),
             'empresa_seleccionada': empresa_seleccionada,
+            'instrumentos_rat': instrumentos_rat,
         }
         return render(request, 'cuestionario/index.html', context)
 
@@ -102,6 +111,7 @@ def index(request):
         instrumento__tipo='rat',
     ).select_related('instrumento').first()
     rat1_instrumento_id = ie_rat1.instrumento.id_instrumento if ie_rat1 else None
+    rat1_nombre = ie_rat1.instrumento.nombre_instrumento if ie_rat1 else 'RAT'
 
     context = {
         'trabajador': trabajador,
@@ -111,6 +121,7 @@ def index(request):
         'es_admin_sistema': False,
         'es_coordinador': trabajador.es_coordinador,
         'rat1_instrumento_id': rat1_instrumento_id,
+        'rat1_nombre': rat1_nombre,
     }
     return render(request, 'cuestionario/index.html', context)
 

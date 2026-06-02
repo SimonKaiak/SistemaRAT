@@ -49,13 +49,13 @@
             {% endif %}{% endif %}
         </div>
         <hr style="margin-top:1.5em;" />
-        <h2>Seguimiento{% if empresa_actual %} — {{ empresa_actual.nombre_empresa }}{% endif %}</h2>
+        <h2>Seguimiento{% if instrumento_actual %} — {{ instrumento_actual.nombre_instrumento }}{% endif %}</h2>
     </header>
 
     <div class="row">
         <div class="col-12">
-            <h3>RAT listos: {{ rat_listos }}</h3>
-            <h3>RAT pendientes: {{ rat_pendientes }}</h3>
+            <h3>RAT Terminados: {{ rat_listos }}</h3>
+            <h3>RAT Pendientes: {{ rat_pendientes }}</h3>
         </div>
     </div>
 

@@ -125,6 +125,7 @@ def panel_seguimiento(request):
         'rat_pendientes': rat_pendientes,
         'empresa_actual': empresa_actual,
         'es_coordinador': es_coordinador,
+        'instrumento_actual': instrumento_empresa_rat.instrumento if instrumento_empresa_rat else None,
     }
     return render(request, 'cuestionario/seguimiento.html', context)
 
@@ -187,5 +188,6 @@ def panel_seguimiento_rat(request):
         'rat_pendientes': rat_pendientes,
         'empresa_actual': empresa_actual,
         'es_coordinador': es_coordinador,
+        'instrumento_actual': instrumento_empresa_rat.instrumento if instrumento_empresa_rat else None,
     }
     return render(request, 'cuestionario/seguimiento_rat.html', context)

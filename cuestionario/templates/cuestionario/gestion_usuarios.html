@@ -246,6 +246,7 @@
 </style>
 
 <section>
+    <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
         <a href="/?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button">← Volver al Panel</a>
     </div>
@@ -813,12 +814,6 @@ async function cargarExcel(input) {
 }
 
 // Ampliar el wrapper solo en esta página
-const wrapper = document.getElementById('wrapper');
-if (wrapper) {
-    wrapper.style.maxWidth = 'calc(100% - 13em)';
-    wrapper.style.width = 'calc(100% - 13em)';
-    wrapper.style.marginLeft = '13em';
-}
 const inner = document.querySelector('#main .inner');
 if (inner) {
     inner.style.padding = '2em 1.5em';

@@ -44,24 +44,28 @@
 <style>
   /* ── Grid de tarjetas ── */
   .instrumentos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.4em;
-    margin-top: 1.8em;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 400px));
+      gap: 1.4em;
+      margin: 1.8em auto 0;
+      justify-content: center;
+      max-width: 400px;
   }
 
   /* ── Tarjeta base ── */
   .instrumento-card {
-    position: relative;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 12px;
-    padding: 1.5em 1.4em 1.3em;
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
-    cursor: default;
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 12px;
+      padding: 1.5em 1.4em 1.3em;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      align-items: center;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      cursor: default;
   }
   .instrumento-card:hover {
     border-color: rgba(79,195,247,0.45);
@@ -71,17 +75,17 @@
 
   /* Indicador de tipo (RAT vs EvalDesempeño) */
   .card-badge {
-    display: inline-block;
-    font-size: 0.72em;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.22em 0.7em;
-    border-radius: 20px;
-    background: rgba(79,195,247,0.15);
-    color: #4fc3f7;
-    border: 1px solid rgba(79,195,247,0.3);
-    align-self: flex-start;
+      display: inline-block;
+      font-size: 0.72em;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.22em 0.7em;
+      border-radius: 20px;
+      background: rgba(79,195,247,0.15);
+      color: #4fc3f7;
+      border: 1px solid rgba(79,195,247,0.3);
+      align-self: center;
   }
   .card-badge.eval {
     background: rgba(81,255,133,0.12);
@@ -116,19 +120,21 @@
     border: 1px solid rgba(255,255,255,0.10);
     border-radius: 12px;
     padding: 1.4em 1.6em;
-    margin-top: 1.8em;
+    margin: 1.8em auto 0;
   }
   .rat-selector-wrapper h3 {
-    margin: 0 0 0.8em;
-    font-size: 1em;
-    font-weight: 600;
-    opacity: 0.85;
+      margin: 0 0 0.8em;
+      font-size: 1em;
+      font-weight: 600;
+      opacity: 0.85;
+      text-align: center;
   }
   .rat-selector-row {
-    display: flex;
-    gap: 0.8em;
-    align-items: center;
-    flex-wrap: wrap;
+      display: flex;
+      gap: 0.8em;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
   }
   .rat-selector-row select {
     flex: 1;
@@ -185,10 +191,12 @@
     margin: 0.2em 0 0;
   }
   #rat-detalle-actions {
-    display: flex;
-    gap: 0.6em;
-    flex-wrap: wrap;
-    flex-shrink: 0;
+      display: flex;
+      gap: 0.6em;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      justify-content: center;
+      width: 100%;
   }
 
   /* ── Separador de secciones ── */
@@ -202,8 +210,9 @@
   }
 </style>
 
-<section>
+<section style="max-width:900px;width:100%;margin:0 auto;text-align:center;">
   <header>
+    <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
     <a href="{% if request.user.is_superuser %}/?empresa_id={{ empresa.id_empresa }}{% else %}{{ next_url|default:'javascript:history.back()' }}{% endif %}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver al panel</a>
     <hr style="margin-top:1em;" />
     <h2 style="margin-bottom:0.2em;">Instrumentos disponibles</h2>
@@ -215,7 +224,7 @@
   {# ─── Bloque RAT: selector desplegable ─── #}
   {% if instrumentos_rat %}
   <p class="section-label">Registros de Actividad de Tratamiento (RAT)</p>
-  <div class="rat-selector-wrapper">
+  <div class="rat-selector-wrapper" style="max-width:480px;">
     <h3>Seleccionar instrumento RAT</h3>
     <div class="rat-selector-row">
       <select id="rat-select" onchange="mostrarDetalleRAT(this)">

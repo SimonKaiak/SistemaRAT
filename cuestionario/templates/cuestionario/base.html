@@ -8,33 +8,150 @@
         
         <link rel="stylesheet" href="{% static 'cuestionario/css/main.css' %}" />
         <noscript><link rel="stylesheet" href="{% static 'cuestionario/css/noscript.css' %}" /></noscript>
-        
         <link rel="stylesheet" href="{% static 'cuestionario/css/mohala.css' %}">
+
+        <style>
+            html, body { height: 100% !important; }
+            body { padding-top: 58px !important; }
+            #sidebar { display: none !important; }
+            #sidebar + #wrapper { margin-left: 0 !important; }
+
+            #topnav {
+                position: fixed;
+                top: 0; left: 0; right: 0;
+                z-index: 9999;
+                background: #1a2332 !important;
+                border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+                box-shadow: none !important;
+                height: 58px;
+                display: flex !important;
+                align-items: center !important;
+            }
+            #topnav-inner {
+                width: 100%;
+                padding: 0 14.8rem;
+                display: flex !important;
+                align-items: center !important;
+                height: 100% !important;
+                gap: 1rem;
+            }
+            #topnav-inicio {
+                color: #ffffff !important;
+                font-size: 0.85rem !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.12em !important;
+                text-transform: uppercase !important;
+                text-decoration: none !important;
+                background: transparent !important;
+                border: 2px solid rgba(255,255,255,0.5) !important;
+                padding: 0.45em 1.4em !important;
+                border-radius: 2em !important;
+                line-height: 1 !important;
+                display: inline-block !important;
+            }
+            #topnav-inicio:hover {
+                border-color: #ffffff !important;
+            }
+            #topnav-logout-form {
+                margin: 0 !important;
+                margin-left: auto !important;
+                padding: 0 !important;
+            }
+            #topnav-logout-btn {
+                font-size: 0.85rem !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.12em !important;
+                text-transform: uppercase !important;
+                color: #ffffff !important;
+                background: transparent !important;
+                border: 2px solid rgba(255,255,255,0.5) !important;
+                padding: 0.45em 1.4em !important;
+                border-radius: 2em !important;
+                cursor: pointer !important;
+                line-height: 1 !important;
+                display: inline-block !important;
+                height: auto !important;
+                width: auto !important;
+            }
+            #topnav-logout-btn:hover {
+                border-color: #ffffff !important;
+            }
+            #main > .inner {
+                padding-top: 3rem !important;
+            }
+            #wrapper {
+                min-height: calc(100vh - 58px - 58px - 4px) !important;
+            }
+            #footer {
+                padding: 0 !important;
+                height: 58px !important;
+                display: flex !important;
+                align-items: center !important;
+                border-top: none !important;
+            }
+            #footer .inner {
+                padding: 0 !important;
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 100% !important;
+            }
+            #footer .menu {
+                margin: 0 !important;
+                padding: 0 !important;
+                list-style: none !important;
+            }
+            #footer .menu li {
+                padding: 0 !important;
+                border: none !important;
+                display: flex !important;
+                align-items: center !important;
+                height: 58px !important;
+                line-height: 58px !important;
+            }
+            #footer .inner ul {
+                display: flex !important;
+                align-items: center !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .wrapper.style1-alt {
+                border-top: none !important;
+            }
+            body {
+                overflow-x: hidden !important;
+            }
+            #wrapper {
+                border-bottom: none !important;
+            }
+            #wrapper {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+        </style>
     </head>
     <body class="is-preload">
 
-        <section id="sidebar">
-            <div class="inner">
-                <nav>
-                    <ul>
-                        <li><a href="/?id={{ trabajador.id_trabajador|default:1 }}">Inicio</a></li>
-                    </ul>
-                </nav>
-
+        <nav id="topnav">
+            <div id="topnav-inner">
                 {% if user.is_authenticated %}
-                    <form action="{% url 'logout' %}" method="post" style="margin-top: 2em;">
+                <a href="/?id={{ trabajador.id_trabajador|default:1 }}" id="topnav-inicio">Inicio</a>
+                    <form action="{% url 'logout' %}" method="post" id="topnav-logout-form">
                         {% csrf_token %}
-                        <button type="submit" class="button small primary" style="font-weight:900;letter-spacing:0.15em;background:#fff;color:#000;border-color:#fff;">Cerrar Sesión</button>
+                        <button type="submit" id="topnav-logout-btn">Cerrar Sesión</button>
                     </form>
                 {% endif %}
             </div>
-        </section>
+        </nav>
 
         <div id="wrapper">
-            <section id="main" class="wrapper style1 fullscreen fade-up">
+            <section id="main" class="wrapper style1 fade-up" style="display:flex;justify-content:center;">
                 <div class="inner">
                     <header>
-                        <h1 style="font-size:2.2em;padding-bottom: 0.5em;">
+                        <h1 style="font-size:2.2em;padding-bottom: 0.5em;text-align:center;">
                             <span>Sistema RAT{% if empresa_actual %} : <span style="color: #4fc3f7;">{{ empresa_actual.nombre_empresa }}</span>{% endif %}{% if empresa_seleccionada %} : <span style="color: #4fc3f7;">{{ empresa_seleccionada.nombre_empresa }}</span>{% endif %}</span>
                         </h1>
                     </header>
