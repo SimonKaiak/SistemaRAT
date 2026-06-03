@@ -40,7 +40,7 @@
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-            <a href="{% url 'seleccion_instrumentos' %}?empresa_id={{ empresa.id_empresa }}" class="button">← Volver a instrumentos</a>
+            <a href="/?empresa_id={{ empresa.id_empresa }}" class="button">← Volver al inicio</a>
             <div style="display:flex;gap:0.8em;">
                 {% if not user.is_superuser %}
                 <a href="{% url 'rat_versiones' %}" class="button">🗃 Versiones</a>

@@ -66,40 +66,57 @@
             <thead>
                 <tr>
                     <th>Colaborador</th>
-                    <th style="text-align: center;">Empresa</th>
                     <th style="text-align: center;">Nivel</th>
-                    <th style="text-align: center;">RAT</th>
+                    <th style="text-align: center;">{{ instrumento_actual.nombre_instrumento|default:'RAT' }}</th>
                     <th style="text-align: center;">Ver Detalle</th>
+                    <th style="text-align: center;">Recordatorio</th>
+                    <th style="text-align: center;">Resetear Clave</th>
                 </tr>
             </thead>
             <tbody>
                 {% for t in trabajadores %}
                 <tr>
-                    <td>
+                    <td style="vertical-align: middle;">
                         <strong>{{ t.nombre }} {{ t.apellido_paterno }} {{ t.apellido_materno }}</strong><br>
                         <small>{{ t.cargo.nombre_cargo }}</small>
                     </td>
-                    <td style="text-align: center;">
-                        <strong>{{ t.empresa.nombre_empresa }}</strong>
-                    </td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center; vertical-align: middle;">
                         <strong>{{ t.nivel_jerarquico }}</strong><br>
                     </td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center; vertical-align: middle;">
                         {% if t.rat_listo %}
                             <span style="color: #51ff85;">✅ Listo</span>
                         {% else %}
                             <span style="color: #ffc107;">⏳ Pendiente</span>
                         {% endif %}
                     </td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center; vertical-align: middle;">
                         {% if t.rat_listo %}
-                            <a href="{% url 'rat_ver_trabajador' t.id_trabajador %}" class="button small primary">
-                                Ver RAT
+                            <a href="{% url 'rat_ver_trabajador' t.id_trabajador %}" class="button small">
+                                Ver {{ instrumento_actual.nombre_instrumento|default:'RAT' }}
                             </a>
                         {% else %}
                             <small style="opacity: 0.3;">---</small>
                         {% endif %}
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        {% if not t.rat_listo %}
+                            <form method="post" action="{% url 'enviar_recordatorio_rat' t.id_trabajador %}" onsubmit="return confirm('¿Enviar recordatorio a {{ t.nombre }}?');" style="margin:0;padding:0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="empresa_id" value="{{ empresa_actual.id_empresa }}">
+                                <input type="hidden" name="nombre_rat" value="{{ instrumento_actual.nombre_instrumento|default:'RAT' }}">
+                                <button type="submit" class="button small">📧 Enviar Recordatorio</button>
+                            </form>
+                        {% else %}
+                            <small style="opacity: 0.3;">---</small>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <form method="post" action="{% url 'resetear_clave_seguimiento' t.id_trabajador %}" onsubmit="return confirm('¿Resetear clave de {{ t.nombre }}?');" style="margin:0;padding:0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="empresa_id" value="{{ empresa_actual.id_empresa }}">
+                            <button type="submit" class="button small">🔑 Resetear</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}

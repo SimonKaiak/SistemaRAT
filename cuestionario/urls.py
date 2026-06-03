@@ -217,4 +217,6 @@ urlpatterns = [
     path('rat/crear-instrumento/', rat_crear_instrumento, name='rat_crear_instrumento'),
     path('rat/ver/<int:trabajador_id>/', rat_ver_trabajador, name='rat_ver_trabajador'),
     path('seguimiento/rat/', seguimiento.panel_seguimiento_rat, name='seguimiento_rat'),
+    path('gestion-usuarios/resetear-clave-seguimiento/<int:trabajador_id>/', gestion_usuarios.resetear_clave_seguimiento, name='resetear_clave_seguimiento'),
+    path('gestion-usuarios/enviar-recordatorio-rat/<int:trabajador_id>/', gestion_usuarios.enviar_recordatorio_rat, name='enviar_recordatorio_rat'),
 ]

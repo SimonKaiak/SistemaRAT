@@ -188,7 +188,12 @@ def modificar_usuario(request, trabajador_id):
 @require_POST
 def resetear_clave(request, trabajador_id):
     if not request.user.is_superuser:
-        return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+        try:
+            trabajador_sesion = Trabajador.objects.get(user=request.user)
+            if not trabajador_sesion.es_coordinador:
+                return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
+        except Trabajador.DoesNotExist:
+            return JsonResponse({'ok': False, 'error': 'Sin permisos'}, status=403)
     try:
         t = Trabajador.objects.get(pk=trabajador_id)
         if not t.user:
@@ -198,7 +203,6 @@ def resetear_clave(request, trabajador_id):
         t.user.set_password(nueva_clave)
         t.user.save()
 
-        # Enviar correo al trabajador
         try:
             send_mail(
                 subject='Restablecimiento de contraseña — Sistema RAT',
@@ -212,16 +216,13 @@ def resetear_clave(request, trabajador_id):
                 ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[t.email],
-                fail_silently=False,
+                fail_silently=True,
             )
-            return JsonResponse({'ok': True, 'correo_enviado': True})
-        except Exception as mail_error:
-            # La clave ya fue reseteada; avisamos que el correo falló
-            return JsonResponse({
-                'ok': True,
-                'correo_enviado': False,
-                'mail_error': str(mail_error),
-            })
+        except Exception:
+            pass
+
+        empresa_id = t.empresa.id_empresa
+        return redirect(f'/seguimiento/rat/?empresa_id={empresa_id}')
 
     except Trabajador.DoesNotExist:
         return JsonResponse({'ok': False, 'error': 'Trabajador no encontrado'})
@@ -310,3 +311,79 @@ def crear_usuario_panel(request):
         return JsonResponse({'ok': False, 'error': 'Empresa no encontrada'})
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)})
+    
+
+@login_required
+@require_POST
+def resetear_clave_seguimiento(request, trabajador_id):
+    """Reset de clave llamado desde seguimiento_rat. Redirige de vuelta."""
+    if not request.user.is_superuser:
+        try:
+            trabajador_sesion = Trabajador.objects.get(user=request.user)
+            if not trabajador_sesion.es_coordinador:
+                return redirect('index')
+        except Trabajador.DoesNotExist:
+            return redirect('index')
+    try:
+        t = Trabajador.objects.get(pk=trabajador_id)
+        if t.user:
+            nueva_clave = 'Mohala2026'
+            t.user.set_password(nueva_clave)
+            t.user.save()
+            try:
+                send_mail(
+                    subject='Restablecimiento de contraseña — Sistema RAT',
+                    message=(
+                        f"Hola {t.nombre} {t.apellido_paterno},\n\n"
+                        f"Tu contraseña en el Sistema RAT ha sido restablecida por un administrador.\n\n"
+                        f"  Usuario: {t.email}\n"
+                        f"  Contraseña: {nueva_clave}\n\n"
+                        f"Te recomendamos iniciar sesión y cambiar tu contraseña a la brevedad.\n\n"
+                        f"Sistema RAT — {t.empresa.nombre_empresa}"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[t.email],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
+    except Trabajador.DoesNotExist:
+        pass
+    empresa_id = request.POST.get('empresa_id', '')
+    return redirect(f'/seguimiento/rat/?empresa_id={empresa_id}')
+
+
+@login_required
+@require_POST
+def enviar_recordatorio_rat(request, trabajador_id):
+    """Envía correo de recordatorio RAT. Redirige de vuelta al seguimiento."""
+    if not request.user.is_superuser:
+        try:
+            trabajador_sesion = Trabajador.objects.get(user=request.user)
+            if not trabajador_sesion.es_coordinador:
+                return redirect('index')
+        except Trabajador.DoesNotExist:
+            return redirect('index')
+    try:
+        t = Trabajador.objects.get(pk=trabajador_id)
+        nombre_rat = request.POST.get('nombre_rat', 'RAT')
+        try:
+            send_mail(
+                subject=f'Recordatorio: {nombre_rat} pendiente — Sistema RAT',
+                message=(
+                    f"Estimad@ {t.nombre} {t.apellido_paterno},\n\n"
+                    f"Te recordamos que tienes pendiente completar el {nombre_rat} "
+                    f"en el Sistema RAT de {t.empresa.nombre_empresa}.\n\n"
+                    f"Por favor ingresa al sistema a la brevedad para completarlo.\n\n"
+                    f"Sistema RAT — {t.empresa.nombre_empresa}"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[t.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+    except Trabajador.DoesNotExist:
+        pass
+    empresa_id = request.POST.get('empresa_id', '')
+    return redirect(f'/seguimiento/rat/?empresa_id={empresa_id}')

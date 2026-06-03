@@ -138,7 +138,7 @@
         <nav id="topnav">
             <div id="topnav-inner">
                 {% if user.is_authenticated %}
-                <a href="/?id={{ trabajador.id_trabajador|default:1 }}" id="topnav-inicio">Inicio</a>
+                <a href="/?salir_empresa=1" id="topnav-inicio">Inicio</a>
                     <form action="{% url 'logout' %}" method="post" id="topnav-logout-form">
                         {% csrf_token %}
                         <button type="submit" id="topnav-logout-btn">Cerrar Sesión</button>
