@@ -70,8 +70,11 @@
             {% if pregunta.tipo == 'texto' and 'Presentación' in pregunta.actividad_tratamiento %}
             <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);border-radius:10px;padding:1.4em 1.6em;">
                 <h4 style="margin:0 0 0.6em;color:#4fc3f7;">Presentación: ¿Qué se entiende por datos personales?</h4>
-                <p style="margin:0;line-height:1.6;opacity:0.85;">{{ pregunta.actividad_tratamiento|slice:"14:" }}</p>
+                <p style="margin:0;line-height:1.6;opacity:0.85;">{{ pregunta.actividad_tratamiento }}</p>
             </div>
+
+            {% elif 'Fuente de la cual' in pregunta.actividad_tratamiento %}
+            {# pregunta interna, no se muestra al usuario #}
 
             {% else %}
             <div id="card-{{ pregunta.id_rat_pregunta }}" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;gap:1em;flex-wrap:wrap;">

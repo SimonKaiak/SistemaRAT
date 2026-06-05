@@ -81,7 +81,7 @@ PREGUNTAS = [
             '¿Con qué frecuencia recibe formación o sensibilización sobre '
             'ética y protección de datos?'
         ),
-        'tipo': 'texto',
+        'tipo': 'escala',
     },
     {
         'orden': 5,

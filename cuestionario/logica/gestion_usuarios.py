@@ -55,7 +55,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.conf import settings
-from cuestionario.models import Empresa, Trabajador
+from cuestionario.models import Empresa, Trabajador, RATRespuestas, InstrumentoEmpresa
 import json
 
 
@@ -386,4 +386,49 @@ def enviar_recordatorio_rat(request, trabajador_id):
     except Trabajador.DoesNotExist:
         pass
     empresa_id = request.POST.get('empresa_id', '')
+    return redirect(f'/seguimiento/rat/?empresa_id={empresa_id}')
+
+
+@login_required
+@require_POST
+def resetear_respuestas_rat(request, trabajador_id):
+    if not request.user.is_superuser:
+        try:
+            trabajador_sesion = Trabajador.objects.get(user=request.user)
+            if not trabajador_sesion.es_coordinador:
+                return redirect('index')
+        except Trabajador.DoesNotExist:
+            return redirect('index')
+
+    empresa_id = request.POST.get('empresa_id', '')
+
+    try:
+        t = Trabajador.objects.get(pk=trabajador_id)
+        instrumento_empresa_rat = InstrumentoEmpresa.objects.filter(
+            empresa=t.empresa, habilitado=True, instrumento__tipo='rat'
+        ).first()
+
+        if instrumento_empresa_rat:
+            total_preguntas = instrumento_empresa_rat.preguntas.exclude(
+                tipo='texto', actividad_tratamiento__startswith='Presentación'
+            ).exclude(
+                actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).count()
+            respondidas = RATRespuestas.objects.filter(
+                trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat
+            ).exclude(
+                pregunta__tipo='texto', pregunta__actividad_tratamiento__startswith='Presentación'
+            ).exclude(
+                pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).values('pregunta').distinct().count()
+            rat_listo = total_preguntas > 0 and respondidas >= total_preguntas
+
+            if rat_listo:
+                RATRespuestas.objects.filter(
+                    trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat
+                ).delete()
+
+    except Trabajador.DoesNotExist:
+        pass
+
     return redirect(f'/seguimiento/rat/?empresa_id={empresa_id}')

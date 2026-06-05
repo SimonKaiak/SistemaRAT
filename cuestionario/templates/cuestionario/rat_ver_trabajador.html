@@ -12,7 +12,8 @@
 
     <div style="display:flex;flex-direction:column;gap:1em;">
         {% for pregunta in preguntas %}
-        {% if not pregunta.tipo == 'texto' or not 'Presentación' in pregunta.actividad_tratamiento %}
+        {% if 'Fuente de la cual' in pregunta.actividad_tratamiento or pregunta.tipo == 'texto' and 'Presentación' in pregunta.actividad_tratamiento %}
+        {% else %}
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1em;">
                 <div style="flex:1;">

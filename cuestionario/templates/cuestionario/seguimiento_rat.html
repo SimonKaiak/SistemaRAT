@@ -43,7 +43,7 @@
             <a href="{% if empresa_actual %}/?empresa_id={{ empresa_actual.id_empresa }}{% else %}{% url 'index' %}{% endif %}" class="button">← Volver al Panel</a>
             {% if user.is_superuser or es_coordinador %}{% if empresa_actual %}
             <div style="display:flex;gap:0.8em;">
-                <a href="{% url 'generar_reporte_global_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button">📊 Generar Reporte Respuestas</a>
+                <a href="{% url 'reporte_rat_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button">📋 Reporte RAT PDF</a>
                 <a href="{% url 'panel_gemini' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button">🤖 Panel Informe con IA</a>
             </div>
             {% endif %}{% endif %}
@@ -71,6 +71,7 @@
                     <th style="text-align: center;">Ver Detalle</th>
                     <th style="text-align: center;">Recordatorio</th>
                     <th style="text-align: center;">Resetear Clave</th>
+                    <th style="text-align: center;">Resetear Respuestas</th>
                 </tr>
             </thead>
             <tbody>
@@ -117,6 +118,17 @@
                             <input type="hidden" name="empresa_id" value="{{ empresa_actual.id_empresa }}">
                             <button type="submit" class="button small">🔑 Resetear</button>
                         </form>
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        {% if t.rat_listo %}
+                            <form method="post" action="{% url 'resetear_respuestas_rat' t.id_trabajador %}" onsubmit="return confirm('¿Resetear todas las respuestas RAT de {{ t.nombre }} {{ t.apellido_paterno }}? Esta acción no se puede deshacer.');" style="margin:0;padding:0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="empresa_id" value="{{ empresa_actual.id_empresa }}">
+                                <button type="submit" class="button small">🗑️ Resetear Respuestas</button>
+                            </form>
+                        {% else %}
+                            <small style="opacity: 0.3;">---</small>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

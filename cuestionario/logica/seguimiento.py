@@ -104,8 +104,8 @@ def panel_seguimiento(request):
             t.diff_promedio = res['diferencia__avg']
 
         if instrumento_empresa_rat:
-            total_preguntas = instrumento_empresa_rat.preguntas.count()
-            respondidas = RATRespuestas.objects.filter(trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat).values('pregunta').distinct().count()
+            total_preguntas = instrumento_empresa_rat.preguntas.exclude(tipo='texto', actividad_tratamiento__startswith='Presentación').exclude(actividad_tratamiento__icontains='Fuente de la cual provienen').count()
+            respondidas = RATRespuestas.objects.filter(trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat).exclude(pregunta__tipo='texto', pregunta__actividad_tratamiento__startswith='Presentación').exclude(pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen').values('pregunta').distinct().count()
             t.rat_listo = total_preguntas > 0 and respondidas >= total_preguntas
         else:
             t.rat_listo = False
@@ -170,10 +170,8 @@ def panel_seguimiento_rat(request):
 
     for t in trabajadores:
         if instrumento_empresa_rat:
-            total_preguntas = instrumento_empresa_rat.preguntas.count()
-            respondidas = RATRespuestas.objects.filter(
-                trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat
-            ).values('pregunta').distinct().count()
+            total_preguntas = instrumento_empresa_rat.preguntas.exclude(tipo='texto', actividad_tratamiento__startswith='Presentación').exclude(actividad_tratamiento__icontains='Fuente de la cual provienen').count()
+            respondidas = RATRespuestas.objects.filter(trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat).exclude(pregunta__tipo='texto', pregunta__actividad_tratamiento__startswith='Presentación').exclude(pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen').values('pregunta').distinct().count()
             t.rat_listo = total_preguntas > 0 and respondidas >= total_preguntas
         else:
             t.rat_listo = False

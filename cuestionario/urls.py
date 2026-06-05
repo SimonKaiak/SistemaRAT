@@ -84,7 +84,7 @@ RAT:
 from django.urls import path
 from django.contrib.auth.views import LogoutView
 from . import logica as views
-from .logica import validador_login, seguimiento, detalle_seguimiento, reporte_pdf, reporte_excel, gemini_admin, reporte_global, manejo_archivos, edicion_cuestionario, poblador, gestion_usuarios, carga_excel
+from .logica import validador_login, seguimiento, detalle_seguimiento, reporte_pdf, reporte_excel, gemini_admin, reporte_global, manejo_archivos, edicion_cuestionario, poblador, gestion_usuarios, carga_excel, reporte_rat_pdf
 from .logica.rat import rat_editar_version, rat_eliminar_version, seleccion_instrumentos, rat_crear_instrumento, rat_ver_trabajador
 
 urlpatterns = [
@@ -219,4 +219,6 @@ urlpatterns = [
     path('seguimiento/rat/', seguimiento.panel_seguimiento_rat, name='seguimiento_rat'),
     path('gestion-usuarios/resetear-clave-seguimiento/<int:trabajador_id>/', gestion_usuarios.resetear_clave_seguimiento, name='resetear_clave_seguimiento'),
     path('gestion-usuarios/enviar-recordatorio-rat/<int:trabajador_id>/', gestion_usuarios.enviar_recordatorio_rat, name='enviar_recordatorio_rat'),
+    path('gestion-usuarios/resetear-respuestas-rat/<int:trabajador_id>/', gestion_usuarios.resetear_respuestas_rat, name='resetear_respuestas_rat'),
+    path('seguimiento/rat/reporte-pdf/', reporte_rat_pdf.generar_reporte_rat_pdf, name='reporte_rat_pdf'),
 ]
