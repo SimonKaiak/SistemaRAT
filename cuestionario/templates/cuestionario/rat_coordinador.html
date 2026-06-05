@@ -39,8 +39,8 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-            <a href="/?empresa_id={{ empresa.id_empresa }}" class="button">← Volver al inicio</a>
+        <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
+            <a href="/?empresa_id={{ empresa.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">← Volver al inicio</a>
             <div style="display:flex;gap:0.8em;">
                 {% if not user.is_superuser %}
                 <a href="{% url 'rat_versiones' %}" class="button">🗃 Versiones</a>
@@ -51,8 +51,8 @@
             </div>
         </div>
         <hr style="margin-top:1.5em;" />
-        <h2>🗂 Panel Coordinador — RAT</h2>
-        <p>Gestiona las preguntas RAT de <strong>{{ empresa.nombre_empresa }}</strong>.</p>
+        <h2 style="text-align:center;">🗂 Panel Coordinador — RAT</h2>
+        <p style="text-align:center;">Gestiona las preguntas RAT de <strong>{{ empresa.nombre_empresa }}</strong>.</p>
     </header>
 
     {% if not preguntas %}
@@ -67,8 +67,8 @@
             <div style="background:rgba(255,255,255,0.08);padding:0.9em 1.3em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5em;">
                 <h4 style="margin:0;flex:1;min-width:0;">{{ pregunta.actividad_tratamiento }}</h4>
                 <div style="display:flex;gap:0.5em;flex-shrink:0;">
-                    <a href="{% url 'rat_editar_pregunta' pregunta.id_rat_pregunta %}?instrumento_id={{ instrumento_id }}" class="button primary small" style="margin:0;">✏️ Editar</a>
-                    <a href="{% url 'rat_eliminar_pregunta' pregunta.id_rat_pregunta %}?instrumento_id={{ instrumento_id }}" class="button small" style="margin:0;background:rgba(255,80,80,0.2);border-color:rgba(255,80,80,0.5);">🗑 Eliminar</a>
+                    <a href="{% url 'rat_editar_pregunta' pregunta.id_rat_pregunta %}?instrumento_id={{ instrumento_id }}" class="button" style="margin:0;background:rgba(240,192,64,0.15);border-color:rgba(240,192,64,0.4);color:#f0c040;font-weight:600;">✏️ Editar</a>
+                    <a href="{% url 'rat_eliminar_pregunta' pregunta.id_rat_pregunta %}?instrumento_id={{ instrumento_id }}" class="button" style="margin:0;background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4);color:#e74c3c;">🗑 Eliminar</a>
                 </div>
             </div>
 

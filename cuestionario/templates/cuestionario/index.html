@@ -61,10 +61,10 @@
         <hr style="margin:1.5em 0;border-color:rgba(255,255,255,0.1);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5em;">
             <div style="display:flex;gap:0.5em;align-items:center;justify-content:center;width:100%;">
-                <a href="{% url 'panel_poblador' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button">✏️ Editar Empresa</a>
+                <a href="{% url 'panel_poblador' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(240,192,64,0.15); border-color:rgba(240,192,64,0.4); color:#f0c040;">✏️ Editar Empresa</a>
                 <form method="post" action="{% url 'eliminar_empresa' empresa_seleccionada.id_empresa %}" onsubmit="return confirm('¿Eliminar {{ empresa_seleccionada.nombre_empresa }}?');" style="margin:0;padding:0;">
                     {% csrf_token %}
-                    <button type="submit" class="button" style="background:transparent;">🗑️ Eliminar Empresa</button>
+                    <button type="submit" class="button" style="background:rgba(192,57,43,0.15); border-color:rgba(192,57,43,0.4); color:#e74c3c;">🗑️ Eliminar Empresa</button>
                 </form>
             </div>
         </div>
@@ -99,13 +99,13 @@
         {% if empresa_seleccionada %}
         <div class="features">
         {% for ie in instrumentos_rat %}
-        <section>
+        <section style="display:flex; flex-direction:column;">
             <span class="icon solid major fa-shield-alt"></span>
             <h3>Seguimiento {{ ie.instrumento.nombre_instrumento }}</h3>
             <p>Visualiza el estado del Registro de Actividad de Tratamiento de datos.</p>
-            <ul class="actions">
+            <ul class="actions" style="margin-top:auto; padding-top:1em;">
                 <li>
-                    <a href="{% url 'seguimiento_rat' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                    <a href="{% url 'seguimiento_rat' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
                         Ver Seguimiento {{ ie.instrumento.nombre_instrumento }}
                     </a>
                 </li>
@@ -119,34 +119,34 @@
         </section>
         {% endfor %}
             {% for ie in instrumentos_rat %}
-                <section>
+                <section style="display:flex; flex-direction:column;">
                     <span class="icon solid major fa-shield-alt"></span>
                     <h3>Edición de Instrumentos {{ ie.instrumento.nombre_instrumento }}</h3>
                     <p>Gestiona los instrumentos RAT de {{ empresa_seleccionada.nombre_empresa }}.</p>
-                    <ul class="actions">
+                    <ul class="actions" style="margin-top:auto; padding-top:1em;">
                         <li>
-                            <a href="/rat/coordinador/?instrumento_id={{ ie.instrumento.id_instrumento }}" class="button primary">
+                            <a href="/rat/coordinador/?instrumento_id={{ ie.instrumento.id_instrumento }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
                                 Editar Instrumentos
                             </a>
                         </li>
                     </ul>
                 </section>
             {% endfor %}
-            <section>
+            <section style="display:flex; flex-direction:column;">
                 <span class="icon solid major fa-lock"></span>
                 <h3>Gestión de Usuarios</h3>
                 <p>Accede al panel nativo de Django para gestionar cuentas y permisos.</p>
-                <ul class="actions">
-                    <li><a href="{% url 'gestion_usuarios' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">Gestionar Usuarios</a></li>
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    <li><a href="{% url 'gestion_usuarios' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">Gestionar Usuarios</a></li>
                 </ul>
             </section>
-            <section>
+            <section style="display:flex; flex-direction:column;">
                 <span class="icon solid major fa-sitemap"></span>
                 <h3>Edición de Niveles Jerárquicos</h3>
                 <p>Edita los niveles jerárquicos de {{ empresa_seleccionada.nombre_empresa }}.</p>
-                <ul class="actions">
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     <li>
-                        <a href="{% url 'panel_edicion_niveles' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                        <a href="{% url 'panel_edicion_niveles' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
                             Editar Niveles
                         </a>
                     </li>
@@ -156,9 +156,9 @@
                 <span class="icon solid major fa-chart-line"></span>
                 <h3>Seguimiento Evaluación Desempeño</h3>
                 <p>Visualiza el estado de las autoevaluaciones y evaluaciones de jefatura.</p>
-                <ul class="actions">
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     <li>
-                        <a href="{% url 'seguimiento_admin' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                        <a href="{% url 'seguimiento_admin' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
                             Ver Seguimiento Desempeño
                         </a>
                     </li>
@@ -168,9 +168,9 @@
                 <span class="icon solid major fa-edit"></span>
                 <h3>Edición de Evaluación de Desempeño</h3>
                 <p>Edita las dimensiones, competencias y escalas del cuestionario de {{ empresa_seleccionada.nombre_empresa }}.</p>
-                <ul class="actions">
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     <li>
-                        <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button primary">
+                        <a href="{% url 'panel_edicion' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
                             Editar Evaluación
                         </a>
                     </li>
@@ -179,7 +179,7 @@
         </div>
         {% endif %}
     </section>
-
+    <hr style="margin-top:1.5em; margin-bottom:0; border-color:rgba(255,255,255,0.1);">
 
     <script>
     function seleccionarEmpresa() {
@@ -210,7 +210,7 @@
                 <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button primary">Ver estado</a>
             {% else %}
                 <p>Presiona el botón para seleccionar la dimensión que deseas evaluar.</p>
-                <ul class="actions">
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     <li>
                         <a href="{% url 'autoevaluacion_inicio' trabajador.id_trabajador %}" class="button primary">
                             Comenzar Autoevaluación
@@ -307,15 +307,15 @@
                 <span class="icon solid major fa-chart-line"></span>
                 <h3>Seguimiento de Empresa</h3>
                 <p>Visualiza el estado de las evaluaciones de {{ trabajador.empresa.nombre_empresa }}.</p>
-                <ul class="actions">
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     <li><a href="{% url 'seguimiento_admin' %}" class="button primary">Ver Seguimiento</a></li>
                 </ul>
             </section>
-            <section>
+            <section style="display:flex; flex-direction:column;">
                 <span class="icon solid major fa-sitemap"></span>
                 <h3>Edición de Niveles Jerárquicos</h3>
                 <p>Edita los niveles jerárquicos de {{ trabajador.empresa.nombre_empresa }}.</p>
-                <ul class="actions">
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     <li>
                         <a href="{% url 'panel_edicion_niveles' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button primary">
                             Editar Niveles
@@ -327,7 +327,7 @@
                 <span class="icon solid major fa-shield-alt"></span>
                 <h3>Edición de Instrumentos RAT</h3>
                 <p>Gestiona el Registro de Actividad de Tratamiento de {{ trabajador.empresa.nombre_empresa }}.</p>
-                <ul class="actions">
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     <li><a href="{% url 'seleccion_instrumentos' %}" class="button primary">Panel RAT</a></li>
                 </ul>
             </section>

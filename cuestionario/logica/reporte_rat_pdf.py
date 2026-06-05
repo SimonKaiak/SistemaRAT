@@ -255,10 +255,10 @@ def generar_reporte_rat_pdf(request):
 
     # Portada
     elements.append(Spacer(1, 1.5 * inch))
-    elements.append(Paragraph("REPORTE DE RESPUESTAS RAT", style_portada))
+    elements.append(Paragraph(f"{ie.instrumento.nombre_instrumento}", style_portada))
     elements.append(Spacer(1, 0.3 * inch))
     elements.append(Paragraph(
-        f"Instrumento: {ie.instrumento.nombre_instrumento}", style_sub
+        f"Reporte de Respuestas {ie.instrumento.nombre_instrumento}", style_sub
     ))
     elements.append(Paragraph(
         f"Empresa: {empresa_obj.nombre_empresa}", style_sub
@@ -271,38 +271,46 @@ def generar_reporte_rat_pdf(request):
     ))
     elements.append(Spacer(1, 2 * inch))
 
-    # ── Sección por pregunta ───────────────────
-    elements.append(Paragraph("Resumen de Respuestas por Pregunta", style_title))
+    from reportlab.platypus import PageBreak
+    from cuestionario.models import Departamento
+
+    def _agregar_preguntas(elements, preguntas, trabajadores_filtrados, helper_styles, style_pregunta, style_normal):
+        for idx, pregunta in enumerate(preguntas, 1):
+            elements.append(Paragraph(f"{idx}. {pregunta.actividad_tratamiento}", style_pregunta))
+            respuestas = list(RATRespuestas.objects.filter(
+                pregunta=pregunta,
+                trabajador__in=trabajadores_filtrados,
+            ).values_list('respuesta', flat=True))
+            if pregunta.tipo == 'sino':
+                elements += _tabla_sino(respuestas, helper_styles)
+            elif pregunta.tipo == 'escala':
+                elements += _tabla_escala(respuestas, helper_styles)
+            elif pregunta.tipo == 'texto':
+                img_buf = _wordcloud_image(respuestas)
+                if img_buf:
+                    elements.append(RLImage(img_buf, width=5.5 * inch, height=2.4 * inch))
+                else:
+                    elements.append(Paragraph("Sin respuestas de texto.", style_normal))
+            elements.append(Spacer(1, 0.3 * inch))
+
+    # ── Resumen Global ─────────────────────────
+    elements.append(Paragraph("Resumen Global — Todos los Departamentos", style_title))
     elements.append(Spacer(1, 0.2 * inch))
+    _agregar_preguntas(elements, preguntas, trabajadores_listos, helper_styles, style_pregunta, style_normal)
 
-    for idx, pregunta in enumerate(preguntas, 1):
-        # Enunciado
-        enunciado = pregunta.actividad_tratamiento
-        elements.append(Paragraph(f"{idx}. {enunciado}", style_pregunta))
-
-        # Recopilar respuestas de todos los trabajadores listos
-        respuestas_qs = RATRespuestas.objects.filter(
-            pregunta=pregunta,
-            trabajador__in=trabajadores_listos,
-        ).values_list('respuesta', flat=True)
-        respuestas = list(respuestas_qs)
-
-        if pregunta.tipo == 'sino':
-            elements += _tabla_sino(respuestas, helper_styles)
-
-        elif pregunta.tipo == 'escala':
-            elements += _tabla_escala(respuestas, helper_styles)
-
-        elif pregunta.tipo == 'texto':
-            # Nube de palabras
-            img_buf = _wordcloud_image(respuestas)
-            if img_buf:
-                img = RLImage(img_buf, width=5.5 * inch, height=2.4 * inch)
-                elements.append(img)
-            else:
-                elements.append(Paragraph("Sin respuestas de texto.", style_normal))
-
-        elements.append(Spacer(1, 0.3 * inch))
+    # ── Por Departamento ───────────────────────
+    departamentos = Departamento.objects.filter(empresa=empresa_obj)
+    for depto in departamentos:
+        trabajadores_depto = [t for t in trabajadores_listos if t.departamento == depto]
+        if not trabajadores_depto:
+            continue
+        elements.append(PageBreak())
+        elements.append(Paragraph(
+            f"Resumen Departamento — {depto.nombre_departamento} ({len(trabajadores_depto)} colaborador{'es' if len(trabajadores_depto) > 1 else ''})",
+            style_title
+        ))
+        elements.append(Spacer(1, 0.2 * inch))
+        _agregar_preguntas(elements, preguntas, trabajadores_depto, helper_styles, style_pregunta, style_normal)
 
     # ── Generar PDF ────────────────────────────
     doc.build(elements)

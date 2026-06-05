@@ -39,21 +39,23 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">            
-            <a href="{% if empresa_actual %}/?empresa_id={{ empresa_actual.id_empresa }}{% else %}{% url 'index' %}{% endif %}" class="button">← Volver al Panel</a>
+        <div style="position:relative; display:flex; justify-content:space-between; align-items:center; padding:0.5em 0;">            
+            <a href="{% if empresa_actual %}/?empresa_id={{ empresa_actual.id_empresa }}{% else %}{% url 'index' %}{% endif %}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">← Volver al Panel</a>
             {% if user.is_superuser or es_coordinador %}{% if empresa_actual %}
-            <div style="display:flex;gap:0.8em;">
-                <a href="{% url 'reporte_rat_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button">📋 Reporte RAT PDF</a>
-                <a href="{% url 'panel_gemini' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button">🤖 Panel Informe con IA</a>
+            <div style="position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:5em;">
+                <span style="color:rgba(255,255,255,0.1);font-size:1.2em;">|</span>
+                <a href="{% url 'reporte_rat_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button" target="_blank" style="background:rgba(192,57,43,0.15); border-color:rgba(192,57,43,0.4); color:#e74c3c;">📋 Reporte {{ instrumento_actual.nombre_instrumento|default:'RAT' }} — PDF</a>
+                <span style="color:rgba(255,255,255,0.15);font-size:1.2em;margin-left:-0.5em;">—</span>
             </div>
+            <a href="{% url 'panel_gemini' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">🤖 Panel Informe — IA</a>
             {% endif %}{% endif %}
         </div>
         <hr style="margin-top:1.5em;" />
-        <h2>Seguimiento{% if instrumento_actual %} — {{ instrumento_actual.nombre_instrumento }}{% endif %}</h2>
+        <h2 style="text-align: center;">Seguimiento{% if instrumento_actual %} — {{ instrumento_actual.nombre_instrumento }}{% endif %}</h2>
     </header>
 
     <div class="row">
-        <div class="col-12">
+        <div class="col-12" style="text-align: center;">
             <h3>RAT Terminados: {{ rat_listos }}</h3>
             <h3>RAT Pendientes: {{ rat_pendientes }}</h3>
         </div>
@@ -61,8 +63,8 @@
 
     <hr />
 
-    <div class="table-wrapper">
-        <table class="alt">
+    <div class="table-wrapper" style="overflow-x: auto; margin-left: -6em; margin-right: -6em;">
+        <table class="alt" style="min-width: 100%; font-size: 0.85em;">
             <thead>
                 <tr>
                     <th>Colaborador</th>
@@ -82,7 +84,7 @@
                         <small>{{ t.cargo.nombre_cargo }}</small>
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
-                        <strong>{{ t.nivel_jerarquico }}</strong><br>
+                        <strong>{{ t.nivel_jerarquico.nombre_nivel_jerarquico }}</strong>
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
                         {% if t.rat_listo %}
@@ -93,7 +95,7 @@
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
                         {% if t.rat_listo %}
-                            <a href="{% url 'rat_ver_trabajador' t.id_trabajador %}" class="button small">
+                            <a href="{% url 'rat_ver_trabajador' t.id_trabajador %}" class="button small" style="font-size: 0.7em; background:rgba(79,195,247,0.15); border-color:rgba(79,195,247,0.4); color:#4fc3f7;">
                                 Ver {{ instrumento_actual.nombre_instrumento|default:'RAT' }}
                             </a>
                         {% else %}
@@ -106,7 +108,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="empresa_id" value="{{ empresa_actual.id_empresa }}">
                                 <input type="hidden" name="nombre_rat" value="{{ instrumento_actual.nombre_instrumento|default:'RAT' }}">
-                                <button type="submit" class="button small">📧 Enviar Recordatorio</button>
+                                <button type="submit" class="button small" style="font-size: 0.7em; background:rgba(230,126,34,0.15); border-color:rgba(230,126,34,0.4); color:#e67e22;">Recordatorio</button>
                             </form>
                         {% else %}
                             <small style="opacity: 0.3;">---</small>
@@ -116,7 +118,7 @@
                         <form method="post" action="{% url 'resetear_clave_seguimiento' t.id_trabajador %}" onsubmit="return confirm('¿Resetear clave de {{ t.nombre }}?');" style="margin:0;padding:0;">
                             {% csrf_token %}
                             <input type="hidden" name="empresa_id" value="{{ empresa_actual.id_empresa }}">
-                            <button type="submit" class="button small">🔑 Resetear</button>
+                            <button type="submit" class="button small" style="font-size: 0.7em; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.75);">🔑 Resetear</button>
                         </form>
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
@@ -124,7 +126,7 @@
                             <form method="post" action="{% url 'resetear_respuestas_rat' t.id_trabajador %}" onsubmit="return confirm('¿Resetear todas las respuestas RAT de {{ t.nombre }} {{ t.apellido_paterno }}? Esta acción no se puede deshacer.');" style="margin:0;padding:0;">
                                 {% csrf_token %}
                                 <input type="hidden" name="empresa_id" value="{{ empresa_actual.id_empresa }}">
-                                <button type="submit" class="button small">🗑️ Resetear Respuestas</button>
+                                <button type="submit" class="button small" style="font-size: 0.7em; background:rgba(155,89,182,0.15); border-color:rgba(155,89,182,0.4); color:#9b59b6;">Reset Respuestas</button>
                             </form>
                         {% else %}
                             <small style="opacity: 0.3;">---</small>
@@ -136,7 +138,7 @@
         </table>
     </div>
 
-    <hr />
+    <hr style="margin-top: 0.2em; margin-bottom: 0em;" />
 
 </section>
 {% endblock %}

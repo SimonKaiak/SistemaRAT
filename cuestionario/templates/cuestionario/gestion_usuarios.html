@@ -111,11 +111,11 @@
 
   .btn-gu {
     display: inline-flex; align-items: center; gap: 0.35em;
-    padding: 0.2em 0.4em;
-    border-radius: 20px;
-    font-size: 0.6em;
+    padding: 0.75em 1.5em;
+    border-radius: 4em;
+    font-size: 0.7em;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
     cursor: pointer;
     border: 1.5px solid transparent;
     transition: opacity 0.15s, transform 0.1s;
@@ -125,12 +125,12 @@
   .btn-gu:hover { opacity: 0.82; transform: translateY(-1px); }
   .btn-gu:active { transform: translateY(0); }
 
-  .btn-add    { background: #27ae60; color: #fff; border-color: #27ae60; }
-  .btn-edit   { background: #988f3c; color: #fff; border-color: #988f3c; }
+  .btn-add    { background: rgba(39,174,96,0.15); color: #27ae60; border-color: rgba(39,174,96,0.4); }
+  .btn-edit   { background: rgba(240,192,64,0.15); color: #f0c040; border-color: rgba(240,192,64,0.4); }
   .btn-reset  { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.2); }
-  .btn-del    { background: #c0392b; color: #fff; border-color: #c0392b; }
-  .btn-quitar { background: rgba(192,57,43,0.15); color: #e74c3c; border-color: #e74c3c; }
-  .btn-excel { background: #2471a3; color: #fff; border-color: #2471a3; }
+  .btn-del    { background: rgba(192,57,43,0.15); color: #e74c3c; border-color: rgba(192,57,43,0.4); }
+  .btn-quitar { background: rgba(192,57,43,0.15); color: #e74c3c; border-color: rgba(192,57,43,0.4); }
+  .btn-excel  { background: rgba(36,113,163,0.15); color: #3498db; border-color: rgba(36,113,163,0.4); }
 
   .gu-overlay {
       display: none; position: fixed; inset: 0;
@@ -247,11 +247,11 @@
 
 <section>
     <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
-        <a href="/?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button">← Volver al Panel</a>
+    <div style="display:flex;justify-content:center;align-items:center;padding:0.5em 0;">
+        <a href="/?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">← Volver al Panel</a>
     </div>
     <hr style="margin-top:1.5em;" />
-  <header>
+  <header style="text-align:center;">
     <h2>Administración de Usuarios</h2>
     <p>Gestiona coordinadores y trabajadores de la empresa seleccionada.</p>
   </header>
@@ -282,7 +282,7 @@
             <th>Departamento</th>
             <th>Nivel Jerárquico</th>
             <th>Cargo</th>
-            <th>Acciones</th>
+            <th style="text-align:center;">Resetear Clave</th>
           </tr>
         </thead>
         <tbody>
@@ -325,6 +325,7 @@
         <h3 class="gu-card-title">👥 Usuarios de {{ empresa_seleccionada.nombre_empresa }}</h3>
         <div style="display:flex; gap:0.6em; flex-wrap:wrap;">
           <button class="btn-gu btn-add" onclick="abrirModalCrear()">＋ Crear Nuevo Usuario</button>
+          <span style="color:rgba(255,255,255,0.2);font-size:1.2em;align-self:flex-end;margin-bottom:0.5em;">—</span>
           <button class="btn-gu btn-excel" onclick="document.getElementById('input-excel').click()">📊 Cargar usuarios desde Excel</button>
           <input type="file" id="input-excel" accept=".xlsx,.xls" style="display:none" onchange="cargarExcel(this)">
         </div>
@@ -340,7 +341,7 @@
             <th>Departamento</th>
             <th>Nivel Jerárquico</th>
             <th>Cargo</th>
-            <th>Acciones</th>
+            <th style="text-align:center;">Resetear Clave</th>
           </tr>
         </thead>
         <tbody id="tbody-trabajadores">

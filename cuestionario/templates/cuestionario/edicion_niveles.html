@@ -32,11 +32,11 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
-            <a href="{% url 'index' %}" class="button">← Volver al Panel</a>
+        <div style="display:flex;justify-content:center;align-items:center;padding:0.5em 0;">
+            <a href="{% url 'index' %}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">← Volver al Panel</a>
         </div>
         <hr style="margin-top:1.5em;" />
-        <h2 style="margin-top: 1em;">Edición de Niveles Jerárquicos</h2>
+        <h2 style="margin-top: 1em; text-align: center;">Edición de Niveles Jerárquicos</h2>
     </header>
 
     {% if messages %}
@@ -49,30 +49,33 @@
 
     {% if empresa_actual %}
     <hr />
-    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 0;">
-        <h3 style="color: #ce93d8;">Niveles Jerárquicos</h3>
+    <div style="background: rgba(255,255,255,0.05); padding: 1.5em 2em 0 2em; border-radius: 8px; margin-bottom: 0; max-width: 900px; margin-left: auto; margin-right: auto;">
+        <h3 style="color: #ce93d8; text-align:center;">Niveles Jerárquicos</h3>
         <div class="table-wrapper">
             <table class="alt">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre actual</th>
-                        <th>Editar</th>
+                        <th style="text-align:center;">ID</th>
+                        <th style="text-align:center;">Nombre actual</th>
+                        <th style="text-align:center;">Editar</th>
+                    <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for nivel in niveles %}
                     <tr>
-                        <td>{{ nivel.id_nivel_jerarquico }}</td>
-                        <td>{{ nivel.nombre_nivel_jerarquico }}</td>
-                        <td>
-                            <form method="POST" action="{% url 'editar_nivel' nivel.id_nivel_jerarquico %}" style="display:flex; gap: 0.5em; align-items: center;">
-                                {% csrf_token %}
+                        <td style="text-align:center;">{{ nivel.id_nivel_jerarquico }}</td>
+                        <td style="text-align:center;">{{ nivel.nombre_nivel_jerarquico }}</td>
+                        <form method="POST" action="{% url 'editar_nivel' nivel.id_nivel_jerarquico %}" style="display:contents;">
+                            {% csrf_token %}
+                            <td style="text-align:center; vertical-align:middle;">
                                 <input type="text" name="nombre_nivel_jerarquico" value="{{ nivel.nombre_nivel_jerarquico }}"
-                                       style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 250px;">
-                                <button type="submit" class="button small primary">Guardar</button>
-                            </form>
-                        </td>
+                                       style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 250px; text-align: center; display:block; margin: 0 auto;">
+                            </td>
+                            <td style="text-align:center;">
+                                <button type="submit" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#27ae60;font-weight:600;">Guardar</button>
+                            </td>
+                        </form>
                     </tr>
                     {% endfor %}
                 </tbody>
