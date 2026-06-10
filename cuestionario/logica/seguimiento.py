@@ -164,9 +164,18 @@ def panel_seguimiento_rat(request):
 
     instrumento_empresa_rat = None
     if empresa_actual:
-        instrumento_empresa_rat = InstrumentoEmpresa.objects.filter(
-            empresa=empresa_actual, habilitado=True, instrumento__tipo='rat'
-        ).first()
+        instrumento_id = request.GET.get('instrumento_id')
+        if instrumento_id:
+            instrumento_empresa_rat = InstrumentoEmpresa.objects.filter(
+                empresa=empresa_actual,
+                habilitado=True,
+                instrumento__tipo='rat',
+                instrumento__id_instrumento=instrumento_id,
+            ).first()
+        else:
+            instrumento_empresa_rat = InstrumentoEmpresa.objects.filter(
+                empresa=empresa_actual, habilitado=True, instrumento__tipo='rat'
+            ).first()
 
     for t in trabajadores:
         if instrumento_empresa_rat:

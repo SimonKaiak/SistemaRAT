@@ -693,12 +693,25 @@ class RATPreguntas(models.Model):
  
     id_rat_pregunta = models.AutoField(primary_key=True)
     actividad_tratamiento = models.CharField(max_length=255)
-    categorias_datos = models.TextField()
+    CATEGORIAS_CHOICES = [
+        ('contactabilidad', 'Datos de contactabilidad de personas'),
+        ('bancarios', 'Datos bancarios o finanzas personales'),
+        ('historia_clinica', 'Datos de historia clínica de personas'),
+    ]
+    categorias_datos = models.CharField(max_length=50, choices=CATEGORIAS_CHOICES)
     descripcion_titulares = models.TextField()
     finalidad_tratamiento = models.TextField()
     base_legitimidad = models.CharField(max_length=50, choices=BASE_LEGITIMIDAD_CHOICES)
     periodo_conservacion = models.PositiveIntegerField()
     fuente_datos = models.CharField(max_length=255)
+    destinatarios = models.ForeignKey(
+        'Trabajador',
+        on_delete=models.DO_NOTHING,
+        db_column='trabajador_id_destinatario',
+        related_name='preguntas_rat_destinatario',
+        null=True,
+        blank=True,
+    )
     TIPO_PREGUNTA_CHOICES = [
         ('texto', 'Texto libre'),
         ('sino', 'Sí / No'),

@@ -105,13 +105,20 @@ def index(request):
         ).exists()
 
     # Detectar instrumento RAT 1 asignado al trabajador
-    ie_rat1 = InstrumentoEmpresa.objects.filter(
+    instrumentos_rat = InstrumentoEmpresa.objects.filter(
         empresa=trabajador.empresa,
         habilitado=True,
         instrumento__tipo='rat',
-    ).select_related('instrumento').first()
+    ).select_related('instrumento').order_by('instrumento__id_instrumento')
+
+    instrumentos_rat_list = list(instrumentos_rat)
+    ie_rat1 = instrumentos_rat_list[0] if len(instrumentos_rat_list) > 0 else None
+    ie_rat2 = instrumentos_rat_list[1] if len(instrumentos_rat_list) > 1 else None
+
     rat1_instrumento_id = ie_rat1.instrumento.id_instrumento if ie_rat1 else None
-    rat1_nombre = ie_rat1.instrumento.nombre_instrumento if ie_rat1 else 'RAT'
+    rat1_nombre = ie_rat1.instrumento.nombre_instrumento if ie_rat1 else 'RAT 1'
+    rat2_instrumento_id = ie_rat2.instrumento.id_instrumento if ie_rat2 else None
+    rat2_nombre = ie_rat2.instrumento.nombre_instrumento if ie_rat2 else 'RAT 2'
 
     context = {
         'trabajador': trabajador,
@@ -122,6 +129,8 @@ def index(request):
         'es_coordinador': trabajador.es_coordinador,
         'rat1_instrumento_id': rat1_instrumento_id,
         'rat1_nombre': rat1_nombre,
+        'rat2_instrumento_id': rat2_instrumento_id,
+        'rat2_nombre': rat2_nombre,
     }
     return render(request, 'cuestionario/index.html', context)
 

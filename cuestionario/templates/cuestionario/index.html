@@ -105,8 +105,20 @@
             <p>Visualiza el estado del Registro de Actividad de Tratamiento de datos.</p>
             <ul class="actions" style="margin-top:auto; padding-top:1em;">
                 <li>
-                    <a href="{% url 'seguimiento_rat' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
+                    <a href="{% url 'seguimiento_rat' %}?empresa_id={{ empresa_seleccionada.id_empresa }}&instrumento_id={{ ie.instrumento.id_instrumento }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
                         Ver Seguimiento {{ ie.instrumento.nombre_instrumento }}
+                    </a>
+                </li>
+            </ul>
+        </section>
+        <section style="display:flex; flex-direction:column;">
+            <span class="icon solid major fa-shield-alt"></span>
+            <h3>Edición de Instrumentos {{ ie.instrumento.nombre_instrumento }}</h3>
+            <p>Gestiona los instrumentos RAT de {{ empresa_seleccionada.nombre_empresa }}.</p>
+            <ul class="actions" style="margin-top:auto; padding-top:1em;">
+                <li>
+                    <a href="/rat/coordinador/?instrumento_id={{ ie.instrumento.id_instrumento }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
+                        Editar {{ ie.instrumento.nombre_instrumento }}
                     </a>
                 </li>
             </ul>
@@ -118,20 +130,6 @@
             <p>No hay instrumentos RAT habilitados para esta empresa.</p>
         </section>
         {% endfor %}
-            {% for ie in instrumentos_rat %}
-                <section style="display:flex; flex-direction:column;">
-                    <span class="icon solid major fa-shield-alt"></span>
-                    <h3>Edición de Instrumentos {{ ie.instrumento.nombre_instrumento }}</h3>
-                    <p>Gestiona los instrumentos RAT de {{ empresa_seleccionada.nombre_empresa }}.</p>
-                    <ul class="actions" style="margin-top:auto; padding-top:1em;">
-                        <li>
-                            <a href="/rat/coordinador/?instrumento_id={{ ie.instrumento.id_instrumento }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
-                                Editar {{ ie.instrumento.nombre_instrumento }}
-                            </a>
-                        </li>
-                    </ul>
-                </section>
-            {% endfor %}
             <section style="display:flex; flex-direction:column;">
                 <span class="icon solid major fa-lock"></span>
                 <h3>Gestión de Usuarios</h3>
@@ -233,6 +231,17 @@
             </ul>
         </section>
 
+        {% if rat2_instrumento_id %}
+        <section>
+            <span class="icon solid major fa-database"></span>
+            <h3>{{ rat2_nombre }}</h3>
+            <p>Completa el Registro de Actividad de Tratamiento de datos — Parte 2.</p>
+            <ul class="actions">
+                <li><a href="{% url 'rat_panel_usuario' %}?instrumento_id={{ rat2_instrumento_id }}" class="button primary">Ir al RAT 2</a></li>
+            </ul>
+        </section>
+        {% endif %}
+
         <section>
             <span class="icon solid major fa-info-circle"></span>
             <h3>Información</h3>
@@ -325,12 +334,47 @@
             </section>
             <section>
                 <span class="icon solid major fa-shield-alt"></span>
-                <h3>Edición de Instrumentos RAT</h3>
-                <p>Gestiona el Registro de Actividad de Tratamiento de {{ trabajador.empresa.nombre_empresa }}.</p>
+                <h3>Ver Seguimiento RAT 1</h3>
+                <p>Visualiza las respuestas del equipo para {{ rat1_nombre }}.</p>
                 <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    {% if rat1_instrumento_id %}
+                    <li><a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ rat1_instrumento_id }}" class="button primary">Ver Seguimiento RAT 1</a></li>
+                    {% else %}
                     <li><a href="{% url 'seleccion_instrumentos' %}" class="button primary">Panel RAT</a></li>
+                    {% endif %}
                 </ul>
             </section>
+
+            <section>
+                <span class="icon solid major fa-shield-alt"></span>
+                <h3>Editar RAT 1</h3>
+                <p>Gestiona las preguntas de {{ rat1_nombre }} para {{ trabajador.empresa.nombre_empresa }}.</p>
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    {% if rat1_instrumento_id %}
+                    <li><a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ rat1_instrumento_id }}" class="button primary">Editar RAT 1</a></li>
+                    {% endif %}
+                </ul>
+            </section>
+
+            {% if rat2_instrumento_id %}
+            <section>
+                <span class="icon solid major fa-database"></span>
+                <h3>Ver Seguimiento RAT 2</h3>
+                <p>Visualiza las respuestas del equipo para {{ rat2_nombre }}.</p>
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    <li><a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ rat2_instrumento_id }}" class="button primary">Ver Seguimiento RAT 2</a></li>
+                </ul>
+            </section>
+
+            <section>
+                <span class="icon solid major fa-edit"></span>
+                <h3>Editar RAT 2</h3>
+                <p>Gestiona las preguntas de {{ rat2_nombre }} para {{ trabajador.empresa.nombre_empresa }}.</p>
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    <li><a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ rat2_instrumento_id }}" class="button primary">Editar RAT 2</a></li>
+                </ul>
+            </section>
+            {% endif %}
         </div>
     </section>
     {% endif %}

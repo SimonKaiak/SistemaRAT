@@ -157,6 +157,7 @@ class RATPreguntaForm(forms.ModelForm):
             'descripcion_titulares',
             'finalidad_tratamiento',
             'base_legitimidad',
+            'destinatarios',
             'periodo_conservacion',
             'fuente_datos',
             'version',
@@ -169,10 +170,8 @@ class RATPreguntaForm(forms.ModelForm):
             'responsable': forms.Select(attrs={
                 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
             }),
-            'categorias_datos': forms.Textarea(attrs={
-                'rows': 2,
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
-                'placeholder': 'Ej: Datos identificativos (RUT, nombre)',
+            'categorias_datos': forms.Select(attrs={
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
             }),
             'descripcion_titulares': forms.Textarea(attrs={
                 'rows': 2,
@@ -198,6 +197,9 @@ class RATPreguntaForm(forms.ModelForm):
             'version': forms.Select(attrs={
                 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
             }),
+            'destinatarios': forms.Select(attrs={
+                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
+            }),
         }
 
     def __init__(self, *args, empresa=None, **kwargs):
@@ -205,10 +207,13 @@ class RATPreguntaForm(forms.ModelForm):
         if empresa:
             self.fields['responsable'].queryset = Trabajador.objects.filter(empresa=empresa)
             self.fields['version'].queryset = RegistroVersiones.objects.filter(empresa=empresa)
+            self.fields['destinatarios'].queryset = Trabajador.objects.filter(empresa=empresa)
         else:
             self.fields['responsable'].queryset = Trabajador.objects.all()
             self.fields['version'].queryset = RegistroVersiones.objects.all()
+            self.fields['destinatarios'].queryset = Trabajador.objects.all()
         self.fields['version'].required = False
+        self.fields['destinatarios'].required = False
 
 
 class RegistroVersionesForm(forms.ModelForm):
