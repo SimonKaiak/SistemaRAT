@@ -456,7 +456,7 @@ class Trabajador(models.Model):
         return self.subordinados.exists()
     
     def __str__(self):
-        return f"{self.nombre} {self.apellido_paterno} | {self.rut} | ID {self.empresa.id_empresa} - {self.empresa.nombre_empresa}"
+        return f"{self.nombre} {self.apellido_paterno} {self.apellido_materno}"
 
 # =========================
 # Tabla Autoevaluación
@@ -701,8 +701,14 @@ class RATPreguntas(models.Model):
     categorias_datos = models.CharField(max_length=50, choices=CATEGORIAS_CHOICES)
     descripcion_titulares = models.TextField()
     finalidad_tratamiento = models.TextField()
-    base_legitimidad = models.CharField(max_length=50, choices=BASE_LEGITIMIDAD_CHOICES)
+    base_legitimidad = models.CharField(max_length=200)  # múltiple, separado por comas
     periodo_conservacion = models.PositiveIntegerField()
+    UNIDAD_TIEMPO_CHOICES = [
+        ('dias', 'Días'),
+        ('meses', 'Meses'),
+        ('anos', 'Años'),
+    ]
+    periodo_unidad = models.CharField(max_length=10, choices=UNIDAD_TIEMPO_CHOICES, default='meses')
     fuente_datos = models.CharField(max_length=255)
     destinatarios = models.ForeignKey(
         'Trabajador',

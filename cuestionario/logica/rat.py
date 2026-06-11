@@ -183,8 +183,8 @@ class RATPreguntaForm(forms.ModelForm):
                 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
                 'placeholder': 'Ej: Calcular y pagar remuneraciones',
             }),
-            'base_legitimidad': forms.Select(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
+            'base_legitimidad': forms.CheckboxSelectMultiple(attrs={
+                'style': 'color:#fff;',
             }),
             'periodo_conservacion': forms.NumberInput(attrs={
                 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
@@ -214,6 +214,27 @@ class RATPreguntaForm(forms.ModelForm):
             self.fields['destinatarios'].queryset = Trabajador.objects.all()
         self.fields['version'].required = False
         self.fields['destinatarios'].required = False
+        self.fields['actividad_tratamiento'].label = 'Actividad de tratamiento'
+        self.fields['responsable'].label = 'Responsable o encargado'
+        self.fields['categorias_datos'].label = 'Categoría, clases o tipos de datos que se tratan'
+        self.fields['descripcion_titulares'].label = 'Descripción del universo de los titulares de los datos personales'
+        self.fields['finalidad_tratamiento'].label = 'Finalidad de tratamiento'
+        self.fields['destinatarios'].label = 'Destinatarios a los que se prevé comunicar o ceder los datos, incluida la transferencia internacional de datos'
+        self.fields['periodo_conservacion'].label = 'Período de conservación'
+        self.fields['fuente_datos'].label = 'Fuente de la cual provienen los datos'
+        self.fields['version'].label = 'Versión'
+        BASE_OPTS = [
+            ('consentimiento', 'Consentimiento'),
+            ('contrato', 'Contrato'),
+            ('obligacion_legal', 'Obligación legal'),
+            ('interes_legitimo', 'Interés legítimo'),
+        ]
+        self.fields['base_legitimidad'] = forms.MultipleChoiceField(
+            choices=BASE_OPTS,
+            widget=forms.CheckboxSelectMultiple(attrs={'style': 'color:#fff;'}),
+            required=True,
+            label='Base de legitimidad del tratamiento',
+        )
 
 
 class RegistroVersionesForm(forms.ModelForm):
@@ -404,6 +425,7 @@ def rat_nueva_pregunta(request):
         if form.is_valid():
             pregunta = form.save(commit=False)
             pregunta.instrumento_empresa = ie
+            pregunta.base_legitimidad = ','.join(form.cleaned_data['base_legitimidad'])
             pregunta.save()
             return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
@@ -433,10 +455,15 @@ def rat_editar_pregunta(request, pregunta_id):
     if request.method == 'POST':
         form = FormClass(request.POST, instance=pregunta, empresa=empresa)
         if form.is_valid():
-            form.save()
+            pregunta_obj = form.save(commit=False)
+            if 'base_legitimidad' in form.cleaned_data:
+                pregunta_obj.base_legitimidad = ','.join(form.cleaned_data['base_legitimidad'])
+            pregunta_obj.save()
             return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
         form = FormClass(instance=pregunta, empresa=empresa)
+        if 'base_legitimidad' in form.fields:
+            form.fields['base_legitimidad'].initial = pregunta.base_legitimidad.split(',') if pregunta.base_legitimidad else []
 
     return render(request, 'cuestionario/rat_formulario.html', {
         'trabajador': trabajador,

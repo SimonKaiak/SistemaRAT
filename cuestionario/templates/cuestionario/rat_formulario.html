@@ -6,16 +6,17 @@
 <section>
     <form method="post" action="">
         {% csrf_token %}
-        <header>
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-                <a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ instrumento_id }}" class="button">← Cancelar</a>
+        <header style="max-width:700px;margin:0 auto;width:100%;text-align:center;margin-bottom:1.5em;">
+            <hr style="margin-bottom:1.5em;" />
+            <div style="display:flex;justify-content:center;align-items:center;padding:0.5em 0;">
+                <a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ instrumento_id }}" class="button" style="background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4);color:#e74c3c;">← Cancelar</a>
             </div>
             <hr style="margin-top:1.5em;" />
             <h2>{% if editando %}✏️ Editar pregunta RAT{% else %}📋 Nueva pregunta RAT{% endif %}</h2>
             <p>Completa los campos para <strong>{{ empresa_actual.nombre_empresa }}</strong>.</p>
         </header>
 
-        <div style="display:flex;flex-direction:column;gap:1em;max-width:700px;">
+        <div style="display:flex;flex-direction:column;gap:1em;max-width:700px;margin:0 auto;width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:2em;">
 
             {# Si es pregunta de Kick Off (sino/escala/texto sin finalidad) #}
             {% if tipo_pregunta == 'sino' or tipo_pregunta == 'escala' or tipo_pregunta == 'texto' and not pregunta.finalidad_tratamiento %}
@@ -58,10 +59,51 @@
                 {# RAT clásico — todos los campos #}
                 {% for field in form %}
                 <div>
-                    <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">
+                    <label style="display:block;margin-bottom:0.4em;font-weight:600;font-size:0.93em;text-align:center;">
                         {{ field.label }}{% if field.field.required %} <span style="color:#ff6b6b;">*</span>{% endif %}
                     </label>
+                    {% if field.html_name == 'base_legitimidad' %}
+                    <div style="position:relative;width:100%;">
+                        <div id="bl-trigger" onclick="document.getElementById('bl-dropdown').style.display = document.getElementById('bl-dropdown').style.display === 'none' ? 'block' : 'none'" style="width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;cursor:pointer;box-sizing:border-box;">
+                            <span id="bl-label">---------</span>
+                        </div>
+                        <div id="bl-dropdown" style="display:none;position:absolute;z-index:999;width:100%;background:rgba(30,30,50,0.98);border:1px solid rgba(255,255,255,0.2);border-radius:6px;margin-top:2px;">
+                            <input type="text" id="bl-search" placeholder="Buscar..." oninput="filtrarOpciones()" style="width:calc(100% - 16px);margin:6px 8px;padding:6px 8px;background:#1e1e32;border:1px solid rgba(255,255,255,0.3);border-radius:4px;color:#fff;font-size:14px;box-sizing:border-box;">
+                            {% for checkbox in field %}
+                            <label style="display:flex;align-items:center;gap:0.6em;padding:0.5em 0.8em;cursor:pointer;color:#fff;">
+                                <input type="checkbox" name="{{ field.html_name }}" value="{{ checkbox.data.value }}"
+                                    {% if checkbox.data.selected %}checked{% endif %}
+                                    onchange="updateLabel()"
+                                    style="width:15px;height:15px;cursor:pointer;accent-color:#4a9eff;">
+                                <span>{{ checkbox.choice_label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <script>
+                    function filtrarOpciones() {
+                        const q = document.getElementById('bl-search').value.toLowerCase();
+                        document.querySelectorAll('#bl-dropdown label').forEach(function(label) {
+                            const texto = label.querySelector('span').textContent.toLowerCase();
+                            label.style.display = texto.includes(q) ? 'flex' : 'none';
+                        });
+                    }
+                    function updateLabel() {
+                        const checked = document.querySelectorAll('input[name="base_legitimidad"]:checked');
+                        const label = document.getElementById('bl-label');
+                        label.textContent = checked.length > 0 ? Array.from(checked).map(c => c.nextElementSibling.textContent).join(', ') : '---------';
+                    }
+                    document.addEventListener('click', function(e) {
+                        const dropdown = document.getElementById('bl-dropdown');
+                        const trigger = document.getElementById('bl-trigger');
+                        if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+                            dropdown.style.display = 'none';
+                        }
+                    });
+                    </script>
+                    {% else %}
                     {{ field }}
+                    {% endif %}
                     {% if field.help_text %}
                         <small style="display:block;margin-top:0.25em;opacity:0.6;">{{ field.help_text }}</small>
                     {% endif %}
@@ -74,15 +116,105 @@
 
         </div>
 
-        <hr style="margin-top:2em;" />
-        <div style="display:flex;justify-content:flex-end;padding:1.5em 0;">
-            <a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ instrumento_id }}" class="button" style="margin-right:1em;">Cancelar</a>
-            <button type="submit" class="button primary">
-                {% if editando %}Guardar cambios{% else %}Guardar pregunta{% endif %}
+        <hr style="margin-top:2em;max-width:700px;margin-left:auto;margin-right:auto;" />
+        <div style="display:flex;justify-content:center;gap:1em;padding:1.5em 0;max-width:700px;margin:0 auto;width:100%;">
+            <button type="submit" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">
+                {% if editando %}✓ Guardar cambios{% else %}✓ Guardar pregunta{% endif %}
             </button>
         </div>
         <hr />
 
     </form>
-</section>
+    </section>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
+    <style>
+    .select2-container--default .select2-selection--single {
+        background: rgba(30,30,50,0.9);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 6px;
+        height: 38px;
+        color: #fff;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff;
+        line-height: 36px;
+        padding-left: 0.5em;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+    .select2-dropdown {
+        background: rgba(30,30,50,0.98);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+    }
+    .select2-container--default .select2-results__option {
+        color: #fff;
+    }
+    .select2-container--default .select2-results__option--highlighted {
+        background: rgba(52,152,219,0.5);
+    }
+    .select2-search--dropdown .select2-search__field {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        color: #fff !important;
+        display: block !important;
+        width: 100% !important;
+        padding: 0.4em !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+        height: auto !important;
+    }
+    .select2-search--dropdown {
+        display: block !important;
+        padding: 4px !important;
+    }
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        background: #1e1e32 !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        color: #ffffff !important;
+        display: block !important;
+        width: calc(100% - 8px) !important;
+        padding: 6px 8px !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: static !important;
+        height: 32px !important;
+        box-sizing: border-box !important;
+        margin: 4px !important;
+        border-radius: 4px !important;
+        font-size: 14px !important;
+        outline: none !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+    }
+    .select2-container--default .select2-search--dropdown {
+        display: block !important;
+        padding: 4px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    input.select2-search__field {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+                const select2Config = { placeholder: '---------', allowClear: true, width: '100%', minimumResultsForSearch: Infinity };
+                $('select[name="responsable"]').select2(select2Config);
+                $('select[name="categorias_datos"]').select2(select2Config);
+                $('select[name="destinatarios"]').select2(select2Config);
+                $('select[name="version"]').select2(select2Config);
+            } else {
+                console.error('jQuery o Select2 no disponible');
+            }
+        }, 800);
+    });
+    </script>
 {% endblock %}
