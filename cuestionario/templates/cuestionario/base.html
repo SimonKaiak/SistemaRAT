@@ -77,10 +77,12 @@
                 border-color: #b45252 !important;
             }
             #main > .inner {
-                padding-top: 3rem !important;
+                padding-top: 2.5rem !important;
+                padding-bottom: 0 !important;
             }
             #wrapper {
                 min-height: calc(100vh - 58px - 58px - 4px) !important;
+                align-items: flex-start !important;
             }
             #footer {
                 padding: 0 !important;
@@ -151,8 +153,9 @@
             <section id="main" class="wrapper style1 fade-up" style="display:flex;justify-content:center;">
                 <div class="inner">
                     <header>
-                        <h1 style="font-size:2.2em;padding-bottom: 0.5em;text-align:center;">
-                            <span>Sistema RAT{% if empresa_actual %} : <span style="color: #4fc3f7;">{{ empresa_actual.nombre_empresa }}</span>{% endif %}{% if empresa_seleccionada %} : <span style="color: #4fc3f7;">{{ empresa_seleccionada.nombre_empresa }}</span>{% endif %}</span>
+                        <hr style="border-color:rgba(255,255,255,0.1);margin-bottom:1.5em;margin-top:0em;">
+                        <h1 style="font-size:2.2em;padding-bottom: 0;margin-bottom:0;text-align:center;">
+                            <span>{% if instrumento %}{{ empresa_actual.nombre_empresa }} : <span style="color: #4fc3f7;">{{ instrumento.nombre_instrumento }}</span>{% elif empresa_actual %}Sistema RAT : <span style="color: #4fc3f7;">{{ empresa_actual.nombre_empresa }}</span>{% elif empresa_seleccionada %}Sistema RAT : <span style="color: #4fc3f7;">{{ empresa_seleccionada.nombre_empresa }}</span>{% else %}Sistema RAT{% if empresa_actual %} : <span style="color: #4fc3f7;">{{ empresa_actual.nombre_empresa }}</span>{% endif %}{% endif %}</span>
                         </h1>
                     </header>
                     

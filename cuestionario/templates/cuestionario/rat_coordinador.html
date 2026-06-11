@@ -39,26 +39,25 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
-            <a href="/?empresa_id={{ empresa.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">← Volver al inicio</a>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8em;padding:0.5em 0;">
+            <a href="javascript:history.back()" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">← Volver</a>
             <div style="display:flex;gap:0.8em;">
                 {% if not user.is_superuser %}
                 <a href="{% url 'rat_versiones' %}" class="button">🗃 Versiones</a>
                 {% endif %}
-                {% if not instrumento.plantilla_preguntas.exists %}
-                <a href="{% url 'rat_nueva_pregunta' %}?instrumento_id={{ instrumento_id }}" class="button primary">+ Nueva pregunta</a>
-                {% endif %}
+                <a href="{% url 'rat_nueva_pregunta' %}?instrumento_id={{ instrumento_id }}" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">+ Crear Preguntas</a>
             </div>
         </div>
         <hr style="margin-top:1.5em;" />
-        <h2 style="text-align:center;">🗂 Panel Coordinador — RAT</h2>
-        <p style="text-align:center;">Gestiona las preguntas RAT de <strong>{{ empresa.nombre_empresa }}</strong>.</p>
+        <h2 style="text-align:center;">🗂 Panel Coordinador — {{ instrumento.nombre_instrumento }}</h2>
+        <p style="text-align:center;">Gestiona las preguntas {{ instrumento.nombre_instrumento }} de <strong>{{ empresa.nombre_empresa }}</strong>.</p>
     </header>
 
     {% if not preguntas %}
         <div style="background:rgba(255,200,50,0.15);border-left:4px solid #f0c040;padding:1em 1.5em;border-radius:6px;margin-bottom:1.5em;">
             ⚠️ No hay preguntas RAT creadas aún para esta empresa.
         </div>
+        <hr style="border-color:rgba(255,255,255,0.1);margin-bottom:0;">
     {% endif %}
 
     <div style="display:flex;flex-direction:column;gap:1.2em;margin-top:1em;">

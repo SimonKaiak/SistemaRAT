@@ -130,26 +130,6 @@
             <p>No hay instrumentos RAT habilitados para esta empresa.</p>
         </section>
         {% endfor %}
-            <section style="display:flex; flex-direction:column;">
-                <span class="icon solid major fa-lock"></span>
-                <h3>Gestión de Usuarios</h3>
-                <p>Accede al panel nativo de Django para gestionar cuentas y permisos.</p>
-                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
-                    <li><a href="{% url 'gestion_usuarios' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">Gestionar Usuarios</a></li>
-                </ul>
-            </section>
-            <section style="display:flex; flex-direction:column;">
-                <span class="icon solid major fa-sitemap"></span>
-                <h3>Edición de Niveles Jerárquicos</h3>
-                <p>Edita los niveles jerárquicos de {{ empresa_seleccionada.nombre_empresa }}.</p>
-                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
-                    <li>
-                        <a href="{% url 'panel_edicion_niveles' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
-                            Editar Niveles
-                        </a>
-                    </li>
-                </ul>
-            </section>
             <section>
                 <span class="icon solid major fa-chart-line"></span>
                 <h3>Seguimiento Evaluación Desempeño</h3>
@@ -174,6 +154,38 @@
                     </li>
                 </ul>
             </section>
+                        <section style="display:flex; flex-direction:column;">
+                <span class="icon solid major fa-lock"></span>
+                <h3>Gestión de Usuarios</h3>
+                <p>Accede al panel nativo de Django para gestionar cuentas y permisos.</p>
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    <li><a href="{% url 'gestion_usuarios' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">Gestionar Usuarios</a></li>
+                </ul>
+            </section>
+            <section style="display:flex; flex-direction:column;">
+                <span class="icon solid major fa-sitemap"></span>
+                <h3>Edición de Niveles Jerárquicos</h3>
+                <p>Edita los niveles jerárquicos de {{ empresa_seleccionada.nombre_empresa }}.</p>
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    <li>
+                        <a href="{% url 'panel_edicion_niveles' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
+                            Editar Niveles
+                        </a>
+                    </li>
+                </ul>
+            </section>
+            <section style="display:flex; flex-direction:column;">
+                <span class="icon solid major fa-list"></span>
+                <h3>Gestionar Instrumentos RAT</h3>
+                <p>Visualiza y gestiona los instrumentos RAT habilitados para {{ empresa_seleccionada.nombre_empresa }}.</p>
+                <ul class="actions" style="margin-top: auto; padding-top: 1em;">
+                    <li>
+                        <a href="{% url 'seleccion_instrumentos' %}?empresa_id={{ empresa_seleccionada.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">
+                            Gestionar Instrumentos
+                        </a>
+                    </li>
+                </ul>
+            </section>
         </div>
         {% endif %}
     </section>
@@ -192,9 +204,12 @@
 
 {% else %}
     <section>
-        <header>
-            <h2>Bienvenid@, {{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</h2>
-            <p><strong>{{ trabajador.cargo.nombre_cargo }}</strong> {{ trabajador.departamento.nombre_departmento }}</p>
+        <header style="text-align:center;">
+            <p style="font-size:1.1em;font-weight:600;margin-bottom:0.2em;">Bienvenid@, {{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</p>
+            <p style="font-size:0.9em;margin-top:0;">{{ trabajador.cargo.nombre_cargo }} {{ trabajador.departamento.nombre_departmento }}</p>
+            <hr style="border-color:rgba(255,255,255,0.1);margin:1.5em 0;">
+            <h2>Panel Principal</h2>
+            <p style="color:#e74c3c;font-size:0.9em;margin-top:0.5em;">Sus instrumentos están en proceso de llenado</p>
         </header>
     </section>
 
@@ -216,6 +231,12 @@
                     </li>
                 </ul>
             {% endif %}
+        </section>
+
+        <section>
+            <span class="icon solid major fa-info-circle"></span>
+            <h3>Información</h3>
+            <p>Este proceso consta de dos partes obligatorias. Los resultados serán revisados por tu jefatura directa.</p>
         </section>
 
         <section>
@@ -241,27 +262,24 @@
             </ul>
         </section>
         {% endif %}
-
-        <section>
-            <span class="icon solid major fa-info-circle"></span>
-            <h3>Información</h3>
-            <p>Este proceso consta de dos partes obligatorias. Los resultados serán revisados por tu jefatura directa.</p>
-        </section>
     </div>
 
     {% if es_jefe %}
-    <section id="jefatura" class="wrapper style2 spotlights" style="margin-top: 2em; border-radius: 10px; overflow: hidden;">
+    <section id="jefatura" style="margin-top: 2em; width: 100%;">
         <section>
-            <div class="content">
-                <div class="inner">
-                    <h2>Panel de Jefatura</h2>
-                    <p>Selecciona a un colaborador para gestionar sus dimensiones de evaluación:</p>
-                    <div class="table-wrapper">
-                        <table class="alt">
+            <div style="width:100%;">
+                <hr style="border-color:rgba(255,255,255,0.1);margin-bottom:1.5em;">
+                <h2 style="text-align:center;">Panel de Jefatura</h2>
+                <p style="text-align:center;">Selecciona a un colaborador para gestionar sus dimensiones de evaluación:</p>
+                <div style="width:100%;padding:2em;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;">
+                    <div class="table-wrapper" style="width:100%;overflow-x:auto;">
+                        <table class="alt" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>Colaborador</th>
-                                    <th>Estado Colaborador</th>
+                                    <th>Estado Autoevaluación</th>
+                                    <th>Estado RAT 1</th>
+                                    <th>Estado RAT 2</th>
                                     <th style="text-align: center;">Acción</th>
                                 </tr>
                             </thead>
@@ -274,12 +292,30 @@
                                     </td>
                                     <td style="vertical-align: middle;">
                                         {% if subordinado.autoevaluacion_terminada %}
-                                            <span style="color: #51ff85; font-size: 0.9em;">✅ Autoevaluación lista</span>
+                                            <span style="color: #51ff85; font-size: 0.9em;">✅ Lista</span>
                                         {% else %}
-                                            <span style="color: #ffc107; font-size: 0.9em;">⏳ Pendiente de autoevaluación</span>
+                                            <span style="color: #ffc107; font-size: 0.9em;">⏳ Pendiente</span>
                                         {% endif %}
                                     </td>
-                                    <td style="text-align: center;">
+                                    <td style="vertical-align: middle;">
+                                        {% if subordinado.rat1_listo %}
+                                            <span style="color: #51ff85; font-size: 0.9em;">✅ Completo</span>
+                                        {% else %}
+                                            <span style="color: #ffc107; font-size: 0.9em;">⏳ {{ subordinado.rat1_progreso }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        {% if rat2_instrumento_id %}
+                                            {% if subordinado.rat2_listo %}
+                                                <span style="color: #51ff85; font-size: 0.9em;">✅ Completo</span>
+                                            {% else %}
+                                                <span style="color: #ffc107; font-size: 0.9em;">⏳ Pendiente</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span style="opacity:0.4;font-size:0.9em;">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="text-align: center; vertical-align: middle;">
                                         {% if subordinado.autoevaluacion_terminada %}
                                             {% if subordinado.ya_evaluado %}
                                                 <a href="{% url 'evaluacion_jefe_inicio' trabajador.id_trabajador subordinado.id_trabajador %}" class="button primary small">✅ Finalizado (Ver)</a>
@@ -287,7 +323,9 @@
                                                 <a href="{% url 'evaluacion_jefe_inicio' trabajador.id_trabajador subordinado.id_trabajador %}" class="button primary small">Evaluar Colaborador →</a>
                                             {% endif %}
                                         {% else %}
-                                            <button class="button primary small" disabled style="opacity: 0.4; cursor: not-allowed;" title="El colaborador debe finalizar su autoevaluación.">Bloqueado</button>
+                                            <span title="El colaborador debe completar su Autoevaluación, RAT 1 y RAT 2 para habilitar esta acción." style="cursor:not-allowed;">
+                                                <button class="button primary small" disabled style="opacity: 0.4; pointer-events: none;">Bloqueado</button>
+                                            </span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -307,11 +345,10 @@
 
     {% if es_coordinador %}
     <section style="margin-top: 2em;">
-        <header>
-            <h2>Panel de Coordinador</h2>
-            <p>Gestiona el proceso de evaluación de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
-        </header>
-        <div class="features">
+        <hr style="border-color:rgba(255,255,255,0.1);margin-bottom:1.5em;">
+        <h2 style="text-align:center;">Panel de Coordinador</h2>
+        <p style="text-align:center;">Gestiona el proceso de evaluación de <strong>{{ trabajador.empresa.nombre_empresa }}</strong>.</p>
+        <div class="features" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:2em;margin-top:1.5em;">
             <section>
                 <span class="icon solid major fa-chart-line"></span>
                 <h3>Seguimiento de Empresa</h3>
@@ -338,7 +375,7 @@
                 <p>Visualiza las respuestas del equipo para {{ rat1_nombre }}.</p>
                 <ul class="actions" style="margin-top: auto; padding-top: 1em;">
                     {% if rat1_instrumento_id %}
-                    <li><a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ rat1_instrumento_id }}" class="button primary">Ver Seguimiento RAT 1</a></li>
+                    <li><a href="{% url 'seguimiento_rat' %}?instrumento_id={{ rat1_instrumento_id }}" class="button primary">Ver Seguimiento RAT 1</a></li>
                     {% else %}
                     <li><a href="{% url 'seleccion_instrumentos' %}" class="button primary">Panel RAT</a></li>
                     {% endif %}
@@ -362,7 +399,7 @@
                 <h3>Ver Seguimiento RAT 2</h3>
                 <p>Visualiza las respuestas del equipo para {{ rat2_nombre }}.</p>
                 <ul class="actions" style="margin-top: auto; padding-top: 1em;">
-                    <li><a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ rat2_instrumento_id }}" class="button primary">Ver Seguimiento RAT 2</a></li>
+                    <li><a href="{% url 'seguimiento_rat' %}?instrumento_id={{ rat2_instrumento_id }}" class="button primary">Ver Seguimiento RAT 2</a></li>
                 </ul>
             </section>
 
@@ -376,6 +413,7 @@
             </section>
             {% endif %}
         </div>
+        <hr style="border-color:rgba(255,255,255,0.1);margin-top:1.5em;margin-bottom:0;">
     </section>
     {% endif %}
 

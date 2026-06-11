@@ -7,11 +7,11 @@
     <form method="post" action="">
         {% csrf_token %}
         <header style="max-width:700px;margin:0 auto;width:100%;text-align:center;margin-bottom:1.5em;">
-            <hr style="margin-bottom:1.5em;" />
-            <div style="display:flex;justify-content:center;align-items:center;padding:0.5em 0;">
+            <hr style="margin-bottom:0.8em;" />
+            <div style="display:flex;justify-content:center;align-items:center;padding:0.8em 0;">
                 <a href="{% url 'rat_panel_coordinador' %}?instrumento_id={{ instrumento_id }}" class="button" style="background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4);color:#e74c3c;">← Cancelar</a>
             </div>
-            <hr style="margin-top:1.5em;" />
+            <hr style="margin-top:0.8em;" />
             <h2>{% if editando %}✏️ Editar pregunta RAT{% else %}📋 Nueva pregunta RAT{% endif %}</h2>
             <p>Completa los campos para <strong>{{ empresa_actual.nombre_empresa }}</strong>.</p>
         </header>
@@ -116,13 +116,13 @@
 
         </div>
 
-        <hr style="margin-top:2em;max-width:700px;margin-left:auto;margin-right:auto;" />
-        <div style="display:flex;justify-content:center;gap:1em;padding:1.5em 0;max-width:700px;margin:0 auto;width:100%;">
+        <hr style="margin-top:1em;margin-bottom:0.6em;max-width:700px;margin-left:auto;margin-right:auto;" />
+        <div style="display:flex;justify-content:center;gap:1em;padding:0.8em 0;max-width:700px;margin:0 auto;width:100%;">
             <button type="submit" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">
                 {% if editando %}✓ Guardar cambios{% else %}✓ Guardar pregunta{% endif %}
             </button>
         </div>
-        <hr />
+        <hr style="margin-top:0.8em;" />
 
     </form>
     </section>

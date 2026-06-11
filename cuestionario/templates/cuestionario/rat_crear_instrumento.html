@@ -26,31 +26,36 @@
 {% block title %}Crear Instrumento RAT{% endblock %}
 {% block content %}
 <section>
-  <header>
-    <a href="{{ next_url }}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver</a>
-    <hr style="margin-top:1em;" />
+  <header style="text-align:center;">
+    <hr style="border-color:rgba(255,255,255,0.1);margin-bottom:1.5em;">
+    <div style="display:flex;justify-content:center;margin-bottom:1.5em;">
+      <a href="/instrumentos/?empresa_id={{ empresa.id_empresa }}" class="button" style="background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4);color:#e74c3c;">← Cancelar</a>
+    </div>
+    <hr style="border-color:rgba(255,255,255,0.1);margin-bottom:1.5em;">
     <h2>Crear nuevo instrumento RAT</h2>
     <p style="opacity:0.6;">El instrumento se creará y quedará habilitado para <strong>{{ empresa.nombre_empresa }}</strong>.</p>
   </header>
 
-  <div class="box">
-    <form method="POST">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ next_url }}">
-      <div class="row">
-        <div class="col-6 col-12-small">
-          <label>Nombre del instrumento</label>
-          <input type="text" name="nombre_instrumento" placeholder="Ej: RAT 2" style="width:100%;" required />
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:2em;max-width:700px;margin:0 auto;">
+      <div style="display:flex;gap:1.5em;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <label style="display:block;text-align:center;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">Nombre del instrumento</label>
+          <input type="text" name="nombre_instrumento" placeholder="Ej: RAT 2" style="width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;text-align:center;" required />
         </div>
-        <div class="col-6 col-12-small">
-          <label>Descripción (opcional)</label>
-          <input type="text" name="descripcion" placeholder="Breve descripción..." style="width:100%;" />
+        <div style="flex:1;min-width:200px;">
+          <label style="display:block;text-align:center;margin-bottom:0.4em;font-weight:600;font-size:0.93em;">Descripción (opcional)</label>
+          <input type="text" name="descripcion" placeholder="Breve descripción..." style="width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;text-align:center;" />
         </div>
       </div>
-      <div style="display:flex;justify-content:center;margin-top:1.5em;">
-        <button type="submit" class="button primary">Crear y habilitar</button>
-      </div>
-    </form>
-  </div>
+    </div>
+    <hr style="border-color:rgba(255,255,255,0.1);margin:2em auto;max-width:700px;">
+    <div style="display:flex;justify-content:center;">
+      <button type="submit" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">✓ Crear y habilitar</button>
+    </div>
+    <hr style="border-color:rgba(255,255,255,0.1);margin:2em auto;max-width:700px;">
+  </form>
 </section>
 {% endblock %}

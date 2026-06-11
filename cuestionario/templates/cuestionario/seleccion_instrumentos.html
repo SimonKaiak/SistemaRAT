@@ -172,9 +172,10 @@
     border-radius: 8px;
     display: none;
     gap: 1em;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    flex-direction: column;
   }
   #rat-detalle.visible {
     display: flex;
@@ -184,11 +185,15 @@
     font-weight: 600;
     color: #4fc3f7;
     margin: 0;
+    text-align: center;
+    width: 100%;
   }
   #rat-detalle-desc {
     font-size: 0.84em;
     opacity: 0.6;
     margin: 0.2em 0 0;
+    text-align: center;
+    width: 100%;
   }
   #rat-detalle-actions {
       display: flex;
@@ -212,8 +217,8 @@
 
 <section style="max-width:900px;width:100%;margin:0 auto;text-align:center;">
   <header>
-    <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-    <a href="{% if request.user.is_superuser %}/?empresa_id={{ empresa.id_empresa }}{% else %}{{ next_url|default:'javascript:history.back()' }}{% endif %}" class="button" style="margin-bottom:0.8em;display:inline-block;">← Volver al panel</a>
+    <hr style="margin-bottom:1.4em;border-color:rgba(255,255,255,0.1);">
+    <a href="{% if request.user.is_superuser %}/?empresa_id={{ empresa.id_empresa }}{% else %}{{ next_url|default:'javascript:history.back()' }}{% endif %}" class="button" style="margin-bottom:0.8em;display:inline-block;background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver al panel</a>
     <hr style="margin-top:1em;" />
     <h2 style="margin-bottom:0.2em;">Instrumentos disponibles</h2>
     <p style="opacity:0.6;margin:0;">
@@ -256,7 +261,7 @@
         <a id="btn-responder" href="#" class="button primary small" style="margin:0;">Responder</a>
         {% endif %}
         {% if user.is_superuser or es_coordinador %}
-        <a id="btn-editar" href="#" class="button small" style="margin:0;">✏️ Editar preguntas</a>
+        <a id="btn-editar" href="#" class="button small" style="margin:0;background:rgba(240,192,64,0.15);border-color:rgba(240,192,64,0.4);color:#f0c040;">✏️ Editar preguntas</a>
         {% endif %}
       </div>
     </div>
@@ -288,6 +293,7 @@
   </div>
   {% endif %}
 
+  <hr style="border-color:rgba(255,255,255,0.1);margin-top:2em;margin-bottom:1.5em;">
 </section>
 
 <script>

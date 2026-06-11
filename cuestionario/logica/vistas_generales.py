@@ -46,7 +46,7 @@ ver_resultados(request, trabajador_id, tipo_evaluacion)
 """
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, TextosEvaluacion, Empresa, InstrumentoEmpresa
+from cuestionario.models import Trabajador, Autoevaluacion, EvaluacionJefatura, TextosEvaluacion, Empresa, InstrumentoEmpresa, RATRespuestas
 
 @login_required
 def index(request):
@@ -91,7 +91,17 @@ def index(request):
     ).exists()
     
     equipo = trabajador.subordinados.all()
-    
+
+    instrumentos_rat = InstrumentoEmpresa.objects.filter(
+        empresa=trabajador.empresa,
+        habilitado=True,
+        instrumento__tipo='rat',
+    ).select_related('instrumento').order_by('instrumento__id_instrumento')
+
+    instrumentos_rat_list = list(instrumentos_rat)
+    ie_rat1 = instrumentos_rat_list[0] if len(instrumentos_rat_list) > 0 else None
+    ie_rat2 = instrumentos_rat_list[1] if len(instrumentos_rat_list) > 1 else None
+
     for sub in equipo:
         sub.autoevaluacion_terminada = Autoevaluacion.objects.filter(
             trabajador=sub, 
@@ -104,16 +114,37 @@ def index(request):
             estado_finalizacion=True
         ).exists()
 
-    # Detectar instrumento RAT 1 asignado al trabajador
-    instrumentos_rat = InstrumentoEmpresa.objects.filter(
-        empresa=trabajador.empresa,
-        habilitado=True,
-        instrumento__tipo='rat',
-    ).select_related('instrumento').order_by('instrumento__id_instrumento')
+        if ie_rat1:
+            total1 = ie_rat1.preguntas.exclude(
+                actividad_tratamiento__istartswith='Presentación'
+            ).exclude(
+                actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).count()
+            respondidas1 = RATRespuestas.objects.filter(
+                trabajador=sub, pregunta__instrumento_empresa=ie_rat1
+            ).exclude(
+                pregunta__actividad_tratamiento__istartswith='Presentación'
+            ).exclude(
+                pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).values('pregunta').distinct().count()
+            sub.rat1_listo = total1 > 0 and respondidas1 >= total1
+            sub.rat1_progreso = f"{respondidas1}/{total1}"
+        else:
+            sub.rat1_listo = False
 
-    instrumentos_rat_list = list(instrumentos_rat)
-    ie_rat1 = instrumentos_rat_list[0] if len(instrumentos_rat_list) > 0 else None
-    ie_rat2 = instrumentos_rat_list[1] if len(instrumentos_rat_list) > 1 else None
+        if ie_rat2:
+            total2 = ie_rat2.preguntas.exclude(
+                actividad_tratamiento__istartswith='Presentación'
+            ).count()
+            respondidas2 = RATRespuestas.objects.filter(
+                trabajador=sub, pregunta__instrumento_empresa=ie_rat2
+            ).exclude(
+                pregunta__actividad_tratamiento__istartswith='Presentación'
+            ).values('pregunta').distinct().count()
+            sub.rat2_listo = total2 > 0 and respondidas2 >= total2
+            sub.rat2_progreso = f"{respondidas2}/{total2}"
+        else:
+            sub.rat2_listo = False
 
     rat1_instrumento_id = ie_rat1.instrumento.id_instrumento if ie_rat1 else None
     rat1_nombre = ie_rat1.instrumento.nombre_instrumento if ie_rat1 else 'RAT 1'
@@ -131,6 +162,7 @@ def index(request):
         'rat1_nombre': rat1_nombre,
         'rat2_instrumento_id': rat2_instrumento_id,
         'rat2_nombre': rat2_nombre,
+        'empresa_actual': trabajador.empresa,
     }
     return render(request, 'cuestionario/index.html', context)
 
