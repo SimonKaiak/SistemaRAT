@@ -45,7 +45,9 @@
                 {% if not user.is_superuser %}
                 <a href="{% url 'rat_versiones' %}" class="button">🗃 Versiones</a>
                 {% endif %}
+                {% if user.is_superuser %}
                 <a href="{% url 'rat_nueva_pregunta' %}?instrumento_id={{ instrumento_id }}" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">+ Crear Preguntas</a>
+                {% endif %}
             </div>
         </div>
         <hr style="margin-top:1.5em;" />
