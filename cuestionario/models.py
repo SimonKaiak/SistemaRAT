@@ -699,17 +699,17 @@ class RATPreguntas(models.Model):
         ('historia_clinica', 'Datos de historia clínica de personas'),
     ]
     categorias_datos = models.CharField(max_length=50, choices=CATEGORIAS_CHOICES)
-    descripcion_titulares = models.TextField()
-    finalidad_tratamiento = models.TextField()
-    base_legitimidad = models.CharField(max_length=200)  # múltiple, separado por comas
-    periodo_conservacion = models.PositiveIntegerField()
+    descripcion_titulares = models.TextField(blank=True, default='')
+    finalidad_tratamiento = models.TextField(blank=True, default='')
+    base_legitimidad = models.CharField(max_length=200, blank=True, default='')  # múltiple, separado por comas
+    periodo_conservacion = models.PositiveIntegerField(default=0)
     UNIDAD_TIEMPO_CHOICES = [
         ('dias', 'Días'),
         ('meses', 'Meses'),
         ('anos', 'Años'),
     ]
     periodo_unidad = models.CharField(max_length=10, choices=UNIDAD_TIEMPO_CHOICES, default='meses')
-    fuente_datos = models.CharField(max_length=255)
+    fuente_datos = models.CharField(max_length=255, blank=True, default='')
     destinatarios = models.ForeignKey(
         'Trabajador',
         on_delete=models.DO_NOTHING,
@@ -722,9 +722,12 @@ class RATPreguntas(models.Model):
         ('texto', 'Texto libre'),
         ('sino', 'Sí / No'),
         ('escala', 'Escala 1-5'),
+        ('select_categorias', 'Selector de categorías'),
+        ('periodo', 'Período (número + unidad)'),
+        ('listado_usuarios', 'Listado de usuarios'),
     ]
     tipo = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=TIPO_PREGUNTA_CHOICES,
         default='texto',
     )

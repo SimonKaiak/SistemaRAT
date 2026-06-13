@@ -97,7 +97,7 @@
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
                         {% if t.rat_listo %}
-                            <a href="{% url 'rat_ver_trabajador' t.id_trabajador %}" class="button small" style="font-size: 0.7em; background:rgba(79,195,247,0.15); border-color:rgba(79,195,247,0.4); color:#4fc3f7;">
+                            <a href="{% url 'rat_ver_trabajador' t.id_trabajador %}?instrumento_id={{ instrumento_actual.id_instrumento }}" class="button small" style="font-size: 0.7em; background:rgba(79,195,247,0.15); border-color:rgba(79,195,247,0.4); color:#4fc3f7;">
                                 Ver {{ instrumento_actual.nombre_instrumento|default:'RAT' }}
                             </a>
                         {% else %}

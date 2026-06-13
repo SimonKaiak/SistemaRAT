@@ -4,13 +4,15 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <a href="{% url 'seguimiento_rat' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver a Seguimiento RAT</a>
+        <div style="display:flex;justify-content:center;">
+            <a href="{% url 'seguimiento_rat' %}?empresa_id={{ trabajador.empresa.id_empresa }}&instrumento_id={{ instrumento.id_instrumento }}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver a Seguimiento RAT</a>
+        </div>
         <hr style="margin-top:1.5em;" />
-        <h2>RAT – {{ trabajador.nombre }} {{ trabajador.apellido_paterno }}</h2>
-        <p>{{ trabajador.cargo.nombre_cargo }} — {{ trabajador.empresa.nombre_empresa }}</p>
+        <h2 style="text-align:center;">RAT – {{ trabajador.nombre }} {{ trabajador.apellido_paterno }}</h2>
+        <p style="text-align:center;">{{ trabajador.cargo.nombre_cargo }} — {{ trabajador.empresa.nombre_empresa }}</p>
     </header>
 
-    <div style="display:flex;flex-direction:column;gap:1em;">
+    <div style="display:flex;flex-direction:column;gap:1em;max-width:700px;margin:0 auto;width:100%;">
         {% for pregunta in preguntas %}
         {% if 'Fuente de la cual' in pregunta.actividad_tratamiento or pregunta.tipo == 'texto' and 'Presentación' in pregunta.actividad_tratamiento %}
         {% else %}
@@ -24,9 +26,11 @@
                         <p style="margin:0.4em 0 0;font-size:0.88em;opacity:0.5;font-style:italic;">Sin respuesta aún.</p>
                     {% endif %}
                 </div>
-                <span style="font-size:0.82em;font-weight:bold;padding:0.25em 0.8em;border-radius:20px;{% if pregunta.respuesta_actual %}background:#51ff85;color:#000;{% else %}background:#f0c040;color:#000;{% endif %}">
-                    {% if pregunta.respuesta_actual %}Respondida{% else %}Pendiente{% endif %}
-                </span>
+                {% if pregunta.respuesta_actual %}
+                <span class="button" style="margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;cursor:default;">✅ Respondida</span>
+                {% else %}
+                <span class="button" style="margin:0;background:rgba(240,192,64,0.15);border-color:rgba(240,192,64,0.4);color:#f0c040;cursor:default;">⏳ Pendiente</span>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -34,5 +38,6 @@
         <p>No hay preguntas RAT para este instrumento.</p>
         {% endfor %}
     </div>
+    <hr style="margin-top:2em;border-color:rgba(255,255,255,0.1);">
 </section>
 {% endblock %}

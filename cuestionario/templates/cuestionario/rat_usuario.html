@@ -52,7 +52,9 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <a href="{% url 'index' %}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver al inicio</a>
+        <div style="display:flex;justify-content:center;">
+            <a href="{% url 'index' %}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver al inicio</a>
+        </div>
         <hr style="margin-top:1.5em;" />
         <h2>📋 Registro de Actividad de Tratamiento (RAT)</h2>
         <p>Bienvenido/a, <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }}</strong>.
@@ -84,7 +86,15 @@
 
                         <div id="vista-{{ pregunta.id_rat_pregunta }}">
                             {% if pregunta.respuesta_actual %}
-                            <p style="margin:0.4em 0 0;font-size:0.88em;color:#4fc3f7;">↳ Tu respuesta: <strong>{{ pregunta.respuesta_actual.respuesta }}</strong></p>
+                            {% with r=pregunta.respuesta_actual.respuesta %}
+                            <p style="margin:0.4em 0 0;font-size:0.88em;color:#4fc3f7;">↳ Tu respuesta: <strong>
+                                {% if r == 'contactabilidad' %}Datos de contactabilidad de personas
+                                {% elif r == 'bancarios' %}Datos bancarios o finanzas personales
+                                {% elif r == 'historia_clinica' %}Datos de historia clínica de personas
+                                {% else %}{{ r }}
+                                {% endif %}
+                            </strong></p>
+                            {% endwith %}
                             {% endif %}
                         </div>
 
@@ -107,6 +117,68 @@
                                      style="font-weight:600;">{{ i }}</div>
                                 {% endfor %}
                             </div>
+                            {% elif pregunta.tipo == 'select_categorias' %}
+                            <select id="texto-{{ pregunta.id_rat_pregunta }}"
+                                style="width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;margin-bottom:0.8em;">
+                                <option value="">-- Selecciona --</option>
+                                <option value="contactabilidad" {% if pregunta.respuesta_actual.respuesta == 'contactabilidad' %}selected{% endif %}>Datos de contactabilidad de personas</option>
+                                <option value="bancarios" {% if pregunta.respuesta_actual.respuesta == 'bancarios' %}selected{% endif %}>Datos bancarios o finanzas personales</option>
+                                <option value="historia_clinica" {% if pregunta.respuesta_actual.respuesta == 'historia_clinica' %}selected{% endif %}>Datos de historia clínica de personas</option>
+                            </select>
+                            {% elif pregunta.tipo == 'periodo' %}
+                            {% if pregunta.respuesta_actual %}
+                            {% with partes=pregunta.respuesta_actual.respuesta.split %}
+                            <div style="display:flex;gap:0.6em;margin-bottom:0.8em;align-items:center;">
+                                <input type="number" id="periodo-num-{{ pregunta.id_rat_pregunta }}" min="1"
+                                    value="{{ partes.0 }}"
+                                    style="width:100px;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;"
+                                    placeholder="Ej: 60">
+                                <select id="periodo-unidad-{{ pregunta.id_rat_pregunta }}"
+                                    style="padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;">
+                                    <option value="días" {% if partes.1 == 'días' or partes.1 == 'día' %}selected{% endif %}>Días</option>
+                                    <option value="meses" {% if partes.1 == 'meses' or partes.1 == 'mes' %}selected{% endif %}>Meses</option>
+                                    <option value="años" {% if partes.1 == 'años' or partes.1 == 'año' %}selected{% endif %}>Años</option>
+                                </select>
+                            </div>
+                            {% endwith %}
+                            {% else %}
+                            <div style="display:flex;gap:0.6em;margin-bottom:0.8em;align-items:center;">
+                                <input type="number" id="periodo-num-{{ pregunta.id_rat_pregunta }}" min="1"
+                                    style="width:100px;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;"
+                                    placeholder="Ej: 60">
+                                <select id="periodo-unidad-{{ pregunta.id_rat_pregunta }}"
+                                    style="padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;">
+                                    <option value="días">Días</option>
+                                    <option value="meses">Meses</option>
+                                    <option value="años">Años</option>
+                                </select>
+                            </div>
+                            {% endif %}
+                            {% elif pregunta.tipo == 'listado_usuarios' %}
+                            <div id="texto-{{ pregunta.id_rat_pregunta }}" style="display:flex;flex-direction:column;gap:0.4em;margin-bottom:0.8em;">
+                                {% for t in trabajadores_empresa %}
+                                {% with nombre_completo=t.nombre|add:' '|add:t.apellido_paterno %}
+                                {% if pregunta.respuesta_actual and nombre_completo in pregunta.respuesta_actual.respuesta %}
+                                <label onclick="toggleLabel(this)" style="display:flex;align-items:center;gap:0.6em;cursor:pointer;padding:0.6em 0.8em;border-radius:6px;border:1px solid rgba(79,195,247,0.5);background:rgba(79,195,247,0.12);transition:all 0.2s;">
+                                    <input type="checkbox"
+                                        name="lu-{{ pregunta.id_rat_pregunta }}"
+                                        value="{{ nombre_completo }}"
+                                        checked
+                                        style="width:16px;height:16px;accent-color:#4fc3f7;cursor:pointer;">
+                                    <span style="font-weight:600;">{{ nombre_completo }}</span>
+                                </label>
+                                {% else %}
+                                <label onclick="toggleLabel(this)" style="display:flex;align-items:center;gap:0.6em;cursor:pointer;padding:0.6em 0.8em;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);transition:all 0.2s;">
+                                    <input type="checkbox"
+                                        name="lu-{{ pregunta.id_rat_pregunta }}"
+                                        value="{{ nombre_completo }}"
+                                        style="width:16px;height:16px;accent-color:#4fc3f7;cursor:pointer;">
+                                    <span style="font-weight:400;">{{ nombre_completo }}</span>
+                                </label>
+                                {% endif %}
+                                {% endwith %}
+                                {% endfor %}
+                            </div>
                             {% else %}
                             <textarea id="texto-{{ pregunta.id_rat_pregunta }}" rows="3"
                                 style="width:100%;padding:0.6em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:0.95em;margin-bottom:0.8em;">{% if pregunta.respuesta_actual %}{{ pregunta.respuesta_actual.respuesta }}{% endif %}</textarea>
@@ -117,24 +189,24 @@
                     <div style="display:flex;flex-direction:column;align-items:center;gap:0.6em;flex-shrink:0;">
                         <div style="display:flex;align-items:center;gap:0.8em;">
                             {% if pregunta.respuesta_actual %}
-                                <span id="badge-{{ pregunta.id_rat_pregunta }}" style="background:#51ff85;color:#000;padding:0.25em 0.8em;border-radius:20px;font-size:0.82em;font-weight:bold;">Respondida</span>
+                                <span id="badge-{{ pregunta.id_rat_pregunta }}" class="button" style="margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;cursor:default;">✅ Respondida</span>
                                 <span onclick="activarEdicion({{ pregunta.id_rat_pregunta }})"
                                     id="btn-{{ pregunta.id_rat_pregunta }}"
-                                    style="font-size:0.82em;font-weight:bold;background:#f0c040;color:#000;padding:0.25em 0.8em;border-radius:20px;cursor:pointer;">
-                                    Editar
+                                    class="button" style="margin:0;background:rgba(240,192,64,0.15);border-color:rgba(240,192,64,0.4);color:#f0c040;cursor:pointer;">
+                                    ✏️ Editar
                                 </span>
                             {% else %}
-                                <span id="badge-{{ pregunta.id_rat_pregunta }}" style="background:#f0c040;color:#000;padding:0.25em 0.8em;border-radius:20px;font-size:0.82em;font-weight:bold;">⏳ Pendiente</span>
+                                <span id="badge-{{ pregunta.id_rat_pregunta }}" class="button" style="margin:0;background:rgba(240,192,64,0.15);border-color:rgba(240,192,64,0.4);color:#f0c040;cursor:default;">⏳ Pendiente</span>
                                 <span onclick="activarEdicion({{ pregunta.id_rat_pregunta }})"
                                     id="btn-{{ pregunta.id_rat_pregunta }}"
-                                    style="font-size:0.82em;font-weight:bold;background:#51ff85;color:#000;padding:0.25em 0.8em;border-radius:20px;cursor:pointer;">Responder</span>
+                                    class="button" style="margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;cursor:pointer;">Responder</span>
                             {% endif %}
                         </div>
                         <div id="acciones-{{ pregunta.id_rat_pregunta }}" style="display:none;gap:0.6em;align-items:center;margin-top:1em;">
-                                <span onclick="guardarRespuesta({{ pregunta.id_rat_pregunta }}, '{{ pregunta.tipo }}')"
-                                    style="font-size:0.82em;font-weight:bold;background:#51ff85;color:#000;padding:0.25em 0.8em;border-radius:20px;cursor:pointer;">Guardar</span>
-                                <span onclick="cancelarEdicion({{ pregunta.id_rat_pregunta }})"
-                                    style="font-size:0.82em;font-weight:bold;background:#ff5151;color:#000;padding:0.25em 0.8em;border-radius:20px;cursor:pointer;">Cancelar</span>
+                            <span onclick="guardarRespuesta({{ pregunta.id_rat_pregunta }}, '{{ pregunta.tipo }}')"
+                                class="button" style="margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;cursor:pointer;">✓ Guardar</span>
+                            <span onclick="cancelarEdicion({{ pregunta.id_rat_pregunta }})"
+                                class="button" style="margin:0;background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4);color:#e74c3c;cursor:pointer;">✕ Cancelar</span>
                         </div>
                     </div>
                 </div>
@@ -144,10 +216,24 @@
             {% endfor %}
         </div>
     {% endif %}
+    <hr style="margin-top:2em;border-color:rgba(255,255,255,0.1);">
 </section>
 
 <script>
 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+function toggleLabel(label) {
+    const cb = label.querySelector('input[type="checkbox"]');
+    const checked = cb.checked;
+    if (checked) {
+        label.style.background = 'rgba(79,195,247,0.12)';
+        label.style.borderColor = 'rgba(79,195,247,0.5)';
+        label.querySelector('span').style.fontWeight = '600';
+    } else {
+        label.style.background = 'rgba(255,255,255,0.03)';
+        label.style.borderColor = 'rgba(255,255,255,0.08)';
+        label.querySelector('span').style.fontWeight = '400';
+    }
+}
 const valorSeleccionado = {};
 
 function activarEdicion(id) {
@@ -183,8 +269,21 @@ function seleccionarOpcion(div, id) {
 
 function guardarRespuesta(id, tipo) {
     let respuesta = '';
-    if (tipo === 'texto') {
+    if (tipo === 'texto' || tipo === 'select_categorias') {
         respuesta = document.getElementById('texto-' + id).value;
+    } else if (tipo === 'periodo') {
+        const num = document.getElementById('periodo-num-' + id).value;
+        let unidad = document.getElementById('periodo-unidad-' + id).value;
+        if (parseInt(num) === 1) {
+            if (unidad === 'días') unidad = 'día';
+            else if (unidad === 'meses') unidad = 'mes';
+            else if (unidad === 'años') unidad = 'año';
+        }
+        respuesta = num + ' ' + unidad;
+    } else if (tipo === 'listado_usuarios') {
+        const checks = document.querySelectorAll(`input[name="lu-${id}"]:checked`);
+        const seleccionados = Array.from(checks).map(c => c.value);
+        respuesta = seleccionados.join(', ');
     } else {
         respuesta = valorSeleccionado[id] || '';
     }

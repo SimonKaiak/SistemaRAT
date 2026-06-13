@@ -104,8 +104,41 @@ def panel_seguimiento(request):
             t.diff_promedio = res['diferencia__avg']
 
         if instrumento_empresa_rat:
-            total_preguntas = instrumento_empresa_rat.preguntas.exclude(tipo='texto', actividad_tratamiento__startswith='Presentación').exclude(actividad_tratamiento__icontains='Fuente de la cual provienen').count()
-            respondidas = RATRespuestas.objects.filter(trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat).exclude(pregunta__tipo='texto', pregunta__actividad_tratamiento__startswith='Presentación').exclude(pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen').values('pregunta').distinct().count()
+            total_preguntas = instrumento_empresa_rat.preguntas.exclude(
+                tipo='texto', actividad_tratamiento__startswith='Presentación'
+            ).exclude(
+                actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).count()
+
+            # Obtener respuestas válidas (excluye periodo con valor 0 o sin número)
+            respuestas_qs = RATRespuestas.objects.filter(
+                trabajador=t,
+                pregunta__instrumento_empresa=instrumento_empresa_rat
+            ).exclude(
+                pregunta__tipo='texto',
+                pregunta__actividad_tratamiento__startswith='Presentación'
+            ).exclude(
+                pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).select_related('pregunta')
+
+            respondidas = 0
+            preguntas_respondidas = set()
+            for resp in respuestas_qs:
+                if resp.pregunta_id in preguntas_respondidas:
+                    continue
+                if resp.pregunta.tipo == 'periodo':
+                    partes = resp.respuesta.strip().split()
+                    try:
+                        num = int(partes[0]) if partes else 0
+                        if num > 0:
+                            respondidas += 1
+                            preguntas_respondidas.add(resp.pregunta_id)
+                    except (ValueError, IndexError):
+                        pass
+                else:
+                    respondidas += 1
+                    preguntas_respondidas.add(resp.pregunta_id)
+
             t.rat_listo = total_preguntas > 0 and respondidas >= total_preguntas
         else:
             t.rat_listo = False
@@ -179,8 +212,41 @@ def panel_seguimiento_rat(request):
 
     for t in trabajadores:
         if instrumento_empresa_rat:
-            total_preguntas = instrumento_empresa_rat.preguntas.exclude(tipo='texto', actividad_tratamiento__startswith='Presentación').exclude(actividad_tratamiento__icontains='Fuente de la cual provienen').count()
-            respondidas = RATRespuestas.objects.filter(trabajador=t, pregunta__instrumento_empresa=instrumento_empresa_rat).exclude(pregunta__tipo='texto', pregunta__actividad_tratamiento__startswith='Presentación').exclude(pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen').values('pregunta').distinct().count()
+            total_preguntas = instrumento_empresa_rat.preguntas.exclude(
+                tipo='texto', actividad_tratamiento__startswith='Presentación'
+            ).exclude(
+                actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).count()
+
+            # Obtener respuestas válidas (excluye periodo con valor 0 o sin número)
+            respuestas_qs = RATRespuestas.objects.filter(
+                trabajador=t,
+                pregunta__instrumento_empresa=instrumento_empresa_rat
+            ).exclude(
+                pregunta__tipo='texto',
+                pregunta__actividad_tratamiento__startswith='Presentación'
+            ).exclude(
+                pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
+            ).select_related('pregunta')
+
+            respondidas = 0
+            preguntas_respondidas = set()
+            for resp in respuestas_qs:
+                if resp.pregunta_id in preguntas_respondidas:
+                    continue
+                if resp.pregunta.tipo == 'periodo':
+                    partes = resp.respuesta.strip().split()
+                    try:
+                        num = int(partes[0]) if partes else 0
+                        if num > 0:
+                            respondidas += 1
+                            preguntas_respondidas.add(resp.pregunta_id)
+                    except (ValueError, IndexError):
+                        pass
+                else:
+                    respondidas += 1
+                    preguntas_respondidas.add(resp.pregunta_id)
+
             t.rat_listo = total_preguntas > 0 and respondidas >= total_preguntas
         else:
             t.rat_listo = False

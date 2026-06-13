@@ -147,94 +147,31 @@ class RATRespuestaForm(forms.ModelForm):
         }
 
 
-class RATPreguntaForm(forms.ModelForm):
-    class Meta:
-        model = RATPreguntas
-        fields = [
-            'actividad_tratamiento',
-            'responsable',
-            'categorias_datos',
-            'descripcion_titulares',
-            'finalidad_tratamiento',
-            'base_legitimidad',
-            'destinatarios',
-            'periodo_conservacion',
-            'fuente_datos',
-            'version',
-        ]
-        widgets = {
-            'actividad_tratamiento': forms.TextInput(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
-                'placeholder': 'Ej: Gestión de nóminas y remuneraciones',
-            }),
-            'responsable': forms.Select(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
-            }),
-            'categorias_datos': forms.Select(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
-            }),
-            'descripcion_titulares': forms.Textarea(attrs={
-                'rows': 2,
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
-                'placeholder': 'Ej: Trabajadores y ex-trabajadores de la empresa',
-            }),
-            'finalidad_tratamiento': forms.Textarea(attrs={
-                'rows': 2,
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
-                'placeholder': 'Ej: Calcular y pagar remuneraciones',
-            }),
-            'base_legitimidad': forms.CheckboxSelectMultiple(attrs={
-                'style': 'color:#fff;',
-            }),
-            'periodo_conservacion': forms.NumberInput(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
-                'placeholder': 'Ej: 60 (meses)',
-            }),
-            'fuente_datos': forms.TextInput(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
-                'placeholder': 'Ej: El propio trabajador mediante contrato de trabajo',
-            }),
-            'version': forms.Select(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
-            }),
-            'destinatarios': forms.Select(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
-            }),
-        }
-
-    def __init__(self, *args, empresa=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        if empresa:
-            self.fields['responsable'].queryset = Trabajador.objects.filter(empresa=empresa)
-            self.fields['version'].queryset = RegistroVersiones.objects.filter(empresa=empresa)
-            self.fields['destinatarios'].queryset = Trabajador.objects.filter(empresa=empresa)
-        else:
-            self.fields['responsable'].queryset = Trabajador.objects.all()
-            self.fields['version'].queryset = RegistroVersiones.objects.all()
-            self.fields['destinatarios'].queryset = Trabajador.objects.all()
-        self.fields['version'].required = False
-        self.fields['destinatarios'].required = False
-        self.fields['actividad_tratamiento'].label = 'Actividad de tratamiento'
-        self.fields['responsable'].label = 'Responsable o encargado'
-        self.fields['categorias_datos'].label = 'Categoría, clases o tipos de datos que se tratan'
-        self.fields['descripcion_titulares'].label = 'Descripción del universo de los titulares de los datos personales'
-        self.fields['finalidad_tratamiento'].label = 'Finalidad de tratamiento'
-        self.fields['destinatarios'].label = 'Destinatarios a los que se prevé comunicar o ceder los datos, incluida la transferencia internacional de datos'
-        self.fields['periodo_conservacion'].label = 'Período de conservación'
-        self.fields['fuente_datos'].label = 'Fuente de la cual provienen los datos'
-        self.fields['version'].label = 'Versión'
-        BASE_OPTS = [
-            ('consentimiento', 'Consentimiento'),
-            ('contrato', 'Contrato'),
-            ('obligacion_legal', 'Obligación legal'),
-            ('interes_legitimo', 'Interés legítimo'),
-        ]
-        self.fields['base_legitimidad'] = forms.MultipleChoiceField(
-            choices=BASE_OPTS,
-            widget=forms.CheckboxSelectMultiple(attrs={'style': 'color:#fff;'}),
-            required=True,
-            label='Base de legitimidad del tratamiento',
-        )
+class RATPreguntaAdminForm(forms.Form):
+    """Admin crea: enunciado de la pregunta + tipo de respuesta."""
+    TIPO_CHOICES = [
+        ('texto', 'Texto libre'),
+        ('sino', 'Sí / No'),
+        ('escala', 'Escala 1-5'),
+        ('select_categorias', 'Selector de categorías de datos'),
+        ('periodo', 'Período (número + días/meses/años)'),
+        ('listado_usuarios', 'Listado de usuarios (uno o varios)'),
+    ]
+    enunciado = forms.CharField(
+        label='Enunciado de la pregunta',
+        widget=forms.Textarea(attrs={
+            'rows': 3,
+            'placeholder': 'Ej: ¿Cuál es la actividad de tratamiento?',
+            'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+        }),
+    )
+    tipo = forms.ChoiceField(
+        label='Tipo de respuesta',
+        choices=TIPO_CHOICES,
+        widget=forms.Select(attrs={
+            'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
+        }),
+    )
 
 
 class RegistroVersionesForm(forms.ModelForm):
@@ -254,27 +191,19 @@ class RegistroVersionesForm(forms.ModelForm):
         }
 
 class RATPreguntaSimpleForm(forms.ModelForm):
-    """Formulario simplificado para preguntas de tipo sino/escala/texto
-    del Kick Off — solo muestra enunciado y responsable."""
+    """Formulario para coordinador: solo edita el enunciado."""
     class Meta:
         model = RATPreguntas
-        fields = ['actividad_tratamiento', 'responsable']
+        fields = ['actividad_tratamiento']
         widgets = {
             'actividad_tratamiento': forms.Textarea(attrs={
                 'rows': 3,
                 'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
             }),
-            'responsable': forms.Select(attrs={
-                'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;',
-            }),
         }
 
     def __init__(self, *args, empresa=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if empresa:
-            self.fields['responsable'].queryset = Trabajador.objects.filter(empresa=empresa)
-        else:
-            self.fields['responsable'].queryset = Trabajador.objects.all()
 
 # ─── VISTAS TRABAJADOR ────────────────────────────────────────────────────────
 
@@ -300,7 +229,20 @@ def rat_panel_usuario(request):
 
     # Anotar cada pregunta con su respuesta para el template
     for p in preguntas:
-        p.respuesta_actual = respuestas_existentes.get(p.id_rat_pregunta)
+        r = respuestas_existentes.get(p.id_rat_pregunta)
+        # Para tipo periodo, si empieza con "0" no cuenta como respondida
+        if r and p.tipo == 'periodo':
+            partes = r.respuesta.strip().split()
+            # Solo cuenta como respondida si tiene número válido > 0
+            try:
+                num = int(partes[0]) if partes else 0
+                p.respuesta_actual = r if num > 0 else None
+            except (ValueError, IndexError):
+                p.respuesta_actual = None
+        else:
+            p.respuesta_actual = r
+
+    trabajadores_empresa = Trabajador.objects.filter(empresa=trabajador.empresa)
 
     return render(request, 'cuestionario/rat_usuario.html', {
         'trabajador': trabajador,
@@ -308,6 +250,8 @@ def rat_panel_usuario(request):
         'respuestas_existentes': respuestas_existentes,
         'instrumento': ie.instrumento,
         'instrumento_id': ie.instrumento.id_instrumento,
+        'trabajadores_empresa': trabajadores_empresa,
+        'empresa_actual': trabajador.empresa,
     })
 
 
@@ -352,7 +296,17 @@ def rat_ver_trabajador(request, trabajador_id):
             return redirect('index')
 
     trabajador = get_object_or_404(Trabajador, id_trabajador=trabajador_id)
-    ie = InstrumentoEmpresa.objects.filter(empresa=trabajador.empresa, habilitado=True, instrumento__tipo='rat').first()
+
+    instrumento_id = request.GET.get('instrumento_id')
+    if instrumento_id:
+        ie = get_object_or_404(
+            InstrumentoEmpresa,
+            instrumento__id_instrumento=instrumento_id,
+            empresa=trabajador.empresa,
+            habilitado=True,
+        )
+    else:
+        ie = InstrumentoEmpresa.objects.filter(empresa=trabajador.empresa, habilitado=True, instrumento__tipo='rat').first()
     if not ie:
         return redirect('index')
 
@@ -362,7 +316,18 @@ def rat_ver_trabajador(request, trabajador_id):
         for r in RATRespuestas.objects.filter(trabajador=trabajador, pregunta__instrumento_empresa=ie)
     }
     for p in preguntas:
-        p.respuesta_actual = respuestas_existentes.get(p.id_rat_pregunta)
+        r = respuestas_existentes.get(p.id_rat_pregunta)
+        # Para tipo periodo, si empieza con "0" no cuenta como respondida
+        if r and p.tipo == 'periodo':
+            partes = r.respuesta.strip().split()
+            # Solo cuenta como respondida si tiene número válido > 0
+            try:
+                num = int(partes[0]) if partes else 0
+                p.respuesta_actual = r if num > 0 else None
+            except (ValueError, IndexError):
+                p.respuesta_actual = None
+        else:
+            p.respuesta_actual = r
 
     return render(request, 'cuestionario/rat_ver_trabajador.html', {
         'trabajador': trabajador,
@@ -412,6 +377,10 @@ def rat_panel_coordinador(request):
 
 @login_required
 def rat_nueva_pregunta(request):
+    # Solo admin (superuser) puede crear preguntas
+    if not request.user.is_superuser:
+        return redirect('index')
+
     empresa, trabajador = _get_empresa_y_trabajador(request)
     if not empresa:
         return redirect('index')
@@ -421,15 +390,28 @@ def rat_nueva_pregunta(request):
         return redirect('seleccion_instrumentos')
 
     if request.method == 'POST':
-        form = RATPreguntaForm(request.POST, empresa=empresa)
+        form = RATPreguntaAdminForm(request.POST)
         if form.is_valid():
-            pregunta = form.save(commit=False)
-            pregunta.instrumento_empresa = ie
-            pregunta.base_legitimidad = ','.join(form.cleaned_data['base_legitimidad'])
+            enunciado = form.cleaned_data['enunciado']
+            tipo = form.cleaned_data['tipo']
+
+            responsable = Trabajador.objects.filter(empresa=empresa).first()
+
+            pregunta = RATPreguntas(
+                actividad_tratamiento=enunciado,
+                tipo=tipo,
+                instrumento_empresa=ie,
+                responsable=responsable,
+                descripcion_titulares='',
+                finalidad_tratamiento='',
+                base_legitimidad='',
+                periodo_conservacion=0,
+                fuente_datos='',
+            )
             pregunta.save()
             return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
-        form = RATPreguntaForm(empresa=empresa)
+        form = RATPreguntaAdminForm()
 
     return render(request, 'cuestionario/rat_formulario.html', {
         'trabajador': trabajador,
@@ -438,11 +420,18 @@ def rat_nueva_pregunta(request):
         'editando': False,
         'instrumento': ie.instrumento,
         'instrumento_id': ie.instrumento.id_instrumento,
+        'modo_simple': True,
     })
 
 
 @login_required
 def rat_editar_pregunta(request, pregunta_id):
+    # Solo coordinador (o superuser) puede editar
+    if not request.user.is_superuser:
+        trabajador_check = _get_trabajador_o_none(request)
+        if not trabajador_check or not trabajador_check.es_coordinador:
+            return redirect('index')
+
     empresa, trabajador = _get_empresa_y_trabajador(request)
     if not empresa:
         return redirect('index')
@@ -450,20 +439,33 @@ def rat_editar_pregunta(request, pregunta_id):
     ie = _get_instrumento_empresa(request, empresa)
     pregunta = get_object_or_404(RATPreguntas, id_rat_pregunta=pregunta_id, instrumento_empresa=ie)
 
-    FormClass = RATPreguntaSimpleForm if pregunta.tipo in ('sino', 'escala', 'texto') and not pregunta.finalidad_tratamiento else RATPreguntaForm
+    if request.user.is_superuser:
+        FormClass = RATPreguntaAdminForm
+    else:
+        FormClass = RATPreguntaSimpleForm
 
     if request.method == 'POST':
-        form = FormClass(request.POST, instance=pregunta, empresa=empresa)
+        if request.user.is_superuser:
+            form = FormClass(request.POST)
+        else:
+            form = FormClass(request.POST, instance=pregunta, empresa=empresa)
         if form.is_valid():
-            pregunta_obj = form.save(commit=False)
-            if 'base_legitimidad' in form.cleaned_data:
-                pregunta_obj.base_legitimidad = ','.join(form.cleaned_data['base_legitimidad'])
-            pregunta_obj.save()
+            if request.user.is_superuser:
+                pregunta.actividad_tratamiento = form.cleaned_data['enunciado']
+                pregunta.tipo = form.cleaned_data['tipo']
+                pregunta.save()
+            else:
+                pregunta_obj = form.save(commit=False)
+                pregunta_obj.save()
             return redirect(f'/rat/coordinador/?instrumento_id={ie.instrumento.id_instrumento}')
     else:
-        form = FormClass(instance=pregunta, empresa=empresa)
-        if 'base_legitimidad' in form.fields:
-            form.fields['base_legitimidad'].initial = pregunta.base_legitimidad.split(',') if pregunta.base_legitimidad else []
+        if request.user.is_superuser:
+            form = FormClass(initial={
+                'enunciado': pregunta.actividad_tratamiento,
+                'tipo': pregunta.tipo,
+            })
+        else:
+            form = FormClass(instance=pregunta, empresa=empresa)
 
     return render(request, 'cuestionario/rat_formulario.html', {
         'trabajador': trabajador,
@@ -474,6 +476,7 @@ def rat_editar_pregunta(request, pregunta_id):
         'tipo_pregunta': pregunta.tipo,
         'instrumento': ie.instrumento,
         'instrumento_id': ie.instrumento.id_instrumento,
+        'modo_simple': request.user.is_superuser,
     })
 
 
@@ -503,38 +506,51 @@ def rat_eliminar_pregunta(request, pregunta_id):
 
 @login_required
 def rat_versiones(request):
-    trabajador = _get_trabajador_o_none(request)
-    if not trabajador or not trabajador.es_coordinador:
-        return redirect('index')
+    if request.user.is_superuser:
+        empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+        empresa = get_object_or_404(Empresa, id_empresa=empresa_id) if empresa_id else None
+        if not empresa:
+            return redirect('index')
+        trabajador = None
+    else:
+        trabajador = _get_trabajador_o_none(request)
+        if not trabajador or not trabajador.es_coordinador:
+            return redirect('index')
+        empresa = trabajador.empresa
 
     versiones = RegistroVersiones.objects.filter(
-        empresa=trabajador.empresa
+        empresa=empresa
     ).order_by('-fecha_modificacion')
 
     return render(request, 'cuestionario/rat_versiones.html', {
         'trabajador': trabajador,
         'versiones': versiones,
+        'empresa': empresa,
     })
 
 
 @login_required
 def rat_nueva_version(request):
-    trabajador = _get_trabajador_o_none(request)
-    if not trabajador or not trabajador.es_coordinador:
+    if not request.user.is_superuser:
+        return redirect('index')
+
+    empresa_id = request.GET.get('empresa_id') or request.session.get('empresa_id_admin')
+    empresa = get_object_or_404(Empresa, id_empresa=empresa_id) if empresa_id else None
+    if not empresa:
         return redirect('index')
 
     if request.method == 'POST':
         form = RegistroVersionesForm(request.POST)
         if form.is_valid():
             version = form.save(commit=False)
-            version.empresa = trabajador.empresa
+            version.empresa = empresa
             version.save()
             return redirect('rat_versiones')
     else:
         form = RegistroVersionesForm()
 
     return render(request, 'cuestionario/rat_nueva_version.html', {
-        'trabajador': trabajador,
+        'trabajador': None,
         'form': form,
     })
 
