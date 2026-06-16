@@ -67,7 +67,7 @@ def index(request):
                 empresa=empresa_seleccionada,
                 habilitado=True,
                 instrumento__tipo='rat'
-            ).select_related('instrumento').order_by('instrumento__id_instrumento')
+            ).select_related('instrumento').order_by('instrumento__nombre_instrumento')
 
         context = {
             'es_admin_sistema': True,
@@ -96,7 +96,7 @@ def index(request):
         empresa=trabajador.empresa,
         habilitado=True,
         instrumento__tipo='rat',
-    ).select_related('instrumento').order_by('instrumento__id_instrumento')
+    ).select_related('instrumento').order_by('instrumento__nombre_instrumento')
 
     instrumentos_rat_list = list(instrumentos_rat)
     ie_rat1 = instrumentos_rat_list[0] if len(instrumentos_rat_list) > 0 else None
