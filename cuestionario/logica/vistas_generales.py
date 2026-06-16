@@ -67,7 +67,7 @@ def index(request):
                 empresa=empresa_seleccionada,
                 habilitado=True,
                 instrumento__tipo='rat'
-            ).select_related('instrumento')
+            ).select_related('instrumento').order_by('instrumento__id_instrumento')
 
         context = {
             'es_admin_sistema': True,
@@ -117,15 +117,11 @@ def index(request):
         if ie_rat1:
             total1 = ie_rat1.preguntas.exclude(
                 actividad_tratamiento__istartswith='Presentación'
-            ).exclude(
-                actividad_tratamiento__icontains='Fuente de la cual provienen'
             ).count()
             respondidas1 = RATRespuestas.objects.filter(
                 trabajador=sub, pregunta__instrumento_empresa=ie_rat1
             ).exclude(
                 pregunta__actividad_tratamiento__istartswith='Presentación'
-            ).exclude(
-                pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
             ).values('pregunta').distinct().count()
             sub.rat1_listo = total1 > 0 and respondidas1 >= total1
             sub.rat1_progreso = f"{respondidas1}/{total1}"
