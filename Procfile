@@ -1,1 +1,1 @@
-python manage.py migrate && python manage.py crear_admin && python manage.py poblar_usuarios && python manage.py poblar_rat_kickoff && gunicorn --timeout 300 --graceful-timeout 300 Sistema_Mohala.wsgi --bind 0.0.0.0:$PORT
+python manage.py migrate contenttypes && python manage.py migrate auth && python manage.py crear_tablas && python manage.py migrate && python manage.py crear_admin && python manage.py poblar_usuarios && python manage.py poblar_rat_kickoff && gunicorn --timeout 300 --graceful-timeout 300 Sistema_Mohala.wsgi --bind 0.0.0.0:$PORT
