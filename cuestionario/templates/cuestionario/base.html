@@ -180,42 +180,5 @@
         <script src="{% static 'cuestionario/js/util.js' %}"></script>
         <script src="{% static 'cuestionario/js/main.js' %}"></script>
 
-        <script>
-        (function() {
-            const ZONE = 150;
-            const MAX_SPEED = 8;
-            const MIN_SPEED = 2;
-            let currentSpeed = 0;
-            let animFrame = null;
-
-            function scrollLoop() {
-                if (currentSpeed !== 0) {
-                    window.scrollBy(0, currentSpeed);
-                }
-                animFrame = requestAnimationFrame(scrollLoop);
-            }
-            animFrame = requestAnimationFrame(scrollLoop);
-
-            document.addEventListener('mousemove', function(e) {
-                const h = window.innerHeight;
-                const y = e.clientY;
-
-                if (y > h - ZONE) {
-                    const ratio = (y - (h - ZONE)) / ZONE;
-                    currentSpeed = MIN_SPEED + ratio * (MAX_SPEED - MIN_SPEED);
-                } else if (y < ZONE) {
-                    const ratio = (ZONE - y) / ZONE;
-                    currentSpeed = -(MIN_SPEED + ratio * (MAX_SPEED - MIN_SPEED));
-                } else {
-                    currentSpeed = 0;
-                }
-            });
-
-            document.addEventListener('mouseleave', function() {
-                currentSpeed = 0;
-            });
-        })();
-        </script>
-
     </body>
 </html>

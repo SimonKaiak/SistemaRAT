@@ -37,7 +37,9 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <a href="{% url 'index' %}?id={{ trabajador.id_trabajador }}" class="button" style="margin:0.5em 0 0.3em 0;display:inline-block;">← Volver al Panel</a>
+        <div style="display:flex;justify-content:center;padding:0.5em 0;">
+            <a href="{% url 'index' %}?id={{ trabajador.id_trabajador }}" class="button" style="margin:0;background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver al Panel</a>
+        </div>
         <hr style="margin-top:1.5em;" />
         <h2 style="font-size:1.4em;">Mi Autoevaluación</h2>
         <p style="font-size:0.92em;">Hola <strong>{{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</strong>, selecciona el bloque que deseas completar:</p>
@@ -53,7 +55,7 @@
             
             {% if item.hecho %}
                 <p style="color: {% if forloop.first %}#51ff85{% else %}#2196F3{% endif %}; font-weight: bold; margin-bottom: 1em;">✅ Sección Completada</p>
-                <a href="{% url 'ver_resultados' trabajador.id_trabajador 'auto' %}?dimension_id={{ item.dimension.id_dimension }}" class="button fit">Ver Mis Respuestas</a>
+                <a href="{% url 'ver_resultados' trabajador.id_trabajador 'auto' %}?dimension_id={{ item.dimension.id_dimension }}" class="button fit" style="background:rgba({% if forloop.first %}81,255,133{% else %}33,150,243{% endif %},0.15);border-color:rgba({% if forloop.first %}81,255,133{% else %}33,150,243{% endif %},0.4);color:{% if forloop.first %}#51ff85{% else %}#2196F3{% endif %};">Ver Mis Respuestas</a>
             {% else %}
                 <a href="{% url 'autoevaluacion' trabajador.id_trabajador item.dimension.id_dimension %}" class="button primary fit">Responder {{ item.dimension.nombre_dimension }}</a>
             {% endif %}
@@ -68,6 +70,7 @@
             <h3 style="color: #51ff85; margin: 0;">🎉 ¡Evaluación Enviada!</h3>
             <p>Tu autoevaluación ha sido confirmada y ya no puede ser modificada.</p>
         </div>
+        <hr />
     {% elif listo_para_enviar %}
         <div style="text-align: center; margin-top: 2em; padding: 2em; background: rgba(255, 193, 7, 0.1); border-radius: 10px; border: 1px solid #ffc107;">
             <h3 style="color: #ffc107;">⚠️ Paso Final: Confirmar Envío</h3>

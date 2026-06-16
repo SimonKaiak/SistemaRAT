@@ -51,10 +51,10 @@
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
-            <a href="{% url 'seguimiento_admin' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button">← Volver a Seguimiento</a>
+            <a href="{% url 'seguimiento_admin' %}?empresa_id={{ trabajador.empresa.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver a Seguimiento</a>
             <div style="display:flex;gap:0.8em;">
-                <a href="{% url 'generar_pdf_detalle' trabajador.id_trabajador %}" class="button" target="_blank">📄 Imprimir Informe</a>
-                <a href="{% url 'generar_excel_detalle' trabajador.id_trabajador %}" class="button">📊 Descargar Excel</a>
+                <a href="{% url 'generar_pdf_detalle' trabajador.id_trabajador %}" class="button" target="_blank" style="background:rgba(231,76,60,0.15);border-color:rgba(231,76,60,0.4);color:#e74c3c;">📄 Imprimir Informe</a>
+                <a href="{% url 'generar_excel_detalle' trabajador.id_trabajador %}" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#27ae60;">📊 Descargar Excel</a>
             </div>
         </div>
         <hr style="margin-top:1.5em;" />

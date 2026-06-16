@@ -39,15 +39,11 @@
 <section>
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0.8em;padding:0.5em 0;">
-            {% if user.is_superuser %}
-            <a href="{% url 'seleccion_instrumentos' %}?empresa_id={{ empresa.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver</a>
-            {% else %}
-            <a href="{% url 'index' %}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver</a>
-            {% endif %}
+        <div style="display:flex;justify-content:{% if user.is_superuser %}space-between{% else %}center{% endif %};align-items:center;gap:0.8em;padding:0.5em 0;">
+            <a href="{% url 'index' %}?empresa_id={{ empresa.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver</a>
             {% if user.is_superuser %}
             <div style="display:flex;gap:0.8em;">
-                <a href="{% url 'rat_versiones' %}" class="button">🗃 Versiones</a>
+                <a href="{% url 'rat_versiones' %}" class="button" style="background:rgba(155,89,182,0.15);border-color:rgba(155,89,182,0.4);color:#9b59b6;">🗃 Versiones</a>
                 <a href="{% url 'rat_nueva_pregunta' %}?instrumento_id={{ instrumento_id }}" class="button" style="background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">+ Crear Preguntas</a>
             </div>
             {% endif %}

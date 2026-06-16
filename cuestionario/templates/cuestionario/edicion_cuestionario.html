@@ -48,8 +48,9 @@
 </style>
 <section>
     <header>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
-            <a href="{{ request.GET.next|default:"javascript:history.back()" }}" class="button">← Volver</a>
+        <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
+        <div style="display:flex;justify-content:center;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">
+            <a href="{{ request.GET.next|default:"javascript:history.back()" }}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver</a>
         </div>
         <hr style="margin-top:1.5em;" />
         <h2 style="margin-top: 1em;">Edición de Cuestionario</h2>
@@ -89,7 +90,7 @@
                                 {% csrf_token %}
                                 <input type="text" name="nombre_dimension" value="{{ dim.nombre_dimension }}"
                                        style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 250px;">
-                                <button type="submit" class="button small primary">Guardar</button>
+                                <button type="submit" class="button" style="margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">Guardar</button>
                             </form>
                         </td>
                     </tr>
@@ -124,7 +125,7 @@
                                 {% csrf_token %}
                                 <input type="text" name="nombre_competencia" value="{{ comp.nombre_competencia }}"
                                        style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 300px;">
-                                <button type="submit" class="button small primary">Guardar</button>
+                                <button type="submit" class="button" style="margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">Guardar</button>
                             </form>
                         </td>
                     </tr>
@@ -162,7 +163,7 @@
                                 {% csrf_token %}
                                 <textarea name="texto" rows="3"
                                           style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 100%; font-size: 0.85em;">{{ texto.texto }}</textarea>
-                                <button type="submit" class="button small primary" style="white-space: nowrap;">Guardar</button>
+                                <button type="submit" class="button" style="white-space:nowrap;margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">Guardar</button>
                             </form>
                         </td>
                     </tr>
@@ -200,7 +201,7 @@
                                 <div style="display:flex; gap: 0.5em; align-items: center; justify-content: space-between; width: 100%;">
                                     <textarea name="descripcion" rows="3"
                                               style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.3em 0.7em; border-radius: 4px; width: 100%; font-size: 0.85em;">{{ escala.descripcion }}</textarea>
-                                    <button type="submit" class="button small primary" style="white-space: nowrap;">Guardar</button>
+                                    <button type="submit" class="button" style="white-space:nowrap;margin:0;background:rgba(39,174,96,0.15);border-color:rgba(39,174,96,0.4);color:#2ecc71;">Guardar</button>
                                 </div>
                             </form>
                         </td>

@@ -40,11 +40,11 @@
     <header>
         <hr style="margin-bottom:1.5em;border-color:rgba(255,255,255,0.1);">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5em 0;flex-wrap:wrap;gap:0.8em;">            
-            <a href="{% if empresa_actual %}/?empresa_id={{ empresa_actual.id_empresa }}{% else %}{% url 'index' %}{% endif %}" class="button">← Volver al Panel</a>
+            <a href="{% if empresa_actual %}/?empresa_id={{ empresa_actual.id_empresa }}{% else %}{% url 'index' %}{% endif %}" class="button" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#3498db;">← Volver al Panel</a>
             {% if user.is_superuser or es_coordinador %}{% if empresa_actual %}
             <div style="display:flex;gap:0.8em;">
-                <a href="{% url 'generar_reporte_global_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button">📊 Generar Reporte Respuestas</a>
-                <a href="{% url 'panel_gemini' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button">🤖 Panel Informe con IA</a>
+                <a href="{% url 'generar_reporte_global_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button" style="background:rgba(230,126,34,0.15);border-color:rgba(230,126,34,0.4);color:#e67e22;">📊 Generar Reporte Respuestas</a>
+                <a href="{% url 'panel_gemini' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button" style="background:rgba(26,188,156,0.15);border-color:rgba(26,188,156,0.4);color:#1abc9c;">🤖 Panel Informe con IA</a>
             </div>
             {% endif %}{% endif %}
         </div>
@@ -108,7 +108,7 @@
                     </td>
                     <td style="text-align: center;">
                         {% if t.diff_promedio is not None %}
-                            <a href="{% url 'detalle_seguimiento' t.id_trabajador %}" class="button small primary">
+                            <a href="{% url 'detalle_seguimiento' t.id_trabajador %}" class="button" style="margin:0;background:rgba(241,196,15,0.15);border-color:rgba(241,196,15,0.4);color:#f1c40f;">
                                 Ver Detalle
                             </a>
                         {% else %}
