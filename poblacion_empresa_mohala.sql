@@ -54,7 +54,6 @@
 -- con setval para evitar errores de duplicate key al insertar
 -- nuevos registros desde Django.
 --
--- Nota: usa session_replication_role='replica' para deshabilitar
 -- verificación de FK durante la inserción (requiere superusuario).
 -- =========================
 
@@ -65,18 +64,16 @@
 -- y DESPUÉS de: python manage.py migrate
 -- =============================================================
 
-SET session_replication_role = 'replica';
-
 -- =========================
 -- Empresa
 -- =========================
-INSERT INTO "EMPRESA" ("ID_EMPRESA", "NOMBRE_EMPRESA", "RUT_EMPRESA", "EMPRESA_ACTIVA", "REGISTRADA_EN")
+INSERT INTO "EMPRESA" ("id_empresa", "nombre_empresa", "rut_empresa", "empresa_activa", "registrada_en")
 VALUES (1, 'Mohala SpA', '76.123.456-7', TRUE, CURRENT_TIMESTAMP);
 
 -- =========================
 -- Departamento
 -- =========================
-INSERT INTO "DEPARTAMENTO" ("ID_DEPARTAMENTO", "NOMBRE_DEPARTAMENTO", "EMPRESA_ID_EMPRESA")
+INSERT INTO "DEPARTAMENTO" ("id_departamento", "nombre_departamento", "empresa_id_empresa")
 VALUES
     (1, 'Gerencia General',               1),
     (2, 'Recursos Humanos',               1),
@@ -85,7 +82,7 @@ VALUES
 -- =========================
 -- Nivel Jerárquico
 -- =========================
-INSERT INTO "NIVEL_JERARQUICO" ("ID_NIVEL_JERARQUICO", "NOMBRE_NIVEL_JERARQUICO", "EMPRESA_ID_EMPRESA")
+INSERT INTO "NIVEL_JERARQUICO" ("id_nivel_jerarquico", "nombre_nivel_jerarquico", "empresa_id_empresa")
 VALUES
     (1, 'Operativo',   1),
     (2, 'Táctico',     1),
@@ -94,7 +91,7 @@ VALUES
 -- =========================
 -- Escala
 -- =========================
-INSERT INTO "ESCALA" ("ID_ESCALA", "VALOR", "TITULO", "DESCRIPCION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "ESCALA" ("id_escala", "valor", "titulo", "descripcion", "empresa_id_empresa")
 VALUES
     (1, 1, 'No Logra lo Esperado',          'No cumple con los comportamientos y resultados mínimos definidos para la competencia.', 1),
     (2, 2, 'Logra Parcialmente lo Esperado','Cumple solo en forma incompleta o inconsistente con los comportamientos y resultados definidos para la competencia.', 1),
@@ -104,7 +101,7 @@ VALUES
 -- =========================
 -- Dimensión
 -- =========================
-INSERT INTO "DIMENSION" ("ID_DIMENSION", "NOMBRE_DIMENSION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "DIMENSION" ("id_dimension", "nombre_dimension", "empresa_id_empresa")
 VALUES
     (1, 'Organizacionales', 1),
     (2, 'Funcionales',      1);
@@ -113,7 +110,7 @@ VALUES
 -- Competencia
 -- =========================
 -- Organizacionales (Dimensión 1)
-INSERT INTO "COMPETENCIA" ("ID_COMPETENCIA", "NOMBRE_COMPETENCIA", "DIMENSION_ID_DIMENSION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "COMPETENCIA" ("id_competencia", "nombre_competencia", "dimension_id_dimension", "empresa_id_empresa")
 VALUES
     (1,  'Creatividad e Innovación',    1, 1),
     (2,  'Enfoque de Negocio',          1, 1),
@@ -122,7 +119,7 @@ VALUES
     (5,  'Visión Global y Sistemática', 1, 1);
 
 -- Funcionales (Dimensión 2)
-INSERT INTO "COMPETENCIA" ("ID_COMPETENCIA", "NOMBRE_COMPETENCIA", "DIMENSION_ID_DIMENSION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "COMPETENCIA" ("id_competencia", "nombre_competencia", "dimension_id_dimension", "empresa_id_empresa")
 VALUES
     (6,  'Análisis y Solución de Problemas',  2, 1),
     (7,  'Aprendizaje e Innovación',           2, 1),
@@ -139,19 +136,19 @@ VALUES
 -- Cargo
 -- =========================
 -- Operativos (Nivel 1)
-INSERT INTO "CARGO" ("ID_CARGO", "NOMBRE_CARGO", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "CARGO" ("id_cargo", "nombre_cargo", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (1, 'Analista',                  1, 1),
     (2, 'Asistente Administrativo',  1, 1);
 
 -- Tácticos (Nivel 2)
-INSERT INTO "CARGO" ("ID_CARGO", "NOMBRE_CARGO", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "CARGO" ("id_cargo", "nombre_cargo", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (3, 'Jefe de Recursos Humanos',  1, 2),
     (4, 'Coordinador de Proyectos',  1, 2);
 
 -- Estratégicos (Nivel 3)
-INSERT INTO "CARGO" ("ID_CARGO", "NOMBRE_CARGO", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "CARGO" ("id_cargo", "nombre_cargo", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (5, 'Gerente General',      1, 3),
     (6, 'Gerente de Innovación',1, 3);
@@ -161,7 +158,7 @@ VALUES
 -- =========================
 
 -- 1. CREATIVIDAD E INNOVACIÓN (Competencia 1)
-INSERT INTO "TEXTOS_EVALUACION" ("ID_TEXTOS_EVALUACION", "CODIGO_EXCEL", "TEXTO", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "TEXTOS_EVALUACION" ("id_textos_evaluacion", "codigo_excel", "texto", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (1, 'CIO1.1', 'Trabaja con mecanismos conocidos y rutinarios.', 1, 1, 1, 1),
     (2, 'CIO1.2', 'Se mueve con facilidad en situaciones conocidas con pautas de acción prefijadas.', 1, 1, 1, 1),
@@ -174,7 +171,7 @@ VALUES
     (9, 'CIE1.3', 'Plantea mejoras o soluciones nuevas a problemas sencillos y complejos, garantizando su efectividad y calidad.', 1, 1, 1, 3);
 
 -- 2. ENFOQUE DE NEGOCIO (Competencia 2)
-INSERT INTO "TEXTOS_EVALUACION" ("ID_TEXTOS_EVALUACION", "CODIGO_EXCEL", "TEXTO", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "TEXTOS_EVALUACION" ("id_textos_evaluacion", "codigo_excel", "texto", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (10, 'ENO2.1', 'Comprende las peculiaridades de los servicios.', 1, 1, 2, 1),
     (11, 'ENO2.2', 'Conoce las estrategias, principios y valores corporativos.', 1, 1, 2, 1),
@@ -187,7 +184,7 @@ VALUES
     (18, 'ENE2.3', 'Es reconocido por su expertise, su alto conocimiento cultural y estrategias de relacionamiento.', 1, 1, 2, 3);
 
 -- 6. ANÁLISIS Y SOLUCIÓN DE PROBLEMAS (Competencia 6)
-INSERT INTO "TEXTOS_EVALUACION" ("ID_TEXTOS_EVALUACION", "CODIGO_EXCEL", "TEXTO", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "TEXTOS_EVALUACION" ("id_textos_evaluacion", "codigo_excel", "texto", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (19, 'ASO1.1', 'Resuelve problemas rutinarios de forma efectiva.', 1, 2, 6, 1),
     (20, 'ASO1.2', 'Acude a sus superiores o pares para crear alternativas que le permitan resolver los problemas con mayor grado de dificultad.', 1, 2, 6, 1),
@@ -202,7 +199,7 @@ VALUES
 -- =========================
 -- Código Evaluación
 -- =========================
-INSERT INTO "CODIGO_EVALUACION" ("ID_CODIGO_EVALUACION", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "TEXTOS_EVALUACION_CODIGO_EXCEL", "TEXTOS_EVALUACION_EMPRESA_ID_EMPRESA")
+INSERT INTO "CODIGO_EVALUACION" ("id_codigo_evaluacion", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico", "textos_evaluacion_codigo_excel", "textos_evaluacion_empresa_id_empresa")
 VALUES
     -- Creatividad e Innovación: Operativo
     (1,  1, 1, 1, 1, 'CIO1.1', 1),
@@ -245,35 +242,22 @@ VALUES
 -- Trabajador
 -- =========================
 -- Estratégico (sin jefe)
-INSERT INTO "TRABAJADOR" ("ID_TRABAJADOR", "RUT", "ID_JEFE_DIRECTO", "NOMBRE", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "EMAIL", "GENERO", "ES_COORDINADOR", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "CARGO_ID_CARGO", "DEPARTAMENTO_ID_DEPARTAMENTO")
+INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
     (1, '10.234.567-1', NULL, 'Roberto',  'Méndez', 'Castro', 'r.mendez@mohala.cl', 'Masculino', FALSE, 1, 3, 5, 1),
     (2, '12.456.789-2', NULL, 'Patricia', 'Lorca',  'Vial',   'p.lorca@mohala.cl',  'Femenino',  TRUE,  1, 3, 6, 1);
 
 -- Táctico (reportan a ID 1 y 2)
-INSERT INTO "TRABAJADOR" ("ID_TRABAJADOR", "RUT", "ID_JEFE_DIRECTO", "NOMBRE", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "EMAIL", "GENERO", "ES_COORDINADOR", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "CARGO_ID_CARGO", "DEPARTAMENTO_ID_DEPARTAMENTO")
+INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
     (3, '13.567.890-4', 1, 'Mónica', 'Sánchez', 'Paz', 'm.sanchez@mohala.cl', 'Femenino',  FALSE, 1, 2, 4, 3),
     (4, '11.345.678-3', 2, 'Andrés', 'Tapia',   'Ruiz','a.tapia@mohala.cl',   'Masculino', FALSE, 1, 2, 3, 2);
 
 -- Operativo (reportan a ID 3 y 4)
-INSERT INTO "TRABAJADOR" ("ID_TRABAJADOR", "RUT", "ID_JEFE_DIRECTO", "NOMBRE", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "EMAIL", "GENERO", "ES_COORDINADOR", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "CARGO_ID_CARGO", "DEPARTAMENTO_ID_DEPARTAMENTO")
+INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
     (5, '18.456.789-9', 3, 'Valeria',  'Cáceres','Pinto','v.caceres@mohala.cl','Femenino',  FALSE, 1, 1, 1, 3),
     (6, '19.567.890-0', 4, 'Sebastián','Marín',  'Rojas','s.marin@mohala.cl',  'Masculino', FALSE, 1, 1, 2, 2);
 
 -- =========================
--- Sincronizar secuencias SERIAL
 -- =========================
-SELECT setval(pg_get_serial_sequence('"EMPRESA"',             'ID_EMPRESA'),             MAX("ID_EMPRESA"))             FROM "EMPRESA";
-SELECT setval(pg_get_serial_sequence('"DEPARTAMENTO"',        'ID_DEPARTAMENTO'),        MAX("ID_DEPARTAMENTO"))        FROM "DEPARTAMENTO";
-SELECT setval(pg_get_serial_sequence('"NIVEL_JERARQUICO"',    'ID_NIVEL_JERARQUICO'),    MAX("ID_NIVEL_JERARQUICO"))    FROM "NIVEL_JERARQUICO";
-SELECT setval(pg_get_serial_sequence('"ESCALA"',              'ID_ESCALA'),              MAX("ID_ESCALA"))              FROM "ESCALA";
-SELECT setval(pg_get_serial_sequence('"DIMENSION"',           'ID_DIMENSION'),           MAX("ID_DIMENSION"))           FROM "DIMENSION";
-SELECT setval(pg_get_serial_sequence('"COMPETENCIA"',         'ID_COMPETENCIA'),         MAX("ID_COMPETENCIA"))         FROM "COMPETENCIA";
-SELECT setval(pg_get_serial_sequence('"CARGO"',               'ID_CARGO'),               MAX("ID_CARGO"))               FROM "CARGO";
-SELECT setval(pg_get_serial_sequence('"TEXTOS_EVALUACION"',   'ID_TEXTOS_EVALUACION'),   MAX("ID_TEXTOS_EVALUACION"))   FROM "TEXTOS_EVALUACION";
-SELECT setval(pg_get_serial_sequence('"CODIGO_EVALUACION"',   'ID_CODIGO_EVALUACION'),   MAX("ID_CODIGO_EVALUACION"))   FROM "CODIGO_EVALUACION";
-SELECT setval(pg_get_serial_sequence('"TRABAJADOR"',          'ID_TRABAJADOR'),          MAX("ID_TRABAJADOR"))          FROM "TRABAJADOR";
-
-SET session_replication_role = 'origin';

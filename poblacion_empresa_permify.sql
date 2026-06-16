@@ -57,18 +57,16 @@
 -- Al final sincroniza las secuencias SERIAL de todas las tablas.
 -- =========================
 
-SET session_replication_role = 'replica';
-
 -- =========================
 -- Empresa
 -- =========================
-INSERT INTO "EMPRESA" ("ID_EMPRESA", "NOMBRE_EMPRESA", "RUT_EMPRESA", "EMPRESA_ACTIVA", "REGISTRADA_EN")
+INSERT INTO "EMPRESA" ("id_empresa", "nombre_empresa", "rut_empresa", "empresa_activa", "registrada_en")
 VALUES (2, 'Permify SpA', '74.123.456-7', TRUE, CURRENT_TIMESTAMP);
 
 -- =========================
 -- Departamento
 -- =========================
-INSERT INTO "DEPARTAMENTO" ("ID_DEPARTAMENTO", "NOMBRE_DEPARTAMENTO", "EMPRESA_ID_EMPRESA")
+INSERT INTO "DEPARTAMENTO" ("id_departamento", "nombre_departamento", "empresa_id_empresa")
 VALUES
     (4, 'Gerencia General',             2),
     (5, 'Recursos Humanos',             2),
@@ -77,7 +75,7 @@ VALUES
 -- =========================
 -- Nivel Jerárquico
 -- =========================
-INSERT INTO "NIVEL_JERARQUICO" ("ID_NIVEL_JERARQUICO", "NOMBRE_NIVEL_JERARQUICO", "EMPRESA_ID_EMPRESA")
+INSERT INTO "NIVEL_JERARQUICO" ("id_nivel_jerarquico", "nombre_nivel_jerarquico", "empresa_id_empresa")
 VALUES
     (4, 'Colaborador', 2),
     (5, 'Supervisor',  2),
@@ -86,7 +84,7 @@ VALUES
 -- =========================
 -- Escala
 -- =========================
-INSERT INTO "ESCALA" ("ID_ESCALA", "VALOR", "TITULO", "DESCRIPCION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "ESCALA" ("id_escala", "valor", "titulo", "descripcion", "empresa_id_empresa")
 VALUES
     (5, 1, 'Desempeño Insuficiente',   'No cumple estándares empresa 2.', 2),
     (6, 2, 'Desempeño en Desarrollo',  'Cumple estándares de manera incompleta en empresa 2.', 2),
@@ -96,7 +94,7 @@ VALUES
 -- =========================
 -- Dimensión
 -- =========================
-INSERT INTO "DIMENSION" ("ID_DIMENSION", "NOMBRE_DIMENSION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "DIMENSION" ("id_dimension", "nombre_dimension", "empresa_id_empresa")
 VALUES
     (3, 'Corporativas', 2),
     (4, 'Técnicas',     2);
@@ -105,7 +103,7 @@ VALUES
 -- Competencia
 -- =========================
 -- Corporativas (Dimensión 3)
-INSERT INTO "COMPETENCIA" ("ID_COMPETENCIA", "NOMBRE_COMPETENCIA", "DIMENSION_ID_DIMENSION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "COMPETENCIA" ("id_competencia", "nombre_competencia", "dimension_id_dimension", "empresa_id_empresa")
 VALUES
     (16, 'Innovación y Creatividad',  3, 2),
     (17, 'Orientación al Cliente',    3, 2),
@@ -114,7 +112,7 @@ VALUES
     (20, 'Pensamiento Estratégico',   3, 2);
 
 -- Técnicas (Dimensión 4)
-INSERT INTO "COMPETENCIA" ("ID_COMPETENCIA", "NOMBRE_COMPETENCIA", "DIMENSION_ID_DIMENSION", "EMPRESA_ID_EMPRESA")
+INSERT INTO "COMPETENCIA" ("id_competencia", "nombre_competencia", "dimension_id_dimension", "empresa_id_empresa")
 VALUES
     (21, 'Resolución de Problemas',   4, 2),
     (22, 'Aprendizaje Continuo',      4, 2),
@@ -131,19 +129,19 @@ VALUES
 -- Cargo
 -- =========================
 -- Colaborador (Nivel 4)
-INSERT INTO "CARGO" ("ID_CARGO", "NOMBRE_CARGO", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "CARGO" ("id_cargo", "nombre_cargo", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (7,  'Analista',                 2, 4),
     (8,  'Asistente Administrativo', 2, 4);
 
 -- Supervisor (Nivel 5)
-INSERT INTO "CARGO" ("ID_CARGO", "NOMBRE_CARGO", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "CARGO" ("id_cargo", "nombre_cargo", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (9,  'Jefe de Recursos Humanos', 2, 5),
     (10, 'Coordinador de Proyectos', 2, 5);
 
 -- Directivo (Nivel 6)
-INSERT INTO "CARGO" ("ID_CARGO", "NOMBRE_CARGO", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "CARGO" ("id_cargo", "nombre_cargo", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (11, 'Gerente General',      2, 6),
     (12, 'Gerente de Innovación',2, 6);
@@ -153,7 +151,7 @@ VALUES
 -- =========================
 
 -- 16. INNOVACIÓN Y CREATIVIDAD (Competencia 16)
-INSERT INTO "TEXTOS_EVALUACION" ("ID_TEXTOS_EVALUACION", "CODIGO_EXCEL", "TEXTO", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "TEXTOS_EVALUACION" ("id_textos_evaluacion", "codigo_excel", "texto", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (28, 'ICC1.1', 'Texto de prueba empresa 2.', 2, 3, 16, 4),
     (29, 'ICC1.2', 'Texto de prueba empresa 2.', 2, 3, 16, 4),
@@ -166,7 +164,7 @@ VALUES
     (36, 'ICD1.3', 'Texto de prueba empresa 2.', 2, 3, 16, 6);
 
 -- 17. ORIENTACIÓN AL CLIENTE (Competencia 17)
-INSERT INTO "TEXTOS_EVALUACION" ("ID_TEXTOS_EVALUACION", "CODIGO_EXCEL", "TEXTO", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "TEXTOS_EVALUACION" ("id_textos_evaluacion", "codigo_excel", "texto", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (37, 'OCC1.1', 'Texto de prueba empresa 2.', 2, 3, 17, 4),
     (38, 'OCC1.2', 'Texto de prueba empresa 2.', 2, 3, 17, 4),
@@ -179,7 +177,7 @@ VALUES
     (45, 'OCD1.3', 'Texto de prueba empresa 2.', 2, 3, 17, 6);
 
 -- 21. RESOLUCIÓN DE PROBLEMAS (Competencia 21)
-INSERT INTO "TEXTOS_EVALUACION" ("ID_TEXTOS_EVALUACION", "CODIGO_EXCEL", "TEXTO", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO")
+INSERT INTO "TEXTOS_EVALUACION" ("id_textos_evaluacion", "codigo_excel", "texto", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico")
 VALUES
     (46, 'RPC1.1', 'Texto de prueba empresa 2.', 2, 4, 21, 4),
     (47, 'RPC1.2', 'Texto de prueba empresa 2.', 2, 4, 21, 4),
@@ -194,7 +192,7 @@ VALUES
 -- =========================
 -- Código Evaluación
 -- =========================
-INSERT INTO "CODIGO_EVALUACION" ("ID_CODIGO_EVALUACION", "EMPRESA_ID_EMPRESA", "DIMENSION_ID_DIMENSION", "COMPETENCIA_ID_COMPETENCIA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "TEXTOS_EVALUACION_CODIGO_EXCEL", "TEXTOS_EVALUACION_EMPRESA_ID_EMPRESA")
+INSERT INTO "CODIGO_EVALUACION" ("id_codigo_evaluacion", "empresa_id_empresa", "dimension_id_dimension", "competencia_id_competencia", "nivel_jerarquico_id_nivel_jerarquico", "textos_evaluacion_codigo_excel", "textos_evaluacion_empresa_id_empresa")
 VALUES
     -- Innovación y Creatividad: Colaborador
     (28, 2, 3, 16, 4, 'ICC1.1', 2),
@@ -237,35 +235,22 @@ VALUES
 -- Trabajador
 -- =========================
 -- Directivo (sin jefe)
-INSERT INTO "TRABAJADOR" ("ID_TRABAJADOR", "RUT", "ID_JEFE_DIRECTO", "NOMBRE", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "EMAIL", "GENERO", "ES_COORDINADOR", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "CARGO_ID_CARGO", "DEPARTAMENTO_ID_DEPARTAMENTO")
+INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
     (7,  '14.123.456-1', NULL, 'Carlos',  'Fuentes','Mora', 'c.fuentes@permify.cl','Masculino', FALSE, 2, 6, 11, 4),
     (8,  '15.234.567-2', NULL, 'Daniela', 'Vega',   'Soto', 'd.vega@permify.cl',   'Femenino',  TRUE,  2, 6, 12, 4);
 
 -- Supervisor (reportan a ID 7 y 8)
-INSERT INTO "TRABAJADOR" ("ID_TRABAJADOR", "RUT", "ID_JEFE_DIRECTO", "NOMBRE", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "EMAIL", "GENERO", "ES_COORDINADOR", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "CARGO_ID_CARGO", "DEPARTAMENTO_ID_DEPARTAMENTO")
+INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
     (9,  '16.345.678-3', 7, 'Felipe', 'Rojas', 'Lima', 'f.rojas@permify.cl',  'Masculino', FALSE, 2, 5, 9,  5),
     (10, '17.456.789-4', 8, 'Camila', 'Núñez', 'Ríos', 'c.nunez@permify.cl',  'Femenino',  FALSE, 2, 5, 10, 6);
 
 -- Colaborador (reportan a ID 9 y 10)
-INSERT INTO "TRABAJADOR" ("ID_TRABAJADOR", "RUT", "ID_JEFE_DIRECTO", "NOMBRE", "APELLIDO_PATERNO", "APELLIDO_MATERNO", "EMAIL", "GENERO", "ES_COORDINADOR", "EMPRESA_ID_EMPRESA", "NIVEL_JERARQUICO_ID_NIVEL_JERARQUICO", "CARGO_ID_CARGO", "DEPARTAMENTO_ID_DEPARTAMENTO")
+INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
     (11, '18.567.890-5', 9,  'Ignacio', 'Pérez', 'Blanc', 'i.perez@permify.cl', 'Masculino', FALSE, 2, 4, 7, 6),
     (12, '19.678.901-6', 10, 'Javiera', 'Muñoz', 'Cerda', 'j.munoz@permify.cl', 'Femenino',  FALSE, 2, 4, 8, 5);
 
 -- =========================
--- Sincronizar secuencias SERIAL
 -- =========================
-SELECT setval(pg_get_serial_sequence('"EMPRESA"',             'ID_EMPRESA'),             MAX("ID_EMPRESA"))             FROM "EMPRESA";
-SELECT setval(pg_get_serial_sequence('"DEPARTAMENTO"',        'ID_DEPARTAMENTO'),        MAX("ID_DEPARTAMENTO"))        FROM "DEPARTAMENTO";
-SELECT setval(pg_get_serial_sequence('"NIVEL_JERARQUICO"',    'ID_NIVEL_JERARQUICO'),    MAX("ID_NIVEL_JERARQUICO"))    FROM "NIVEL_JERARQUICO";
-SELECT setval(pg_get_serial_sequence('"ESCALA"',              'ID_ESCALA'),              MAX("ID_ESCALA"))              FROM "ESCALA";
-SELECT setval(pg_get_serial_sequence('"DIMENSION"',           'ID_DIMENSION'),           MAX("ID_DIMENSION"))           FROM "DIMENSION";
-SELECT setval(pg_get_serial_sequence('"COMPETENCIA"',         'ID_COMPETENCIA'),         MAX("ID_COMPETENCIA"))         FROM "COMPETENCIA";
-SELECT setval(pg_get_serial_sequence('"CARGO"',               'ID_CARGO'),               MAX("ID_CARGO"))               FROM "CARGO";
-SELECT setval(pg_get_serial_sequence('"TEXTOS_EVALUACION"',   'ID_TEXTOS_EVALUACION'),   MAX("ID_TEXTOS_EVALUACION"))   FROM "TEXTOS_EVALUACION";
-SELECT setval(pg_get_serial_sequence('"CODIGO_EVALUACION"',   'ID_CODIGO_EVALUACION'),   MAX("ID_CODIGO_EVALUACION"))   FROM "CODIGO_EVALUACION";
-SELECT setval(pg_get_serial_sequence('"TRABAJADOR"',          'ID_TRABAJADOR'),          MAX("ID_TRABAJADOR"))          FROM "TRABAJADOR";
-
-SET session_replication_role = 'origin';
