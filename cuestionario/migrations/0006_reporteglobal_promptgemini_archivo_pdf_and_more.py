@@ -44,6 +44,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'REPORTE_GLOBAL',
+                'managed': False,
             },
         ),
         migrations.AddField(

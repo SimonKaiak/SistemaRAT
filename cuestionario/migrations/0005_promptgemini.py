@@ -42,6 +42,7 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'PROMPT_GEMINI',
                 'ordering': ['-timestamp'],
+                'managed': False,
             },
         ),
     ]

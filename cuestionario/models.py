@@ -162,6 +162,7 @@ class ReporteGlobal(models.Model):
     )
 
     class Meta:
+        managed = False
         db_table = 'REPORTE_GLOBAL'
 
     def __str__(self):
@@ -195,6 +196,7 @@ class PromptGemini(models.Model):
     )
 
     class Meta:
+        managed = False
         db_table = 'PROMPT_GEMINI'
         ordering = ['-timestamp']
 
