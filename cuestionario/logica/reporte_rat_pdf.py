@@ -10,16 +10,24 @@ generar_reporte_rat_pdf(request)
     - Preguntas escala (3, 4): porcentaje por opción 1-5
     - Preguntas texto  (5, 6): nube de palabras
 
+    Incluye portada institucional (logo placeholder, metadatos),
+    encabezado con empresa + instrumento y pie de página con
+    número de página y aviso de confidencialidad en cada hoja.
+
     Control de acceso:
     - Superusuario: filtra por empresa vía query param empresa_id.
     - Coordinador: solo su empresa.
     - Trabajador regular: redirige a index.
+
+    Filtra por instrumento vía query param instrumento_id (RAT 1,
+    RAT 2, etc.). Si no se especifica, usa el primer instrumento
+    RAT habilitado de la empresa (ordenado por id).
 """
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from cuestionario.models import (
-    Trabajador, Empresa, RATPreguntas, RATRespuestas, InstrumentoEmpresa
+    Trabajador, Empresa, RATPreguntas, RATRespuestas, InstrumentoEmpresa, Departamento
 )
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
@@ -27,9 +35,10 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch, cm
 from reportlab.platypus import (
     SimpleDocTemplate, Table, TableStyle, Paragraph,
-    Spacer, Image as RLImage
+    Spacer, Image as RLImage, PageBreak
 )
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.graphics.shapes import Drawing, Rect, String
 from io import BytesIO
 from datetime import datetime
 from collections import Counter
@@ -40,6 +49,15 @@ from wordcloud import WordCloud
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+
+# ──────────────────────────────────────────────
+# Paleta institucional
+# ──────────────────────────────────────────────
+
+COLOR_MARCA = colors.HexColor('#5e42a6')
+COLOR_GRIS = colors.HexColor('#6b6b6b')
+COLOR_LINEA = colors.HexColor('#dddddd')
 
 
 # ──────────────────────────────────────────────
@@ -100,7 +118,7 @@ def _tabla_sino(respuestas: list[str], styles: dict) -> list:
     ]
     t = Table(data, colWidths=[2.5 * inch, 1.5 * inch, 1.5 * inch])
     t.setStyle(TableStyle([
-        ('BACKGROUND',    (0, 0), (-1, 0),  colors.HexColor('#5e42a6')),
+        ('BACKGROUND',    (0, 0), (-1, 0),  COLOR_MARCA),
         ('TEXTCOLOR',     (0, 0), (-1, 0),  colors.white),
         ('FONTNAME',      (0, 0), (-1, 0),  'Helvetica-Bold'),
         ('ALIGN',         (0, 0), (-1, -1), 'CENTER'),
@@ -137,7 +155,7 @@ def _tabla_escala(respuestas: list[str], styles: dict) -> list:
 
     t = Table(data, colWidths=[2.5 * inch, 1.5 * inch, 1.5 * inch])
     t.setStyle(TableStyle([
-        ('BACKGROUND',    (0, 0), (-1, 0),  colors.HexColor('#5e42a6')),
+        ('BACKGROUND',    (0, 0), (-1, 0),  COLOR_MARCA),
         ('TEXTCOLOR',     (0, 0), (-1, 0),  colors.white),
         ('FONTNAME',      (0, 0), (-1, 0),  'Helvetica-Bold'),
         ('ALIGN',         (0, 0), (-1, -1), 'CENTER'),
@@ -149,6 +167,98 @@ def _tabla_escala(respuestas: list[str], styles: dict) -> list:
         ('TOPPADDING',    (0, 0), (-1, -1), 7),
     ]))
     return [t]
+
+
+CATEGORIAS_LABELS = {
+    'contactabilidad': 'Datos de contactabilidad de personas',
+    'bancarios': 'Datos bancarios o finanzas personales',
+    'historia_clinica': 'Datos de historia clínica de personas',
+}
+
+
+def _tabla_generica(respuestas: list[str], styles: dict, label_map: dict | None = None) -> list:
+    """Tabla de frecuencias genérica para tipos de pregunta que no tienen
+    un formato propio (periodo, select_categorias, listado_usuarios, etc.).
+    Cuenta cuántas veces se repite cada respuesta exacta."""
+    total = len(respuestas)
+    if total == 0:
+        return [Paragraph("Sin respuestas.", styles['normal'])]
+
+    label_map = label_map or {}
+    conteo = Counter(r.strip() for r in respuestas if r and r.strip())
+    if not conteo:
+        return [Paragraph("Sin respuestas.", styles['normal'])]
+
+    data = [['Respuesta', 'Cantidad', 'Porcentaje']]
+    for valor, cant in conteo.most_common():
+        etiqueta = label_map.get(valor, valor)
+        pct = cant / total * 100
+        data.append([etiqueta, str(cant), f'{pct:.1f}%'])
+    data.append(['Total', str(total), '100%'])
+
+    t = Table(data, colWidths=[3.5 * inch, 1.2 * inch, 1.2 * inch])
+    t.setStyle(TableStyle([
+        ('BACKGROUND',    (0, 0), (-1, 0),  COLOR_MARCA),
+        ('TEXTCOLOR',     (0, 0), (-1, 0),  colors.white),
+        ('FONTNAME',      (0, 0), (-1, 0),  'Helvetica-Bold'),
+        ('ALIGN',         (1, 0), (-1, -1), 'CENTER'),
+        ('ALIGN',         (0, 0), (0, -1),  'LEFT'),
+        ('FONTSIZE',      (0, 0), (-1, -1), 9.5),
+        ('GRID',          (0, 0), (-1, -1), 0.5, colors.grey),
+        ('BACKGROUND',    (0, -1), (-1, -1), colors.HexColor('#f0f0f0')),
+        ('FONTNAME',      (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING',    (0, 0), (-1, -1), 6),
+    ]))
+    return [t]
+
+
+def _logo_placeholder(ancho=2.6 * inch, alto=0.9 * inch) -> Drawing:
+    """Genera un recuadro placeholder centrado con el texto 'LOGO EMPRESA',
+    para usar en la portada mientras no se cargue un logo real."""
+    d = Drawing(ancho, alto)
+    d.hAlign = 'CENTER'
+    rect = Rect(0, 0, ancho, alto, fillColor=colors.white, strokeColor=COLOR_GRIS, strokeWidth=1)
+    rect.strokeDashArray = [4, 3]
+    d.add(rect)
+    d.add(String(ancho / 2, alto / 2 - 5, "LOGO EMPRESA", fontSize=13, fillColor=COLOR_GRIS,
+                  textAnchor='middle', fontName='Helvetica-Bold'))
+    return d
+
+
+def _hacer_header_footer(empresa_obj, instrumento_nombre):
+    """Devuelve una función onPage para ReportLab que dibuja un
+    encabezado institucional (a partir de la página 2) y un pie de
+    página con número de página y aviso de confidencialidad en
+    todas las hojas."""
+    def _dibujar(canvas, doc):
+        ancho, alto = A4
+        canvas.saveState()
+
+        # ── Pie de página (todas las hojas) ──
+        canvas.setStrokeColor(COLOR_LINEA)
+        canvas.setLineWidth(0.6)
+        canvas.line(2 * cm, 1.5 * cm, ancho - 2 * cm, 1.5 * cm)
+        canvas.setFont('Helvetica', 8)
+        canvas.setFillColor(COLOR_GRIS)
+        canvas.drawString(2 * cm, 1.05 * cm, f"Sistema RAT — {empresa_obj.nombre_empresa}")
+        canvas.drawCentredString(ancho / 2, 1.05 * cm, "Documento confidencial — uso interno")
+        canvas.drawRightString(ancho - 2 * cm, 1.05 * cm, f"Página {canvas.getPageNumber()}")
+
+        # ── Encabezado (a partir de la 2ª página, la portada no lo lleva) ──
+        if canvas.getPageNumber() > 1:
+            canvas.setFont('Helvetica-Bold', 10)
+            canvas.setFillColor(COLOR_MARCA)
+            canvas.drawString(2 * cm, alto - 1.4 * cm, empresa_obj.nombre_empresa)
+            canvas.setFont('Helvetica', 9)
+            canvas.setFillColor(COLOR_GRIS)
+            canvas.drawRightString(ancho - 2 * cm, alto - 1.4 * cm, instrumento_nombre)
+            canvas.setStrokeColor(COLOR_MARCA)
+            canvas.setLineWidth(1.1)
+            canvas.line(2 * cm, alto - 1.55 * cm, ancho - 2 * cm, alto - 1.55 * cm)
+
+        canvas.restoreState()
+    return _dibujar
 
 
 # ──────────────────────────────────────────────
@@ -180,17 +290,19 @@ def generar_reporte_rat_pdf(request):
         return HttpResponse("No se especificó empresa.", status=400)
 
     # ── Instrumento RAT activo ─────────────────
-    ie = InstrumentoEmpresa.objects.filter(
+    instrumento_id = request.GET.get('instrumento_id')
+    ie_qs = InstrumentoEmpresa.objects.filter(
         empresa=empresa_obj, habilitado=True, instrumento__tipo='rat'
-    ).first()
+    )
+    if instrumento_id:
+        ie_qs = ie_qs.filter(instrumento__id_instrumento=instrumento_id)
+    ie = ie_qs.order_by('instrumento__id_instrumento').first()
     if not ie:
         return HttpResponse("No hay instrumento RAT habilitado para esta empresa.", status=404)
 
     # ── Preguntas (excluyendo presentación) ────
     preguntas = ie.preguntas.exclude(
         tipo='texto', actividad_tratamiento__startswith='Presentación'
-    ).exclude(
-        actividad_tratamiento__icontains='Fuente de la cual provienen'
     ).order_by('id_rat_pregunta')
 
     if not preguntas.exists():
@@ -206,8 +318,6 @@ def generar_reporte_rat_pdf(request):
                 ).exclude(
                     pregunta__tipo='texto',
                     pregunta__actividad_tratamiento__startswith='Presentación'
-                ).exclude(
-                    pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
                 ).values('pregunta').distinct().count()
         if total_preguntas > 0 and respondidas >= total_preguntas:
             trabajadores_listos.append(t)
@@ -219,22 +329,27 @@ def generar_reporte_rat_pdf(request):
     styles_rl = getSampleStyleSheet()
     style_title = ParagraphStyle(
         'RATTitle', parent=styles_rl['Heading1'],
-        fontSize=18, textColor=colors.HexColor('#5e42a6'),
-        spaceAfter=20, alignment=TA_CENTER,
+        fontSize=16, textColor=COLOR_MARCA,
+        spaceAfter=18, alignment=TA_CENTER,
     )
     style_portada = ParagraphStyle(
         'RATPortada', parent=styles_rl['Heading1'],
-        fontSize=22, textColor=colors.HexColor('#5e42a6'),
-        spaceAfter=16, alignment=TA_CENTER,
+        fontSize=24, textColor=COLOR_MARCA,
+        spaceAfter=6, alignment=TA_CENTER,
     )
     style_sub = ParagraphStyle(
         'RATSub', parent=styles_rl['Normal'],
         fontSize=12, textColor=colors.HexColor('#333333'),
         spaceAfter=8, alignment=TA_CENTER,
     )
+    style_confidencial = ParagraphStyle(
+        'RATConfidencial', parent=styles_rl['Normal'],
+        fontSize=9, textColor=COLOR_GRIS,
+        alignment=TA_CENTER,
+    )
     style_pregunta = ParagraphStyle(
         'RATPregunta', parent=styles_rl['Normal'],
-        fontSize=11, textColor=colors.HexColor('#5e42a6'),
+        fontSize=11, textColor=COLOR_MARCA,
         fontName='Helvetica-Bold',
         spaceAfter=6, spaceBefore=16,
     )
@@ -249,30 +364,40 @@ def generar_reporte_rat_pdf(request):
     doc = SimpleDocTemplate(
         buffer, pagesize=A4,
         leftMargin=2 * cm, rightMargin=2 * cm,
-        topMargin=2 * cm, bottomMargin=2 * cm,
+        topMargin=2.3 * cm, bottomMargin=2.3 * cm,
     )
     elements = []
 
-    # Portada
-    elements.append(Spacer(1, 1.5 * inch))
+    # ── Portada institucional ──────────────────
+    elements.append(Spacer(1, 1 * inch))
+    elements.append(_logo_placeholder())
+    elements.append(Spacer(1, 0.5 * inch))
     elements.append(Paragraph(f"{ie.instrumento.nombre_instrumento}", style_portada))
-    elements.append(Spacer(1, 0.3 * inch))
-    elements.append(Paragraph(
-        f"Reporte de Respuestas {ie.instrumento.nombre_instrumento}", style_sub
-    ))
-    elements.append(Paragraph(
-        f"Empresa: {empresa_obj.nombre_empresa}", style_sub
-    ))
-    elements.append(Paragraph(
-        f"Colaboradores con RAT completado: {len(trabajadores_listos)}", style_sub
-    ))
-    elements.append(Paragraph(
-        f"Fecha de generación: {datetime.now().strftime('%d/%m/%Y %H:%M')}", style_sub
-    ))
-    elements.append(Spacer(1, 2 * inch))
+    elements.append(Paragraph("Reporte de Respuestas", style_sub))
+    elements.append(Spacer(1, 0.6 * inch))
 
-    from reportlab.platypus import PageBreak
-    from cuestionario.models import Departamento
+    metadata = [
+        ['Empresa', empresa_obj.nombre_empresa],
+        ['Colaboradores con RAT completado', str(len(trabajadores_listos))],
+        ['Fecha de generación', datetime.now().strftime('%d/%m/%Y %H:%M')],
+    ]
+    t_meta = Table(metadata, colWidths=[2.8 * inch, 2.8 * inch])
+    t_meta.setStyle(TableStyle([
+        ('FONTNAME',      (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('TEXTCOLOR',     (0, 0), (0, -1), COLOR_MARCA),
+        ('TEXTCOLOR',     (1, 0), (1, -1), colors.HexColor('#333333')),
+        ('FONTSIZE',      (0, 0), (-1, -1), 10.5),
+        ('TOPPADDING',    (0, 0), (-1, -1), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 9),
+        ('LINEBELOW',     (0, 0), (-1, -2), 0.6, COLOR_LINEA),
+        ('ALIGN',         (0, 0), (0, -1), 'LEFT'),
+    ]))
+    elements.append(t_meta)
+    elements.append(Spacer(1, 1.8 * inch))
+    elements.append(Paragraph("Este documento contiene información sensible de la empresa.", style_confidencial))
+    elements.append(Paragraph("Su distribución debe restringirse a personal autorizado.", style_confidencial))
+
+    elements.append(PageBreak())
 
     def _agregar_preguntas(elements, preguntas, trabajadores_filtrados, helper_styles, style_pregunta, style_normal):
         for idx, pregunta in enumerate(preguntas, 1):
@@ -291,6 +416,11 @@ def generar_reporte_rat_pdf(request):
                     elements.append(RLImage(img_buf, width=5.5 * inch, height=2.4 * inch))
                 else:
                     elements.append(Paragraph("Sin respuestas de texto.", style_normal))
+            elif pregunta.tipo == 'select_categorias':
+                elements += _tabla_generica(respuestas, helper_styles, label_map=CATEGORIAS_LABELS)
+            else:
+                # periodo, listado_usuarios y cualquier otro tipo futuro
+                elements += _tabla_generica(respuestas, helper_styles)
             elements.append(Spacer(1, 0.3 * inch))
 
     # ── Resumen Global ─────────────────────────
@@ -313,12 +443,14 @@ def generar_reporte_rat_pdf(request):
         _agregar_preguntas(elements, preguntas, trabajadores_depto, helper_styles, style_pregunta, style_normal)
 
     # ── Generar PDF ────────────────────────────
-    doc.build(elements)
+    pagina = _hacer_header_footer(empresa_obj, ie.instrumento.nombre_instrumento)
+    doc.build(elements, onFirstPage=pagina, onLaterPages=pagina)
     pdf_bytes = buffer.getvalue()
     buffer.close()
 
     nombre_archivo = (
-        f"reporte_rat_{empresa_obj.nombre_empresa.replace(' ', '_')}"
+        f"reporte_{ie.instrumento.nombre_instrumento.replace(' ', '_')}"
+        f"_{empresa_obj.nombre_empresa.replace(' ', '_')}"
         f"_{datetime.now().strftime('%Y%m%d')}.pdf"
     )
     response = HttpResponse(pdf_bytes, content_type='application/pdf')

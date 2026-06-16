@@ -50,16 +50,18 @@ def descargar_datos_xlsx(request):
         return HttpResponse("No se especificó empresa.", status=400)
 
     # ── Instrumento RAT activo ─────────────────
-    ie = InstrumentoEmpresa.objects.filter(
+    instrumento_id = request.GET.get('instrumento_id')
+    ie_qs = InstrumentoEmpresa.objects.filter(
         empresa=empresa_obj, habilitado=True, instrumento__tipo='rat'
-    ).first()
+    )
+    if instrumento_id:
+        ie_qs = ie_qs.filter(instrumento__id_instrumento=instrumento_id)
+    ie = ie_qs.order_by('instrumento__id_instrumento').first()
     if not ie:
         return HttpResponse("No hay instrumento RAT habilitado para esta empresa.", status=404)
 
     preguntas = ie.preguntas.exclude(
         tipo='texto', actividad_tratamiento__startswith='Presentación'
-    ).exclude(
-        actividad_tratamiento__icontains='Fuente de la cual provienen'
     ).order_by('id_rat_pregunta')
 
     # ── Trabajadores con RAT listo ─────────────
@@ -72,8 +74,6 @@ def descargar_datos_xlsx(request):
         ).exclude(
             pregunta__tipo='texto',
             pregunta__actividad_tratamiento__startswith='Presentación'
-        ).exclude(
-            pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
         ).values('pregunta').distinct().count()
         if total_preguntas > 0 and respondidas >= total_preguntas:
             trabajadores_listos.append(t)

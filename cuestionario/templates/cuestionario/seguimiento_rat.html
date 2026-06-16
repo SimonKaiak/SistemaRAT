@@ -45,9 +45,9 @@
         <hr style="margin-top:1.5em; margin-bottom:1.5em; border-color:rgba(255,255,255,0.1);">
         {% if user.is_superuser or es_coordinador %}{% if empresa_actual %}
         <div style="display:flex; justify-content:center; align-items:center; gap:3em; padding:0.5em 0; flex-wrap:wrap;">
-            <a href="{% url 'reporte_rat_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button" target="_blank" style="background:rgba(192,57,43,0.15); border-color:rgba(192,57,43,0.4); color:#e74c3c;">📋 Reporte {{ instrumento_actual.nombre_instrumento|default:'RAT' }} — PDF</a>
+            <a href="{% url 'reporte_rat_pdf' %}?empresa_id={{ empresa_actual.id_empresa }}&instrumento_id={{ instrumento_actual.id_instrumento }}" class="button" target="_blank" style="background:rgba(192,57,43,0.15); border-color:rgba(192,57,43,0.4); color:#e74c3c;">📋 Reporte {{ instrumento_actual.nombre_instrumento|default:'RAT' }} — PDF</a>
             <span style="color:rgba(255,255,255,0.2); font-size:1.2em;">—</span>
-            <a href="{% url 'descargar_datos_xlsx' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button" style="background:rgba(39,174,96,0.15); border-color:rgba(39,174,96,0.4); color:#27ae60;">📊 Descargar Datos — XLSX</a>
+            <a href="{% url 'descargar_datos_xlsx' %}?empresa_id={{ empresa_actual.id_empresa }}&instrumento_id={{ instrumento_actual.id_instrumento }}" class="button" style="background:rgba(39,174,96,0.15); border-color:rgba(39,174,96,0.4); color:#27ae60;">📊 Descargar Datos — XLSX</a>
             <span style="color:rgba(255,255,255,0.2); font-size:1.2em;">—</span>
             <a href="{% url 'panel_gemini' %}?empresa_id={{ empresa_actual.id_empresa }}" class="button" style="background:rgba(52,152,219,0.15); border-color:rgba(52,152,219,0.4); color:#3498db;">🤖 Panel Informe — IA</a>
         </div>

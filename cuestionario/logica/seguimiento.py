@@ -106,8 +106,6 @@ def panel_seguimiento(request):
         if instrumento_empresa_rat:
             total_preguntas = instrumento_empresa_rat.preguntas.exclude(
                 tipo='texto', actividad_tratamiento__startswith='Presentación'
-            ).exclude(
-                actividad_tratamiento__icontains='Fuente de la cual provienen'
             ).count()
 
             # Obtener respuestas válidas (excluye periodo con valor 0 o sin número)
@@ -117,8 +115,6 @@ def panel_seguimiento(request):
             ).exclude(
                 pregunta__tipo='texto',
                 pregunta__actividad_tratamiento__startswith='Presentación'
-            ).exclude(
-                pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
             ).select_related('pregunta')
 
             respondidas = 0
@@ -214,8 +210,6 @@ def panel_seguimiento_rat(request):
         if instrumento_empresa_rat:
             total_preguntas = instrumento_empresa_rat.preguntas.exclude(
                 tipo='texto', actividad_tratamiento__startswith='Presentación'
-            ).exclude(
-                actividad_tratamiento__icontains='Fuente de la cual provienen'
             ).count()
 
             # Obtener respuestas válidas (excluye periodo con valor 0 o sin número)
@@ -225,8 +219,6 @@ def panel_seguimiento_rat(request):
             ).exclude(
                 pregunta__tipo='texto',
                 pregunta__actividad_tratamiento__startswith='Presentación'
-            ).exclude(
-                pregunta__actividad_tratamiento__icontains='Fuente de la cual provienen'
             ).select_related('pregunta')
 
             respondidas = 0
