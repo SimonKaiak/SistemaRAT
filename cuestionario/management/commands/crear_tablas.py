@@ -77,13 +77,13 @@ CREATE TABLE IF NOT EXISTS "PROMPT_GEMINI" (
 CREATE TABLE IF NOT EXISTS "DEPARTAMENTO" (
     id_departamento SERIAL PRIMARY KEY,
     nombre_departamento VARCHAR(50) NOT NULL,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "NIVEL_JERARQUICO" (
     id_nivel_jerarquico SERIAL PRIMARY KEY,
     nombre_nivel_jerarquico VARCHAR(50) NOT NULL,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "ESCALA" (
@@ -91,26 +91,26 @@ CREATE TABLE IF NOT EXISTS "ESCALA" (
     valor INT NOT NULL,
     titulo VARCHAR(100) NOT NULL,
     descripcion VARCHAR(250) NOT NULL,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "DIMENSION" (
     id_dimension SERIAL PRIMARY KEY,
     nombre_dimension VARCHAR(50) NOT NULL,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "COMPETENCIA" (
     id_competencia SERIAL PRIMARY KEY,
     nombre_competencia VARCHAR(50) NOT NULL,
     dimension_id_dimension INT NOT NULL REFERENCES "DIMENSION"(id_dimension),
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "CARGO" (
     id_cargo SERIAL PRIMARY KEY,
     nombre_cargo VARCHAR(50) NOT NULL,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
     nivel_jerarquico_id_nivel_jerarquico INT NOT NULL REFERENCES "NIVEL_JERARQUICO"(id_nivel_jerarquico)
 );
 
@@ -118,24 +118,24 @@ CREATE TABLE IF NOT EXISTS "TEXTOS_EVALUACION" (
     id_textos_evaluacion SERIAL PRIMARY KEY,
     codigo_excel VARCHAR(10) NOT NULL,
     texto TEXT NOT NULL,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
     dimension_id_dimension INT NOT NULL REFERENCES "DIMENSION"(id_dimension),
     competencia_id_competencia INT NOT NULL REFERENCES "COMPETENCIA"(id_competencia),
     nivel_jerarquico_id_nivel_jerarquico INT NOT NULL REFERENCES "NIVEL_JERARQUICO"(id_nivel_jerarquico),
-    UNIQUE (codigo_excel, "EMPRESA_ID_EMPRESA")
+    UNIQUE (codigo_excel, empresa_id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "CODIGO_EVALUACION" (
     id_codigo_evaluacion SERIAL PRIMARY KEY,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
     dimension_id_dimension INT NOT NULL REFERENCES "DIMENSION"(id_dimension),
     competencia_id_competencia INT NOT NULL REFERENCES "COMPETENCIA"(id_competencia),
     nivel_jerarquico_id_nivel_jerarquico INT NOT NULL REFERENCES "NIVEL_JERARQUICO"(id_nivel_jerarquico),
     textos_evaluacion_codigo_excel VARCHAR(10) NOT NULL,
     textos_evaluacion_empresa_id_empresa INT NOT NULL,
-    UNIQUE ("EMPRESA_ID_EMPRESA", textos_evaluacion_codigo_excel),
+    UNIQUE (empresa_id_empresa, textos_evaluacion_codigo_excel),
     FOREIGN KEY (textos_evaluacion_codigo_excel, textos_evaluacion_empresa_id_empresa)
-        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, "EMPRESA_ID_EMPRESA")
+        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, empresa_id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "TRABAJADOR" (
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS "TRABAJADOR" (
     email VARCHAR(80) NOT NULL,
     genero VARCHAR(10) NOT NULL,
     es_coordinador BOOLEAN NOT NULL,
-    "EMPRESA_ID_EMPRESA" INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
+    empresa_id_empresa INT NOT NULL REFERENCES "EMPRESA"(id_empresa),
     nivel_jerarquico_id_nivel_jerarquico INT NOT NULL REFERENCES "NIVEL_JERARQUICO"(id_nivel_jerarquico),
     cargo_id_cargo INT NOT NULL REFERENCES "CARGO"(id_cargo),
     departamento_id_departamento INT NOT NULL REFERENCES "DEPARTAMENTO"(id_departamento),
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS "AUTOEVALUACION" (
     textos_evaluacion_empresa_id_empresa INT NOT NULL,
     escala_id_escala INT NOT NULL REFERENCES "ESCALA"(id_escala),
     FOREIGN KEY (textos_evaluacion_codigo_excel, textos_evaluacion_empresa_id_empresa)
-        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, "EMPRESA_ID_EMPRESA")
+        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, empresa_id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "EVALUACION_JEFATURA" (
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS "EVALUACION_JEFATURA" (
     textos_evaluacion_empresa_id_empresa INT NOT NULL,
     escala_id_escala INT NOT NULL REFERENCES "ESCALA"(id_escala),
     FOREIGN KEY (textos_evaluacion_codigo_excel, textos_evaluacion_empresa_id_empresa)
-        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, "EMPRESA_ID_EMPRESA")
+        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, empresa_id_empresa)
 );
 
 CREATE TABLE IF NOT EXISTS "RESULTADO_CONSOLIDADO" (
@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS "RESULTADO_CONSOLIDADO" (
     textos_evaluacion_empresa_id_empresa INT NOT NULL,
     UNIQUE (trabajador_id_trabajador, textos_evaluacion_codigo_excel, periodo),
     FOREIGN KEY (textos_evaluacion_codigo_excel, textos_evaluacion_empresa_id_empresa)
-        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, "EMPRESA_ID_EMPRESA")
+        REFERENCES "TEXTOS_EVALUACION"(codigo_excel, empresa_id_empresa)
 );
 """
 
