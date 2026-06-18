@@ -171,6 +171,7 @@ def _grafico_barras_avance(datos: OrderedDict, titulo: str) -> BytesIO:
 
 
 COLOR_ESCALA = ['#c0392b', '#e67e22', '#f1c40f', '#3498db', '#27ae60']  # 1..5
+COLOR_NO = '#c0392b'  # rojo para "No" en preguntas sino (distinto del naranjo de Listos/Pendientes)
 
 
 def _normalizar_respuesta_grafico(valor: str, tipo: str):
@@ -214,7 +215,7 @@ def _grafico_pregunta_por_nivel(respuestas_qs, tipo: str, niveles_referencia: li
         return None
 
     if tipo == 'sino':
-        opciones, colores = ['Sí', 'No'], [COLOR_LISTOS, COLOR_PENDIENTES]
+        opciones, colores = ['Sí', 'No'], [COLOR_LISTOS, COLOR_NO]
     else:
         opciones, colores = [1, 2, 3, 4, 5], COLOR_ESCALA
 
