@@ -41,7 +41,7 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.graphics.shapes import Drawing, Rect, String
 from io import BytesIO
 from datetime import datetime
-from collections import Counter
+from collections import Counter, OrderedDict
 import re
 
 # wordcloud + matplotlib para generar la imagen de nube
@@ -49,6 +49,7 @@ from wordcloud import WordCloud
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 
 # ──────────────────────────────────────────────
@@ -95,6 +96,66 @@ def _wordcloud_image(textos: list[str]) -> BytesIO | None:
     ax.axis('off')
     buf = BytesIO()
     fig.savefig(buf, format='png', bbox_inches='tight', dpi=120)
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
+# ──────────────────────────────────────────────
+# Gráficos de avance (equivalentes a los de
+# Chart.js de la página de Seguimiento RAT, pero
+# renderizados como imagen estática con matplotlib
+# para poder insertarlos en el PDF).
+# ──────────────────────────────────────────────
+
+COLOR_LISTOS = '#27ae60'
+COLOR_PENDIENTES = '#e67e22'
+
+
+def _grafico_pie_avance(listos: int, pendientes: int) -> BytesIO:
+    """Gráfico de torta Total de Trabajadores: Listos vs Pendientes."""
+    fig, ax = plt.subplots(figsize=(4, 4))
+    ax.pie(
+        [listos, pendientes],
+        labels=['Listos', 'Pendientes'],
+        colors=[COLOR_LISTOS, COLOR_PENDIENTES],
+        autopct=lambda p: f'{p:.0f}%' if p > 0 else '',
+        textprops={'fontsize': 11},
+        startangle=90,
+    )
+    ax.set_title('Total de Trabajadores', fontsize=13, fontweight='bold', color='#333333')
+    buf = BytesIO()
+    fig.savefig(buf, format='png', bbox_inches='tight', dpi=150, transparent=True)
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
+def _grafico_barras_avance(datos: OrderedDict, titulo: str) -> BytesIO:
+    """Gráfico de barras Listos/Pendientes agrupado por la clave de
+    `datos` (departamento o nivel jerárquico)."""
+    etiquetas = list(datos.keys())
+    listos = [v['listos'] for v in datos.values()]
+    pendientes = [v['pendientes'] for v in datos.values()]
+    posiciones = range(len(etiquetas))
+    ancho_barra = 0.35
+
+    fig, ax = plt.subplots(figsize=(6.2, 3.6))
+    ax.bar([p - ancho_barra / 2 for p in posiciones], listos, width=ancho_barra,
+           label='Listos', color=COLOR_LISTOS)
+    ax.bar([p + ancho_barra / 2 for p in posiciones], pendientes, width=ancho_barra,
+           label='Pendientes', color=COLOR_PENDIENTES)
+    ax.set_xticks(list(posiciones))
+    ax.set_xticklabels(etiquetas, rotation=15, ha='right', fontsize=9)
+    ax.set_ylabel('Trabajadores')
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.set_title(titulo, fontsize=13, fontweight='bold', color='#333333')
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.32), ncol=2, frameon=False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    fig.tight_layout()
+    buf = BytesIO()
+    fig.savefig(buf, format='png', dpi=150, transparent=True)
     plt.close(fig)
     buf.seek(0)
     return buf
@@ -308,10 +369,13 @@ def generar_reporte_rat_pdf(request):
     if not preguntas.exists():
         return HttpResponse("No hay preguntas RAT configuradas.", status=404)
 
-    # ── Trabajadores con RAT listo ─────────────
+    # ── Trabajadores con RAT listo / pendiente ─
     total_preguntas = preguntas.count()
-    trabajadores_empresa = Trabajador.objects.filter(empresa=empresa_obj)
+    trabajadores_empresa = Trabajador.objects.filter(empresa=empresa_obj).select_related('departamento', 'nivel_jerarquico')
     trabajadores_listos = []
+    trabajadores_pendientes = []
+    datos_departamento = OrderedDict()
+    datos_nivel = OrderedDict()
     for t in trabajadores_empresa:
         respondidas = RATRespuestas.objects.filter(
                     trabajador=t, pregunta__instrumento_empresa=ie
@@ -319,8 +383,21 @@ def generar_reporte_rat_pdf(request):
                     pregunta__tipo='texto',
                     pregunta__actividad_tratamiento__startswith='Presentación'
                 ).values('pregunta').distinct().count()
-        if total_preguntas > 0 and respondidas >= total_preguntas:
+        listo = total_preguntas > 0 and respondidas >= total_preguntas
+
+        nombre_departamento = t.departamento.nombre_departamento if t.departamento_id else 'Sin Departamento'
+        nombre_nivel = t.nivel_jerarquico.nombre_nivel_jerarquico if t.nivel_jerarquico_id else 'Sin Nivel'
+        datos_departamento.setdefault(nombre_departamento, {'listos': 0, 'pendientes': 0})
+        datos_nivel.setdefault(nombre_nivel, {'listos': 0, 'pendientes': 0})
+
+        if listo:
             trabajadores_listos.append(t)
+            datos_departamento[nombre_departamento]['listos'] += 1
+            datos_nivel[nombre_nivel]['listos'] += 1
+        else:
+            trabajadores_pendientes.append(t)
+            datos_departamento[nombre_departamento]['pendientes'] += 1
+            datos_nivel[nombre_nivel]['pendientes'] += 1
 
     if not trabajadores_listos:
         return HttpResponse("No hay trabajadores con RAT completado.", status=404)
@@ -396,6 +473,23 @@ def generar_reporte_rat_pdf(request):
     elements.append(Spacer(1, 1.8 * inch))
     elements.append(Paragraph("Este documento contiene información sensible de la empresa.", style_confidencial))
     elements.append(Paragraph("Su distribución debe restringirse a personal autorizado.", style_confidencial))
+
+    elements.append(PageBreak())
+
+    # ── Resumen Gráfico de Avance ───────────────
+    elements.append(Paragraph("Resumen Gráfico de Avance", style_title))
+    elements.append(Spacer(1, 0.15 * inch))
+
+    img_pie = _grafico_pie_avance(len(trabajadores_listos), len(trabajadores_pendientes))
+    elements.append(RLImage(img_pie, width=2.3 * inch, height=2.3 * inch, hAlign='CENTER'))
+    elements.append(Spacer(1, 0.2 * inch))
+
+    img_departamento = _grafico_barras_avance(datos_departamento, 'Por Departamento')
+    elements.append(RLImage(img_departamento, width=5.4 * inch, height=2.7 * inch, hAlign='CENTER'))
+    elements.append(Spacer(1, 0.15 * inch))
+
+    img_nivel = _grafico_barras_avance(datos_nivel, 'Por Nivel Jerárquico')
+    elements.append(RLImage(img_nivel, width=5.4 * inch, height=2.7 * inch, hAlign='CENTER'))
 
     elements.append(PageBreak())
 

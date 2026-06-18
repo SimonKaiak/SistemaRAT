@@ -65,6 +65,86 @@
 
     <hr />
 
+    {{ grafico_departamento|json_script:"datos-departamento-rat" }}
+    {{ grafico_nivel|json_script:"datos-nivel-rat" }}
+
+    <div class="row">
+        <div class="col-4 col-12-small" style="text-align:center;">
+            <h4>Total de Trabajadores</h4>
+            <canvas id="grafico-total-rat" style="max-height:280px;"></canvas>
+        </div>
+        <div class="col-4 col-12-small" style="text-align:center;">
+            <h4>Por Departamento</h4>
+            <canvas id="grafico-departamento-rat" style="max-height:280px;"></canvas>
+        </div>
+        <div class="col-4 col-12-small" style="text-align:center;">
+            <h4>Por Nivel Jerárquico</h4>
+            <canvas id="grafico-nivel-rat" style="max-height:280px;"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var colorListos = '#27ae60';
+            var colorPendientes = '#e67e22';
+
+            new Chart(document.getElementById('grafico-total-rat'), {
+                type: 'pie',
+                data: {
+                    labels: ['Listos', 'Pendientes'],
+                    datasets: [{
+                        data: [{{ rat_listos }}, {{ rat_pendientes }}],
+                        backgroundColor: [colorListos, colorPendientes]
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+                }
+            });
+
+            var datosDepartamento = JSON.parse(document.getElementById('datos-departamento-rat').textContent);
+            new Chart(document.getElementById('grafico-departamento-rat'), {
+                type: 'bar',
+                data: {
+                    labels: datosDepartamento.labels,
+                    datasets: [
+                        { label: 'Listos', data: datosDepartamento.listos, backgroundColor: colorListos },
+                        { label: 'Pendientes', data: datosDepartamento.pendientes, backgroundColor: colorPendientes }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: { ticks: { color: '#fff' } },
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#fff' } }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+                }
+            });
+
+            var datosNivel = JSON.parse(document.getElementById('datos-nivel-rat').textContent);
+            new Chart(document.getElementById('grafico-nivel-rat'), {
+                type: 'bar',
+                data: {
+                    labels: datosNivel.labels,
+                    datasets: [
+                        { label: 'Listos', data: datosNivel.listos, backgroundColor: colorListos },
+                        { label: 'Pendientes', data: datosNivel.pendientes, backgroundColor: colorPendientes }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: { ticks: { color: '#fff' } },
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#fff' } }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+                }
+            });
+        });
+    </script>
+
+    <hr />
+
     <div class="table-wrapper" style="overflow-x: auto; margin-left: -6em; margin-right: -6em;">
         <table class="alt" style="min-width: 100%; font-size: 0.85em;">
             <thead>

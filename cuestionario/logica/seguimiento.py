@@ -32,6 +32,7 @@ panel_seguimiento(request)
     jefaturas_listas, jefaturas_pendientes, empresa_actual,
     es_coordinador.
 """
+from collections import OrderedDict
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
@@ -184,12 +185,14 @@ def panel_seguimiento_rat(request):
     if empresa_actual:
         trabajadores = Trabajador.objects.filter(
             empresa=empresa_actual
-        ).select_related('cargo', 'empresa').order_by('-nivel_jerarquico__id_nivel_jerarquico')
+        ).select_related('cargo', 'empresa', 'departamento', 'nivel_jerarquico').order_by('-nivel_jerarquico__id_nivel_jerarquico')
     else:
         trabajadores = Trabajador.objects.none()
 
     rat_listos = 0
     rat_pendientes = 0
+    datos_departamento = OrderedDict()
+    datos_nivel = OrderedDict()
 
     instrumento_empresa_rat = None
     if empresa_actual:
@@ -247,6 +250,30 @@ def panel_seguimiento_rat(request):
         else:
             rat_pendientes += 1
 
+        nombre_departamento = t.departamento.nombre_departamento if t.departamento_id else 'Sin Departamento'
+        nombre_nivel = t.nivel_jerarquico.nombre_nivel_jerarquico if t.nivel_jerarquico_id else 'Sin Nivel'
+
+        datos_departamento.setdefault(nombre_departamento, {'listos': 0, 'pendientes': 0})
+        datos_nivel.setdefault(nombre_nivel, {'listos': 0, 'pendientes': 0})
+
+        if t.rat_listo:
+            datos_departamento[nombre_departamento]['listos'] += 1
+            datos_nivel[nombre_nivel]['listos'] += 1
+        else:
+            datos_departamento[nombre_departamento]['pendientes'] += 1
+            datos_nivel[nombre_nivel]['pendientes'] += 1
+
+    grafico_departamento = {
+        'labels': list(datos_departamento.keys()),
+        'listos': [v['listos'] for v in datos_departamento.values()],
+        'pendientes': [v['pendientes'] for v in datos_departamento.values()],
+    }
+    grafico_nivel = {
+        'labels': list(datos_nivel.keys()),
+        'listos': [v['listos'] for v in datos_nivel.values()],
+        'pendientes': [v['pendientes'] for v in datos_nivel.values()],
+    }
+
     context = {
         'trabajadores': trabajadores,
         'rat_listos': rat_listos,
@@ -254,5 +281,7 @@ def panel_seguimiento_rat(request):
         'empresa_actual': empresa_actual,
         'es_coordinador': es_coordinador,
         'instrumento_actual': instrumento_empresa_rat.instrumento if instrumento_empresa_rat else None,
+        'grafico_departamento': grafico_departamento,
+        'grafico_nivel': grafico_nivel,
     }
     return render(request, 'cuestionario/seguimiento_rat.html', context)
