@@ -114,12 +114,21 @@ COLOR_PENDIENTES = '#e67e22'
 
 def _grafico_pie_avance(listos: int, pendientes: int) -> BytesIO:
     """Gráfico de torta Total de Trabajadores: Listos vs Pendientes."""
+    valores = [listos, pendientes]
+    total = sum(valores)
+
+    def _autopct(pct):
+        if pct <= 0:
+            return ''
+        cantidad = round(pct * total / 100.0)
+        return f'{cantidad} ({pct:.0f}%)'
+
     fig, ax = plt.subplots(figsize=(4, 4))
     ax.pie(
-        [listos, pendientes],
+        valores,
         labels=['Listos', 'Pendientes'],
         colors=[COLOR_LISTOS, COLOR_PENDIENTES],
-        autopct=lambda p: f'{p:.0f}%' if p > 0 else '',
+        autopct=_autopct,
         textprops={'fontsize': 11},
         startangle=90,
     )
@@ -151,6 +160,73 @@ def _grafico_barras_avance(datos: OrderedDict, titulo: str) -> BytesIO:
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.set_title(titulo, fontsize=13, fontweight='bold', color='#333333')
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.32), ncol=2, frameon=False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    fig.tight_layout()
+    buf = BytesIO()
+    fig.savefig(buf, format='png', dpi=150, transparent=True)
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
+COLOR_ESCALA = ['#c0392b', '#e67e22', '#f1c40f', '#3498db', '#27ae60']  # 1..5
+
+
+def _normalizar_respuesta_grafico(valor: str, tipo: str):
+    """Convierte la respuesta cruda en la etiqueta que se usa como serie del gráfico."""
+    if tipo == 'sino':
+        return 'Sí' if valor.strip().lower() in ('si', 'sí', '1', 'true') else 'No'
+    if tipo == 'escala':
+        try:
+            v = int(valor.strip())
+            if 1 <= v <= 5:
+                return v
+        except ValueError:
+            pass
+    return None
+
+
+def _grafico_pregunta_por_nivel(respuestas_qs, tipo: str) -> BytesIO | None:
+    """Distribución de respuestas de una pregunta (sino/escala), separada
+    por nivel jerárquico. Usa barras APILADAS (una barra por nivel,
+    segmentada por opción) en vez de barras agrupadas, para evitar que
+    las preguntas de escala (5 opciones) multipliquen la cantidad de
+    barras al cruzarse con los niveles jerárquicos."""
+    conteo_por_nivel = OrderedDict()
+    for r in respuestas_qs:
+        opcion = _normalizar_respuesta_grafico(r.respuesta, tipo)
+        if opcion is None:
+            continue
+        nivel = (
+            r.trabajador.nivel_jerarquico.nombre_nivel_jerarquico
+            if r.trabajador.nivel_jerarquico_id else 'Sin Nivel'
+        )
+        conteo_por_nivel.setdefault(nivel, Counter())
+        conteo_por_nivel[nivel][opcion] += 1
+
+    if not conteo_por_nivel:
+        return None
+
+    if tipo == 'sino':
+        opciones, colores = ['Sí', 'No'], [COLOR_LISTOS, COLOR_PENDIENTES]
+    else:
+        opciones, colores = [1, 2, 3, 4, 5], COLOR_ESCALA
+
+    niveles = list(conteo_por_nivel.keys())
+    fig, ax = plt.subplots(figsize=(6.2, 3.6))
+    base = [0] * len(niveles)
+    for opcion, color in zip(opciones, colores):
+        valores = [conteo_por_nivel[n].get(opcion, 0) for n in niveles]
+        if not any(valores):
+            continue
+        ax.bar(niveles, valores, bottom=base, label=str(opcion), color=color)
+        base = [b + v for b, v in zip(base, valores)]
+
+    ax.set_ylabel('Trabajadores')
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.set_title('Por Nivel Jerárquico', fontsize=13, fontweight='bold', color='#333333')
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.18), ncol=min(len(opciones), 5), frameon=False)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     fig.tight_layout()
@@ -496,10 +572,11 @@ def generar_reporte_rat_pdf(request):
     def _agregar_preguntas(elements, preguntas, trabajadores_filtrados, helper_styles, style_pregunta, style_normal):
         for idx, pregunta in enumerate(preguntas, 1):
             elements.append(Paragraph(f"{idx}. {pregunta.actividad_tratamiento}", style_pregunta))
-            respuestas = list(RATRespuestas.objects.filter(
+            respuestas_qs = RATRespuestas.objects.filter(
                 pregunta=pregunta,
                 trabajador__in=trabajadores_filtrados,
-            ).values_list('respuesta', flat=True))
+            ).select_related('trabajador__nivel_jerarquico')
+            respuestas = [r.respuesta for r in respuestas_qs]
             if pregunta.tipo == 'sino':
                 elements += _tabla_sino(respuestas, helper_styles)
             elif pregunta.tipo == 'escala':
@@ -515,6 +592,14 @@ def generar_reporte_rat_pdf(request):
             else:
                 # periodo, listado_usuarios y cualquier otro tipo futuro
                 elements += _tabla_generica(respuestas, helper_styles)
+
+            # Gráfico adicional separado por nivel jerárquico (solo preguntas 1 a 4)
+            if idx <= 4 and pregunta.tipo in ('sino', 'escala'):
+                img_nivel_pregunta = _grafico_pregunta_por_nivel(respuestas_qs, pregunta.tipo)
+                if img_nivel_pregunta:
+                    elements.append(Spacer(1, 0.15 * inch))
+                    elements.append(RLImage(img_nivel_pregunta, width=5.4 * inch, height=2.7 * inch, hAlign='CENTER'))
+
             elements.append(Spacer(1, 0.3 * inch))
 
     # ── Resumen Global ─────────────────────────
