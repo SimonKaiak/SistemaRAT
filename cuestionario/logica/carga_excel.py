@@ -40,7 +40,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from cuestionario.models import Trabajador, Empresa, Departamento, NivelJerarquico, Cargo
+from cuestionario.models import Trabajador, Empresa, Departamento, NivelJerarquico, Cargo, generar_password_empresa
 import openpyxl
 
 
@@ -115,7 +115,7 @@ def cargar_usuarios_excel(request):
             continue
 
         try:
-            new_user = User.objects.create_user(username=username, email=email, password='Mohala2026')
+            new_user = User.objects.create_user(username=username, email=email, password=generar_password_empresa(empresa))
             t = Trabajador(
                 rut=rut, nombre=nombre,
                 apellido_paterno=ap_paterno, apellido_materno=ap_materno,

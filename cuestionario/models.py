@@ -99,8 +99,25 @@ RATPlantillaPregunta
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save 
-from django.dispatch import receiver 
+import re
+from datetime import datetime
+
+
+def generar_password_empresa(empresa, anio=None):
+    """Genera la contraseña inicial/por defecto de un trabajador según
+    su empresa, con el formato [PrimeraPalabraDelNombre][AñoDeCreación].
+    Usa solo la primera palabra del nombre de la empresa (ignora
+    sufijos como SpA, S.A., Ltda., etc.) para mantener la contraseña
+    simple. Ej: empresa 'Mohala SpA' -> 'Mohala2026'.
+
+    anio=None usa el año actual (datetime.now().year). Se usa al crear
+    un Trabajador (señal automática, panel de gestión de usuarios,
+    carga masiva por Excel) y al resetear una clave a su valor
+    por defecto."""
+    anio = anio or datetime.now().year
+    primera_palabra = (empresa.nombre_empresa or '').strip().split(' ')[0]
+    nombre_limpio = re.sub(r'[^A-Za-z0-9]', '', primera_palabra) or 'Empresa'
+    return f"{nombre_limpio}{anio}"
 
 # =========================
 # Tabla Empresa
@@ -590,22 +607,6 @@ class ResultadoConsolidado(models.Model):
 
     def __str__(self):
         return f"Resultado {self.id_resultado_consolidado}"
-
-
-# ==========================================================
-# SIGNALS: Automatización de creación de usuarios para Login
-# ==========================================================
-@receiver(post_save, sender=Trabajador)
-def crear_usuario_automatico(sender, instance, created, **kwargs):
-    if created and not instance.user:
-        nuevo_user = User.objects.create_user(
-            username=instance.email,
-            email=instance.email,
-            password='Mohala2026'
-        )
-        instance.user = nuevo_user
-        instance.save()
-
 
 # =========================
 # Tabla Registro Versiones

@@ -55,7 +55,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.conf import settings
-from cuestionario.models import Empresa, Trabajador, RATRespuestas, InstrumentoEmpresa
+from cuestionario.models import Empresa, Trabajador, RATRespuestas, InstrumentoEmpresa, generar_password_empresa
 import json
 
 
@@ -199,7 +199,7 @@ def resetear_clave(request, trabajador_id):
         if not t.user:
             return JsonResponse({'ok': False, 'error': 'El trabajador no tiene usuario asociado'})
 
-        nueva_clave = 'Mohala2026'
+        nueva_clave = generar_password_empresa(t.empresa)
         t.user.set_password(nueva_clave)
         t.user.save()
 
@@ -282,7 +282,7 @@ def crear_usuario_panel(request):
         cargo      = Cargo.objects.get(id_cargo=cargo_id, empresa=empresa)
         departamento = Departamento.objects.get(id_departamento=depto_id, empresa=empresa)
 
-        clave_inicial = 'Mohala2026'
+        clave_inicial = generar_password_empresa(empresa)
         new_user = User.objects.create_user(username=username, email=email, password=clave_inicial)
 
         try:
@@ -327,7 +327,7 @@ def resetear_clave_seguimiento(request, trabajador_id):
     try:
         t = Trabajador.objects.get(pk=trabajador_id)
         if t.user:
-            nueva_clave = 'Mohala2026'
+            nueva_clave = generar_password_empresa(t.empresa)
             t.user.set_password(nueva_clave)
             t.user.save()
             try:

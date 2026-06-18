@@ -55,17 +55,13 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from cuestionario.models import Trabajador, InstrumentoEmpresa
+from cuestionario.models import Trabajador, InstrumentoEmpresa, generar_password_empresa
 
 
 # ─── Helper ───────────────────────────────────────────────────────────────────
 
 def get_password_por_empresa(trabajador):
-    passwords = {
-        1: 'Mohala2026',
-        2: 'Permify2026',
-    }
-    return passwords.get(trabajador.empresa_id, 'DefaultPass2026')
+    return generar_password_empresa(trabajador.empresa)
 
 
 # ─── Señal 1: crear usuario automático ────────────────────────────────────────
