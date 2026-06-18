@@ -187,13 +187,18 @@ def _normalizar_respuesta_grafico(valor: str, tipo: str):
     return None
 
 
-def _grafico_pregunta_por_nivel(respuestas_qs, tipo: str) -> BytesIO | None:
+def _grafico_pregunta_por_nivel(respuestas_qs, tipo: str, niveles_referencia: list) -> BytesIO | None:
     """Distribución de respuestas de una pregunta (sino/escala), separada
     por nivel jerárquico. Usa barras APILADAS (una barra por nivel,
     segmentada por opción) en vez de barras agrupadas, para evitar que
     las preguntas de escala (5 opciones) multipliquen la cantidad de
-    barras al cruzarse con los niveles jerárquicos."""
-    conteo_por_nivel = OrderedDict()
+    barras al cruzarse con los niveles jerárquicos.
+
+    `niveles_referencia` es la misma lista de niveles que usa el gráfico
+    de avance "Por Nivel Jerárquico", para que un nivel sin respuestas
+    en esta pregunta puntual siga apareciendo con barra en 0 en vez de
+    desaparecer del gráfico."""
+    conteo_por_nivel = OrderedDict((nivel, Counter()) for nivel in niveles_referencia)
     for r in respuestas_qs:
         opcion = _normalizar_respuesta_grafico(r.respuesta, tipo)
         if opcion is None:
@@ -205,7 +210,7 @@ def _grafico_pregunta_por_nivel(respuestas_qs, tipo: str) -> BytesIO | None:
         conteo_por_nivel.setdefault(nivel, Counter())
         conteo_por_nivel[nivel][opcion] += 1
 
-    if not conteo_por_nivel:
+    if not any(conteo_por_nivel.values()):
         return None
 
     if tipo == 'sino':
@@ -220,7 +225,16 @@ def _grafico_pregunta_por_nivel(respuestas_qs, tipo: str) -> BytesIO | None:
         valores = [conteo_por_nivel[n].get(opcion, 0) for n in niveles]
         if not any(valores):
             continue
-        ax.bar(niveles, valores, bottom=base, label=str(opcion), color=color)
+        barras = ax.bar(niveles, valores, bottom=base, label=str(opcion), color=color)
+        for barra, valor in zip(barras, valores):
+            if valor > 0:
+                ax.text(
+                    barra.get_x() + barra.get_width() / 2,
+                    barra.get_y() + barra.get_height() / 2,
+                    str(valor),
+                    ha='center', va='center', fontsize=9.5,
+                    fontweight='bold', color='#1a1a1a',
+                )
         base = [b + v for b, v in zip(base, valores)]
 
     ax.set_ylabel('Trabajadores')
@@ -569,7 +583,11 @@ def generar_reporte_rat_pdf(request):
 
     elements.append(PageBreak())
 
-    def _agregar_preguntas(elements, preguntas, trabajadores_filtrados, helper_styles, style_pregunta, style_normal):
+    # Misma lista de niveles que usa el gráfico de avance de arriba, para
+    # que las preguntas 1-4 muestren siempre los mismos niveles jerárquicos.
+    niveles_ordenados = list(datos_nivel.keys())
+
+    def _agregar_preguntas(elements, preguntas, trabajadores_filtrados, helper_styles, style_pregunta, style_normal, niveles_ordenados):
         for idx, pregunta in enumerate(preguntas, 1):
             elements.append(Paragraph(f"{idx}. {pregunta.actividad_tratamiento}", style_pregunta))
             respuestas_qs = RATRespuestas.objects.filter(
@@ -595,7 +613,7 @@ def generar_reporte_rat_pdf(request):
 
             # Gráfico adicional separado por nivel jerárquico (solo preguntas 1 a 4)
             if idx <= 4 and pregunta.tipo in ('sino', 'escala'):
-                img_nivel_pregunta = _grafico_pregunta_por_nivel(respuestas_qs, pregunta.tipo)
+                img_nivel_pregunta = _grafico_pregunta_por_nivel(respuestas_qs, pregunta.tipo, niveles_ordenados)
                 if img_nivel_pregunta:
                     elements.append(Spacer(1, 0.15 * inch))
                     elements.append(RLImage(img_nivel_pregunta, width=5.4 * inch, height=2.7 * inch, hAlign='CENTER'))
@@ -605,7 +623,7 @@ def generar_reporte_rat_pdf(request):
     # ── Resumen Global ─────────────────────────
     elements.append(Paragraph("Resumen Global — Todos los Departamentos", style_title))
     elements.append(Spacer(1, 0.2 * inch))
-    _agregar_preguntas(elements, preguntas, trabajadores_listos, helper_styles, style_pregunta, style_normal)
+    _agregar_preguntas(elements, preguntas, trabajadores_listos, helper_styles, style_pregunta, style_normal, niveles_ordenados)
 
     # ── Por Departamento ───────────────────────
     departamentos = Departamento.objects.filter(empresa=empresa_obj)
@@ -619,7 +637,7 @@ def generar_reporte_rat_pdf(request):
             style_title
         ))
         elements.append(Spacer(1, 0.2 * inch))
-        _agregar_preguntas(elements, preguntas, trabajadores_depto, helper_styles, style_pregunta, style_normal)
+        _agregar_preguntas(elements, preguntas, trabajadores_depto, helper_styles, style_pregunta, style_normal, niveles_ordenados)
 
     # ── Generar PDF ────────────────────────────
     pagina = _hacer_header_footer(empresa_obj, ie.instrumento.nombre_instrumento)
