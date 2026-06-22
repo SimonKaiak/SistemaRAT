@@ -270,7 +270,7 @@ def crear_usuario_panel(request):
         if Trabajador.objects.filter(rut=rut).exists():
             return JsonResponse({'ok': False, 'error': f'Ya existe un trabajador con RUT {rut}'})
 
-        username = email.split('@')[0]
+        username = email
 
         if User.objects.filter(username=username).exists():
             return JsonResponse({'ok': False, 'error': f'Ya existe un usuario con username {username}'})

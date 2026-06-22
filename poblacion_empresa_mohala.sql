@@ -68,7 +68,7 @@
 -- Empresa
 -- =========================
 INSERT INTO "EMPRESA" ("id_empresa", "nombre_empresa", "rut_empresa", "empresa_activa", "registrada_en")
-VALUES (1, 'Mohala SpA', '76.123.456-7', TRUE, CURRENT_TIMESTAMP);
+VALUES (1, 'Empresa Uno SpA', '76.111.111-1', TRUE, CURRENT_TIMESTAMP);
 
 -- =========================
 -- Departamento
@@ -244,20 +244,20 @@ VALUES
 -- Estratégico (sin jefe)
 INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
-    (1, '10.234.567-1', NULL, 'Roberto',  'Méndez', 'Castro', 'r.mendez@mohala.cl', 'Masculino', FALSE, 1, 3, 5, 1),
-    (2, '12.456.789-2', NULL, 'Patricia', 'Lorca',  'Vial',   'p.lorca@mohala.cl',  'Femenino',  TRUE,  1, 3, 6, 1);
+    (1, '10.111.111-1', NULL, 'Carlos', 'González', 'Pérez', 'c.gonzalez@empresauno.cl', 'Masculino', FALSE, 1, 3, 5, 1),
+    (2, '10.222.222-2', NULL, 'Ana',    'Martínez', 'López', 'a.martinez@empresauno.cl', 'Femenino',  TRUE,  1, 3, 6, 1);
 
 -- Táctico (reportan a ID 1 y 2)
 INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
-    (3, '13.567.890-4', 1, 'Mónica', 'Sánchez', 'Paz', 'm.sanchez@mohala.cl', 'Femenino',  FALSE, 1, 2, 4, 3),
-    (4, '11.345.678-3', 2, 'Andrés', 'Tapia',   'Ruiz','a.tapia@mohala.cl',   'Masculino', FALSE, 1, 2, 3, 2);
+    (3, '10.333.333-3', 1, 'Diego', 'Ramírez', 'Torres', 'd.ramirez@empresauno.cl', 'Masculino', FALSE, 1, 2, 4, 3),
+    (4, '10.444.444-4', 2, 'Sofía', 'Herrera',  'Vega',  's.herrera@empresauno.cl', 'Femenino',  FALSE, 1, 2, 3, 2);
 
 -- Operativo (reportan a ID 3 y 4)
 INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
-    (5, '18.456.789-9', 3, 'Valeria',  'Cáceres','Pinto','v.caceres@mohala.cl','Femenino',  FALSE, 1, 1, 1, 3),
-    (6, '19.567.890-0', 4, 'Sebastián','Marín',  'Rojas','s.marin@mohala.cl',  'Masculino', FALSE, 1, 1, 2, 2);
+    (5, '10.555.555-5', 3, 'Felipe', 'Morales', 'Ríos',  'f.morales@empresauno.cl', 'Masculino', FALSE, 1, 1, 1, 3),
+    (6, '10.666.666-6', 4, 'Camila', 'Vargas',  'Pinto', 'c.vargas@empresauno.cl',  'Femenino',  FALSE, 1, 1, 2, 2);
 
 -- =========================
 -- =========================

@@ -61,7 +61,7 @@
 -- Empresa
 -- =========================
 INSERT INTO "EMPRESA" ("id_empresa", "nombre_empresa", "rut_empresa", "empresa_activa", "registrada_en")
-VALUES (2, 'Permify SpA', '74.123.456-7', TRUE, CURRENT_TIMESTAMP);
+VALUES (2, 'Empresa Dos SpA', '74.222.222-2', TRUE, CURRENT_TIMESTAMP);
 
 -- =========================
 -- Departamento
@@ -237,20 +237,20 @@ VALUES
 -- Directivo (sin jefe)
 INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
-    (7,  '14.123.456-1', NULL, 'Carlos',  'Fuentes','Mora', 'c.fuentes@permify.cl','Masculino', FALSE, 2, 6, 11, 4),
-    (8,  '15.234.567-2', NULL, 'Daniela', 'Vega',   'Soto', 'd.vega@permify.cl',   'Femenino',  TRUE,  2, 6, 12, 4);
+    (7,  '20.111.111-1', NULL, 'Luis',    'Castillo', 'Ríos',   'l.castillo@empresados.cl', 'Masculino', FALSE, 2, 6, 11, 4),
+    (8,  '20.222.222-2', NULL, 'Valentina','Flores',  'Mora',   'v.flores@empresados.cl',   'Femenino',  TRUE,  2, 6, 12, 4);
 
 -- Supervisor (reportan a ID 7 y 8)
 INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
-    (9,  '16.345.678-3', 7, 'Felipe', 'Rojas', 'Lima', 'f.rojas@permify.cl',  'Masculino', FALSE, 2, 5, 9,  5),
-    (10, '17.456.789-4', 8, 'Camila', 'Núñez', 'Ríos', 'c.nunez@permify.cl',  'Femenino',  FALSE, 2, 5, 10, 6);
+    (9,  '20.333.333-3', 7, 'Rodrigo', 'Navarro', 'Soto',  'r.navarro@empresados.cl', 'Masculino', FALSE, 2, 5, 9,  5),
+    (10, '20.444.444-4', 8, 'Francisca','Ibáñez', 'Cruz',  'f.ibanez@empresados.cl',  'Femenino',  FALSE, 2, 5, 10, 6);
 
 -- Colaborador (reportan a ID 9 y 10)
 INSERT INTO "TRABAJADOR" ("id_trabajador", "rut", "id_jefe_directo", "nombre", "apellido_paterno", "apellido_materno", "email", "genero", "es_coordinador", "empresa_id_empresa", "nivel_jerarquico_id_nivel_jerarquico", "cargo_id_cargo", "departamento_id_departamento")
 VALUES
-    (11, '18.567.890-5', 9,  'Ignacio', 'Pérez', 'Blanc', 'i.perez@permify.cl', 'Masculino', FALSE, 2, 4, 7, 6),
-    (12, '19.678.901-6', 10, 'Javiera', 'Muñoz', 'Cerda', 'j.munoz@permify.cl', 'Femenino',  FALSE, 2, 4, 8, 5);
+    (11, '20.555.555-5', 9,  'Matías',  'Espinoza', 'Vega',  'm.espinoza@empresados.cl', 'Masculino', FALSE, 2, 4, 7, 6),
+    (12, '20.666.666-6', 10, 'Isidora', 'Contreras','Pino',  'i.contreras@empresados.cl','Femenino',  FALSE, 2, 4, 8, 5);
 
 -- =========================
 -- =========================
