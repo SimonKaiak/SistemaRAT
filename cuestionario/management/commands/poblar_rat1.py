@@ -113,6 +113,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write('🔧 Creando Instrumento Kick Off...')
 
+        # Renombrar "Kick Off" a "RAT 1" si existe
+        Instrumento.objects.filter(nombre_instrumento='Kick Off').update(nombre_instrumento='RAT 1')
+
         instrumento, creado = Instrumento.objects.get_or_create(
             nombre_instrumento='RAT 1',
             defaults={
