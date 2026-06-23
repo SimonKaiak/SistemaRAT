@@ -121,6 +121,7 @@
                                 <option value="contactabilidad" {% if pregunta.respuesta_actual.respuesta == 'contactabilidad' %}selected{% endif %}>Datos de contactabilidad de personas</option>
                                 <option value="bancarios" {% if pregunta.respuesta_actual.respuesta == 'bancarios' %}selected{% endif %}>Datos bancarios o finanzas personales</option>
                                 <option value="historia_clinica" {% if pregunta.respuesta_actual.respuesta == 'historia_clinica' %}selected{% endif %}>Datos de historia clínica de personas</option>
+                                <option value="otra_categoria" {% if pregunta.respuesta_actual.respuesta == 'otra_categoria' %}selected{% endif %}>Otra categoría</option>
                             </select>
                             {% elif pregunta.tipo == 'periodo' %}
                             {% if pregunta.respuesta_actual %}
