@@ -42,9 +42,9 @@ class Command(BaseCommand):
         for pregunta in PREGUNTAS_RAT2:
             obj, nuevo = RATPlantillaPregunta.objects.get_or_create(
                 instrumento=instrumento,
-                orden=pregunta['orden'],
+                enunciado=pregunta['enunciado'],
                 defaults={
-                    'enunciado': pregunta['enunciado'],
+                    'orden': pregunta['orden'],
                     'tipo': pregunta['tipo'],
                 },
             )
@@ -52,8 +52,11 @@ class Command(BaseCommand):
                 creadas += 1
                 self.stdout.write(self.style.SUCCESS(f'  ✅ [{obj.orden}] {obj.enunciado[:60]}'))
             else:
+                obj.orden = pregunta['orden']
+                obj.tipo = pregunta['tipo']
+                obj.save()
                 existentes += 1
-                self.stdout.write(f'  ℹ️  [{obj.orden}] ya existe — sin cambios')
+                self.stdout.write(f'  ℹ️  [{obj.orden}] actualizado — orden y tipo corregidos')
 
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS(
