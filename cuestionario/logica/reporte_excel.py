@@ -98,7 +98,7 @@ def generar_excel_detalle(request, trabajador_id):
     jefe = EvaluacionJefatura.objects.filter(trabajador_evaluado=trabajador, estado_finalizacion=True).first()
     
     timestamp_auto = auto.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if auto else "Pendiente"
-    timestamp_jefe = jefe.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if jefe else "N/A"
+    timestamp_jefe = jefe.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if jefe else "Pendiente"
     
     wb = Workbook()
     ws = wb.active
@@ -166,7 +166,7 @@ def generar_excel_detalle(request, trabajador_id):
             ws[f'A{row}'] = r.texto_eval.codigo_excel
             ws[f'B{row}'] = r.texto_eval.competencia.nombre_competencia
             ws[f'C{row}'] = r.puntaje_autoev
-            ws[f'D{row}'] = r.puntaje_jefe if r.puntaje_jefe > 0 else 'N/A'
+            ws[f'D{row}'] = r.puntaje_jefe if r.puntaje_jefe > 0 else 'Pendiente'
             ws[f'E{row}'] = int(r.diferencia)
 
             for col in ['A', 'B', 'C', 'D', 'E']:

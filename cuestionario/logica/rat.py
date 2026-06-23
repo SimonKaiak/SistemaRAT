@@ -156,6 +156,9 @@ class RATPreguntaAdminForm(forms.Form):
         ('select_categorias', 'Selector de categorías de datos'),
         ('periodo', 'Período (número + días/meses/años)'),
         ('listado_usuarios', 'Listado de usuarios (uno o varios)'),
+        ('select_actividad', 'Selector de actividad de tratamiento'),
+        ('select_formato', 'Selector de formato de archivo'),
+        ('select_base_legitimidad', 'Selector de base de legitimidad (múltiple)'),
     ]
     enunciado = forms.CharField(
         label='Enunciado de la pregunta',

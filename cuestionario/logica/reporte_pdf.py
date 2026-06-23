@@ -108,7 +108,7 @@ def generar_pdf_detalle(request, trabajador_id):
     jefe = EvaluacionJefatura.objects.filter(trabajador_evaluado=trabajador, estado_finalizacion=True).first()
     
     timestamp_auto = auto.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if auto else "Pendiente"
-    timestamp_jefe = jefe.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if jefe else "N/A"
+    timestamp_jefe = jefe.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if jefe else "Pendiente"
     
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)

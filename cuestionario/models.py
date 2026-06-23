@@ -728,6 +728,9 @@ class RATPreguntas(models.Model):
         ('select_categorias', 'Selector de categorías'),
         ('periodo', 'Período (número + unidad)'),
         ('listado_usuarios', 'Listado de usuarios'),
+        ('select_actividad', 'Selector de actividad de tratamiento'),
+        ('select_formato', 'Selector de formato de archivo'),
+        ('select_base_legitimidad', 'Selector de base de legitimidad (múltiple)'),
     ]
     tipo = models.CharField(
         max_length=20,

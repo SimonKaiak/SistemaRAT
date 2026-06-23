@@ -168,6 +168,57 @@ function abrirModal(preguntaId, tipo, valorActual) {
             <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta:</label>
             <div style="display:flex;gap:1em;flex-wrap:wrap;">${ops}</div>
             <p style="font-size:0.85em;opacity:0.6;margin-top:0.6em;">1 = Nada familiarizado/a &nbsp;|&nbsp; 5 = Muy familiarizado/a</p>`;
+    } else if (tipo === 'select_actividad') {
+        const opciones = [
+            'Limpieza, depuración de datos',
+            'Combinación de datos con otra fuente',
+            'Uso operacional (para llamar, enviar emails, mensajes de texto, Whatsapp)',
+            'Otra actividad'
+        ];
+        const opts = opciones.map(o =>
+            `<option value="${o}" ${valorActual === o ? 'selected' : ''}>${o}</option>`
+        ).join('');
+        campos.innerHTML = `
+            <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta:</label>
+            <select name="respuesta" style="width:100%;padding:0.6em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;font-size:0.95em;">
+                <option value="">-- Selecciona una opción --</option>
+                ${opts}
+            </select>`;
+    } else if (tipo === 'select_formato') {
+        const opciones = [
+            'Planilla de cálculo (Excel)',
+            'Documento de texto (Word)',
+            'Base de datos',
+            'Otro formato'
+        ];
+        const opts = opciones.map(o =>
+            `<option value="${o}" ${valorActual === o ? 'selected' : ''}>${o}</option>`
+        ).join('');
+        campos.innerHTML = `
+            <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta:</label>
+            <select name="respuesta" style="width:100%;padding:0.6em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;font-size:0.95em;">
+                <option value="">-- Selecciona una opción --</option>
+                ${opts}
+            </select>`;
+    } else if (tipo === 'select_base_legitimidad') {
+        const opciones = [
+            'Términos de Uso de Datos',
+            'Consentimiento',
+            'Contrato',
+            'Otra base de legitimidad',
+            'No conozco la base de legitimidad'
+        ];
+        const seleccionadas = valorActual ? valorActual.split(',').map(v => v.trim()) : [];
+        const checks = opciones.map(o => `
+            <label style="display:flex;align-items:center;gap:0.6em;padding:0.5em 0;cursor:pointer;">
+                <input type="checkbox" name="base_legitimidad" value="${o}" ${seleccionadas.includes(o) ? 'checked' : ''}
+                    style="width:16px;height:16px;cursor:pointer;">
+                ${o}
+            </label>`).join('');
+        campos.innerHTML = `
+            <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta (puedes elegir varias):</label>
+            <input type="hidden" name="respuesta" id="respuesta-legitimidad" value="${valorActual}">
+            <div id="checks-legitimidad">${checks}</div>`;
     } else {
         campos.innerHTML = `
             <label style="display:block;margin-bottom:0.8em;font-weight:bold;">Tu respuesta:</label>
@@ -202,7 +253,14 @@ document.getElementById('modal-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const formData = new FormData(this);
     const csrfToken = formData.get('csrfmiddlewaretoken');
-    const respuesta = formData.get('respuesta');
+    // Para select_base_legitimidad, combina los checks en un string separado por comas
+    const checks = this.querySelectorAll('input[name="base_legitimidad"]:checked');
+    let respuesta;
+    if (checks.length > 0) {
+        respuesta = Array.from(checks).map(c => c.value).join(', ');
+    } else {
+        respuesta = formData.get('respuesta');
+    }
 
     fetch(`/rat/responder/${preguntaIdActual}/?instrumento_id={{ instrumento_id }}`, {
         method: 'POST',

@@ -224,7 +224,7 @@ def generar_reporte_global_pdf(request):
         ).first()
 
         timestamp_auto = auto.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if auto else "Pendiente"
-        timestamp_jefe = jefe.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if jefe else "N/A"
+        timestamp_jefe = jefe.momento_evaluacion.strftime("%d/%m/%Y %H:%M") if jefe else "Pendiente"
 
         elements.append(
             Paragraph(f"Reporte de Evaluación de Desempeño — #{idx} de {total}", title_style)

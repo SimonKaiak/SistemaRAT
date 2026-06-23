@@ -126,7 +126,7 @@ def _grafico_pie_avance(listos: int, pendientes: int) -> BytesIO:
     fig, ax = plt.subplots(figsize=(4, 4))
     ax.pie(
         valores,
-        labels=['Listos', 'Pendientes'],
+        labels=['Terminados', 'Pendientes'],
         colors=[COLOR_LISTOS, COLOR_PENDIENTES],
         autopct=_autopct,
         textprops={'fontsize': 11},
@@ -144,14 +144,14 @@ def _grafico_barras_avance(datos: OrderedDict, titulo: str) -> BytesIO:
     """Gráfico de barras Listos/Pendientes agrupado por la clave de
     `datos` (departamento o nivel jerárquico)."""
     etiquetas = list(datos.keys())
-    listos = [v['listos'] for v in datos.values()]
+    listos = [v['terminados'] for v in datos.values()]
     pendientes = [v['pendientes'] for v in datos.values()]
     posiciones = range(len(etiquetas))
     ancho_barra = 0.35
 
     fig, ax = plt.subplots(figsize=(6.2, 3.6))
     ax.bar([p - ancho_barra / 2 for p in posiciones], listos, width=ancho_barra,
-           label='Listos', color=COLOR_LISTOS)
+           label='Terminados', color=COLOR_LISTOS)
     ax.bar([p + ancho_barra / 2 for p in posiciones], pendientes, width=ancho_barra,
            label='Pendientes', color=COLOR_PENDIENTES)
     ax.set_xticks(list(posiciones))
@@ -463,7 +463,7 @@ def generar_reporte_rat_pdf(request):
     # ── Trabajadores con RAT listo / pendiente ─
     total_preguntas = preguntas.count()
     trabajadores_empresa = Trabajador.objects.filter(empresa=empresa_obj).select_related('departamento', 'nivel_jerarquico')
-    trabajadores_listos = []
+    trabajadores_terminados = []
     trabajadores_pendientes = []
     datos_departamento = OrderedDict()
     datos_nivel = OrderedDict()
@@ -478,20 +478,20 @@ def generar_reporte_rat_pdf(request):
 
         nombre_departamento = t.departamento.nombre_departamento if t.departamento_id else 'Sin Departamento'
         nombre_nivel = t.nivel_jerarquico.nombre_nivel_jerarquico if t.nivel_jerarquico_id else 'Sin Nivel'
-        datos_departamento.setdefault(nombre_departamento, {'listos': 0, 'pendientes': 0})
-        datos_nivel.setdefault(nombre_nivel, {'listos': 0, 'pendientes': 0})
+        datos_departamento.setdefault(nombre_departamento, {'terminados': 0, 'pendientes': 0})
+        datos_nivel.setdefault(nombre_nivel, {'terminados': 0, 'pendientes': 0})
 
         if listo:
-            trabajadores_listos.append(t)
-            datos_departamento[nombre_departamento]['listos'] += 1
-            datos_nivel[nombre_nivel]['listos'] += 1
+            trabajadores_terminados.append(t)
+            datos_departamento[nombre_departamento]['terminados'] += 1
+            datos_nivel[nombre_nivel]['terminados'] += 1
         else:
             trabajadores_pendientes.append(t)
             datos_departamento[nombre_departamento]['pendientes'] += 1
             datos_nivel[nombre_nivel]['pendientes'] += 1
 
-    if not trabajadores_listos:
-        return HttpResponse("No hay trabajadores con RAT completado.", status=404)
+    if not trabajadores_terminados:
+        return HttpResponse("No hay trabajadores con RAT Terminado.", status=404)
 
     # ── Estilos ────────────────────────────────
     styles_rl = getSampleStyleSheet()
@@ -546,7 +546,7 @@ def generar_reporte_rat_pdf(request):
 
     metadata = [
         ['Empresa', empresa_obj.nombre_empresa],
-        ['Colaboradores con RAT completado', str(len(trabajadores_listos))],
+        ['Colaboradores con RAT Terminado', str(len(trabajadores_terminados))],
         ['Fecha de generación', datetime.now().strftime('%d/%m/%Y %H:%M')],
     ]
     t_meta = Table(metadata, colWidths=[2.8 * inch, 2.8 * inch])
@@ -571,7 +571,7 @@ def generar_reporte_rat_pdf(request):
     elements.append(Paragraph("Resumen Gráfico de Avance", style_title))
     elements.append(Spacer(1, 0.15 * inch))
 
-    img_pie = _grafico_pie_avance(len(trabajadores_listos), len(trabajadores_pendientes))
+    img_pie = _grafico_pie_avance(len(trabajadores_terminados), len(trabajadores_pendientes))
     elements.append(RLImage(img_pie, width=2.3 * inch, height=2.3 * inch, hAlign='CENTER'))
     elements.append(Spacer(1, 0.2 * inch))
 
@@ -624,12 +624,12 @@ def generar_reporte_rat_pdf(request):
     # ── Resumen Global ─────────────────────────
     elements.append(Paragraph("Resumen Global — Todos los Departamentos", style_title))
     elements.append(Spacer(1, 0.2 * inch))
-    _agregar_preguntas(elements, preguntas, trabajadores_listos, helper_styles, style_pregunta, style_normal, niveles_ordenados)
+    _agregar_preguntas(elements, preguntas, trabajadores_terminados, helper_styles, style_pregunta, style_normal, niveles_ordenados)
 
     # ── Por Departamento ───────────────────────
     departamentos = Departamento.objects.filter(empresa=empresa_obj)
     for depto in departamentos:
-        trabajadores_depto = [t for t in trabajadores_listos if t.departamento == depto]
+        trabajadores_depto = [t for t in trabajadores_terminados if t.departamento == depto]
         if not trabajadores_depto:
             continue
         elements.append(PageBreak())

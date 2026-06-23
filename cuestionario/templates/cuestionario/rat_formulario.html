@@ -56,6 +56,11 @@
                         {% if tipo_pregunta == 'sino' %}Sí / No
                         {% elif tipo_pregunta == 'escala' %}Escala 1-5
                         {% elif tipo_pregunta == 'select_categorias' %}Selector de categorías de datos
+                        {% elif tipo_pregunta == 'periodo' %}Período (número + días/meses/años)
+                        {% elif tipo_pregunta == 'listado_usuarios' %}Listado de usuarios
+                        {% elif tipo_pregunta == 'select_actividad' %}Selector de actividad de tratamiento
+                        {% elif tipo_pregunta == 'select_formato' %}Selector de formato de archivo
+                        {% elif tipo_pregunta == 'select_base_legitimidad' %}Selector de base de legitimidad (múltiple)
                         {% else %}Texto libre
                         {% endif %}
                         <em style="font-size:0.85em;"> — no editable</em>
