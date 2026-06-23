@@ -64,7 +64,7 @@ class Command(BaseCommand):
             for pregunta in PREGUNTAS_RAT2:
                 RATPreguntas.objects.filter(
                     instrumento_empresa=ie,
-                    actividad_tratamiento=pregunta['enunciado']
+                    actividad_tratamiento__icontains=pregunta['enunciado'][:30]
                 ).update(orden=pregunta['orden'])
         self.stdout.write(self.style.SUCCESS('✅ Órdenes corregidos en RATPreguntas existentes'))
 
