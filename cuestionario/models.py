@@ -809,6 +809,12 @@ class RATPlantillaPregunta(models.Model):
         ('texto', 'Texto libre'),
         ('sino', 'Sí / No'),
         ('escala', 'Escala 1-5'),
+        ('select_categorias', 'Selector de categorías'),
+        ('periodo', 'Período (número + unidad)'),
+        ('listado_usuarios', 'Listado de usuarios'),
+        ('select_actividad', 'Selector de actividad de tratamiento'),
+        ('select_formato', 'Selector de formato de archivo'),
+        ('select_base_legitimidad', 'Selector de base de legitimidad (múltiple)'),
     ]
  
     id_plantilla = models.AutoField(primary_key=True)
@@ -820,7 +826,7 @@ class RATPlantillaPregunta(models.Model):
     )
     orden = models.PositiveSmallIntegerField(default=0)
     enunciado = models.TextField()
-    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='texto')
+    tipo = models.CharField(max_length=30, choices=TIPO_CHOICES, default='texto')
  
     class Meta:
         managed = True

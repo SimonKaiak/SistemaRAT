@@ -114,7 +114,7 @@ class Command(BaseCommand):
         self.stdout.write('🔧 Creando Instrumento Kick Off...')
 
         instrumento, creado = Instrumento.objects.get_or_create(
-            nombre_instrumento='Kick Off',
+            nombre_instrumento='RAT 1',
             defaults={
                 'descripcion': (
                     'Instrumento de diagnóstico inicial sobre conocimiento y '
