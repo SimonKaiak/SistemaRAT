@@ -733,7 +733,7 @@ class RATPreguntas(models.Model):
         ('select_base_legitimidad', 'Selector de base de legitimidad (múltiple)'),
     ]
     tipo = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=TIPO_PREGUNTA_CHOICES,
         default='texto',
     )
