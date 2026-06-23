@@ -151,6 +151,35 @@
                                 </select>
                             </div>
                             {% endif %}
+                            {% elif pregunta.tipo == 'select_actividad' %}
+                            <select id="texto-{{ pregunta.id_rat_pregunta }}"
+                                style="width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;margin-bottom:0.8em;">
+                                <option value="">-- Selecciona --</option>
+                                <option value="Limpieza, depuración de datos" {% if pregunta.respuesta_actual.respuesta == 'Limpieza, depuración de datos' %}selected{% endif %}>Limpieza, depuración de datos</option>
+                                <option value="Combinación de datos con otra fuente" {% if pregunta.respuesta_actual.respuesta == 'Combinación de datos con otra fuente' %}selected{% endif %}>Combinación de datos con otra fuente</option>
+                                <option value="Uso operacional (para llamar, enviar emails, mensajes de texto, Whatsapp)" {% if pregunta.respuesta_actual.respuesta == 'Uso operacional (para llamar, enviar emails, mensajes de texto, Whatsapp)' %}selected{% endif %}>Uso operacional (para llamar, enviar emails, mensajes de texto, Whatsapp)</option>
+                                <option value="Otra actividad" {% if pregunta.respuesta_actual.respuesta == 'Otra actividad' %}selected{% endif %}>Otra actividad</option>
+                            </select>
+                            {% elif pregunta.tipo == 'select_formato' %}
+                            <select id="texto-{{ pregunta.id_rat_pregunta }}"
+                                style="width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(30,30,50,0.9);color:#fff;margin-bottom:0.8em;">
+                                <option value="">-- Selecciona --</option>
+                                <option value="Planilla de cálculo (Excel)" {% if pregunta.respuesta_actual.respuesta == 'Planilla de cálculo (Excel)' %}selected{% endif %}>Planilla de cálculo (Excel)</option>
+                                <option value="Documento de texto (Word)" {% if pregunta.respuesta_actual.respuesta == 'Documento de texto (Word)' %}selected{% endif %}>Documento de texto (Word)</option>
+                                <option value="Base de datos" {% if pregunta.respuesta_actual.respuesta == 'Base de datos' %}selected{% endif %}>Base de datos</option>
+                                <option value="Otro formato" {% if pregunta.respuesta_actual.respuesta == 'Otro formato' %}selected{% endif %}>Otro formato</option>
+                            </select>
+                            {% elif pregunta.tipo == 'select_base_legitimidad' %}
+                            <div style="display:flex;flex-direction:column;gap:0.4em;margin-bottom:0.8em;">
+                                {% for opcion in opciones_legitimidad %}
+                                <label style="display:flex;align-items:center;gap:0.6em;cursor:pointer;padding:0.6em 0.8em;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);">
+                                    <input type="checkbox" name="bl-{{ pregunta.id_rat_pregunta }}" value="{{ opcion }}"
+                                        {% if pregunta.respuesta_actual and opcion in pregunta.respuesta_actual.respuesta %}checked{% endif %}
+                                        style="width:16px;height:16px;accent-color:#4fc3f7;cursor:pointer;">
+                                    {{ opcion }}
+                                </label>
+                                {% endfor %}
+                            </div>
                             {% elif pregunta.tipo == 'listado_usuarios' %}
                             <div id="texto-{{ pregunta.id_rat_pregunta }}" style="display:flex;flex-direction:column;gap:0.4em;margin-bottom:0.8em;">
                                 {% for t in trabajadores_empresa %}
@@ -266,8 +295,11 @@ function seleccionarOpcion(div, id) {
 
 function guardarRespuesta(id, tipo) {
     let respuesta = '';
-    if (tipo === 'texto' || tipo === 'select_categorias') {
+    if (tipo === 'texto' || tipo === 'select_categorias' || tipo === 'select_actividad' || tipo === 'select_formato') {
         respuesta = document.getElementById('texto-' + id).value;
+    } else if (tipo === 'select_base_legitimidad') {
+        const checks = document.querySelectorAll(`input[name="bl-${id}"]:checked`);
+        respuesta = Array.from(checks).map(c => c.value).join(', ');
     } else if (tipo === 'periodo') {
         const num = document.getElementById('periodo-num-' + id).value;
         let unidad = document.getElementById('periodo-unidad-' + id).value;

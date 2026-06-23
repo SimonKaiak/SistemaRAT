@@ -248,6 +248,13 @@ def rat_panel_usuario(request):
     trabajadores_empresa = Trabajador.objects.filter(empresa=trabajador.empresa)
 
     return render(request, 'cuestionario/rat_usuario.html', {
+        'opciones_legitimidad': [
+            'Términos de Uso de Datos',
+            'Consentimiento',
+            'Contrato',
+            'Otra base de legitimidad',
+            'No conozco la base de legitimidad',
+        ],
         'trabajador': trabajador,
         'preguntas': preguntas,
         'respuestas_existentes': respuestas_existentes,
