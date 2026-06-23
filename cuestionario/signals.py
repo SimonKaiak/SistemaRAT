@@ -123,10 +123,8 @@ def clonar_preguntas_rat(sender, instance, created, **kwargs):
     for plantilla in plantillas:
         preguntas_a_crear.append(RATPreguntas(
             instrumento_empresa=instance,
-            # Mapeamos el enunciado de la plantilla al campo actividad_tratamiento
-            # que es el campo "título" de la pregunta en el modelo actual
             actividad_tratamiento=plantilla.enunciado,
-            # Valores por defecto razonables — el coordinador los edita después
+            orden=plantilla.orden,
             categorias_datos='',
             descripcion_titulares='',
             finalidad_tratamiento='',
