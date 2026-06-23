@@ -341,14 +341,15 @@ def _tabla_generica(respuestas: list[str], styles: dict, label_map: dict | None 
     if not conteo:
         return [Paragraph("Sin respuestas.", styles['normal'])]
 
+    style_celda = ParagraphStyle('celdaGenerica', fontSize=9.5, leading=12)
     data = [['Respuesta', 'Cantidad', 'Porcentaje']]
     for valor, cant in conteo.most_common():
         etiqueta = label_map.get(valor, valor)
         pct = cant / total * 100
-        data.append([etiqueta, str(cant), f'{pct:.1f}%'])
+        data.append([Paragraph(etiqueta, style_celda), str(cant), f'{pct:.1f}%'])
     data.append(['Total', str(total), '100%'])
 
-    t = Table(data, colWidths=[3.5 * inch, 1.2 * inch, 1.2 * inch])
+    t = Table(data, colWidths=[4.5 * inch, 1.0 * inch, 1.0 * inch])
     t.setStyle(TableStyle([
         ('BACKGROUND',    (0, 0), (-1, 0),  COLOR_MARCA),
         ('TEXTCOLOR',     (0, 0), (-1, 0),  colors.white),
