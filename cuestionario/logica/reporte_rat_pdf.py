@@ -325,6 +325,7 @@ CATEGORIAS_LABELS = {
     'contactabilidad': 'Datos de contactabilidad de personas',
     'bancarios': 'Datos bancarios o finanzas personales',
     'historia_clinica': 'Datos de historia clínica de personas',
+    'otra_categoria': 'Otra categoría',
 }
 
 
@@ -548,6 +549,8 @@ def generar_reporte_rat_pdf(request):
     metadata = [
         ['Empresa', empresa_obj.nombre_empresa],
         ['Colaboradores con RAT Terminado', str(len(trabajadores_terminados))],
+        ['Colaboradores con RAT Pendiente', str(len(trabajadores_pendientes))],
+        ['Total de Colaboradores', str(len(trabajadores_terminados) + len(trabajadores_pendientes))],
         ['Fecha de generación', datetime.now().strftime('%d/%m/%Y %H:%M')],
     ]
     t_meta = Table(metadata, colWidths=[2.8 * inch, 2.8 * inch])

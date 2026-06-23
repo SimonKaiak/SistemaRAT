@@ -695,6 +695,7 @@ class RATPreguntas(models.Model):
     ]
  
     id_rat_pregunta = models.AutoField(primary_key=True)
+    orden = models.PositiveSmallIntegerField(default=0)
     actividad_tratamiento = models.CharField(max_length=255)
     CATEGORIAS_CHOICES = [
         ('contactabilidad', 'Datos de contactabilidad de personas'),
@@ -762,6 +763,7 @@ class RATPreguntas(models.Model):
     class Meta:
         managed = True
         db_table = 'RAT_PREGUNTAS'
+        ordering = ['orden', 'id_rat_pregunta']
  
     def __str__(self):
         return self.actividad_tratamiento

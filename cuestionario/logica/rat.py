@@ -160,6 +160,14 @@ class RATPreguntaAdminForm(forms.Form):
         ('select_formato', 'Selector de formato de archivo'),
         ('select_base_legitimidad', 'Selector de base de legitimidad (múltiple)'),
     ]
+    orden = forms.IntegerField(
+        label='Orden',
+        min_value=0,
+        initial=0,
+        widget=forms.NumberInput(attrs={
+            'style': 'width:100%;padding:0.5em;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;',
+        }),
+    )
     enunciado = forms.CharField(
         label='Enunciado de la pregunta',
         widget=forms.Textarea(attrs={
@@ -408,6 +416,7 @@ def rat_nueva_pregunta(request):
             responsable = Trabajador.objects.filter(empresa=empresa).first()
 
             pregunta = RATPreguntas(
+                orden=form.cleaned_data['orden'],
                 actividad_tratamiento=enunciado,
                 tipo=tipo,
                 instrumento_empresa=ie,
@@ -461,6 +470,7 @@ def rat_editar_pregunta(request, pregunta_id):
             form = FormClass(request.POST, instance=pregunta, empresa=empresa)
         if form.is_valid():
             if request.user.is_superuser:
+                pregunta.orden = form.cleaned_data['orden']
                 pregunta.actividad_tratamiento = form.cleaned_data['enunciado']
                 pregunta.tipo = form.cleaned_data['tipo']
                 pregunta.save()
@@ -471,6 +481,7 @@ def rat_editar_pregunta(request, pregunta_id):
     else:
         if request.user.is_superuser:
             form = FormClass(initial={
+                'orden': pregunta.orden,
                 'enunciado': pregunta.actividad_tratamiento,
                 'tipo': pregunta.tipo,
             })
