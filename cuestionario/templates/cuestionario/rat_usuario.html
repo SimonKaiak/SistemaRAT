@@ -79,7 +79,7 @@
             <div id="card-{{ pregunta.id_rat_pregunta }}" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:1.2em 1.5em;gap:1em;flex-wrap:wrap;">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:1em;flex-wrap:wrap;">
                     <div style="flex:1;min-width:200px;">
-                        <h4 style="margin:0 0 0.3em;">{{ pregunta.actividad_tratamiento }}</h4>
+                        <h4 style="margin:0 0 0.3em;">{% if pregunta.orden %}{{ pregunta.orden }}. {% endif %}{{ pregunta.actividad_tratamiento }}</h4>
 
                         <div id="vista-{{ pregunta.id_rat_pregunta }}">
                             {% if pregunta.respuesta_actual %}

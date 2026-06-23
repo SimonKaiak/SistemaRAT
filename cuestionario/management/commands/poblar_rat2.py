@@ -58,6 +58,16 @@ class Command(BaseCommand):
                 existentes += 1
                 self.stdout.write(f'  ℹ️  [{obj.orden}] actualizado — orden y tipo corregidos')
 
+        # Corregir orden en RATPreguntas existentes para todas las empresas
+        from cuestionario.models import RATPreguntas, InstrumentoEmpresa
+        for ie in InstrumentoEmpresa.objects.filter(instrumento=instrumento):
+            for pregunta in PREGUNTAS_RAT2:
+                RATPreguntas.objects.filter(
+                    instrumento_empresa=ie,
+                    actividad_tratamiento=pregunta['enunciado']
+                ).update(orden=pregunta['orden'])
+        self.stdout.write(self.style.SUCCESS('✅ Órdenes corregidos en RATPreguntas existentes'))
+
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS(
             f'✅ Listo. Preguntas creadas: {creadas} | Ya existían: {existentes}'
