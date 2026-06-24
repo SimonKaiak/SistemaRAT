@@ -174,12 +174,19 @@
                             {% elif pregunta.tipo == 'select_base_legitimidad' %}
                             <div style="display:flex;flex-direction:column;gap:0.4em;margin-bottom:0.8em;">
                                 {% for opcion in opciones_legitimidad %}
-                                <label style="display:flex;align-items:center;gap:0.6em;cursor:pointer;padding:0.6em 0.8em;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);">
-                                    <input type="checkbox" name="bl-{{ pregunta.id_rat_pregunta }}" value="{{ opcion }}"
-                                        {% if pregunta.respuesta_actual and opcion in pregunta.respuesta_actual.respuesta %}checked{% endif %}
+                                {% if pregunta.respuesta_actual and opcion in pregunta.respuesta_actual.respuesta %}
+                                <label onclick="toggleLabel(this)" style="display:flex;align-items:center;gap:0.6em;cursor:pointer;padding:0.6em 0.8em;border-radius:6px;border:1px solid rgba(79,195,247,0.5);background:rgba(79,195,247,0.12);transition:all 0.2s;">
+                                    <input type="checkbox" name="bl-{{ pregunta.id_rat_pregunta }}" value="{{ opcion }}" checked
                                         style="width:16px;height:16px;accent-color:#4fc3f7;cursor:pointer;">
-                                    {{ opcion }}
+                                    <span style="font-weight:600;">{{ opcion }}</span>
                                 </label>
+                                {% else %}
+                                <label onclick="toggleLabel(this)" style="display:flex;align-items:center;gap:0.6em;cursor:pointer;padding:0.6em 0.8em;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);transition:all 0.2s;">
+                                    <input type="checkbox" name="bl-{{ pregunta.id_rat_pregunta }}" value="{{ opcion }}"
+                                        style="width:16px;height:16px;accent-color:#4fc3f7;cursor:pointer;">
+                                    <span style="font-weight:400;">{{ opcion }}</span>
+                                </label>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                             {% elif pregunta.tipo == 'listado_usuarios' %}
