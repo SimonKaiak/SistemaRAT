@@ -140,6 +140,39 @@ def _grafico_pie_avance(listos: int, pendientes: int) -> BytesIO:
     return buf
 
 
+def _grafico_pie_respuestas(conteo: Counter, titulo: str, label_map: dict | None = None) -> BytesIO | None:
+    """Gráfico de torta para distribución de respuestas de una pregunta."""
+    if not conteo:
+        return None
+    label_map = label_map or {}
+    etiquetas = [label_map.get(k, k) for k in conteo.keys()]
+    valores = list(conteo.values())
+    total = sum(valores)
+
+    def _autopct(pct):
+        if pct <= 0:
+            return ''
+        cantidad = round(pct * total / 100.0)
+        return f'{cantidad} ({pct:.0f}%)'
+
+    colores = ['#5e42a6', '#27ae60', '#e67e22', '#3498db', '#c0392b', '#f1c40f', '#1abc9c', '#e91e63']
+    fig, ax = plt.subplots(figsize=(5, 4))
+    ax.pie(
+        valores,
+        labels=etiquetas,
+        colors=colores[:len(valores)],
+        autopct=_autopct,
+        textprops={'fontsize': 9},
+        startangle=90,
+    )
+    ax.set_title(titulo, fontsize=12, fontweight='bold', color='#333333')
+    buf = BytesIO()
+    fig.savefig(buf, format='png', bbox_inches='tight', dpi=150, transparent=True)
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
 def _grafico_barras_avance(datos: OrderedDict, titulo: str) -> BytesIO:
     """Gráfico de barras Listos/Pendientes agrupado por la clave de
     `datos` (departamento o nivel jerárquico)."""
@@ -615,6 +648,23 @@ def generar_reporte_rat_pdf(request):
             else:
                 # periodo, listado_usuarios y cualquier otro tipo futuro
                 elements += _tabla_generica(respuestas, helper_styles)
+
+            # Gráfico de pie para preguntas con orden 1, 2, 3, 6, 9
+            if pregunta.orden in (1, 2, 3, 6, 9) and respuestas:
+                label_map = CATEGORIAS_LABELS if pregunta.tipo == 'select_categorias' else {}
+                conteo_pie = Counter(r.strip() for r in respuestas if r and r.strip())
+                # Para listado_usuarios expandir por comas
+                if pregunta.tipo == 'listado_usuarios':
+                    conteo_pie = Counter()
+                    for r in respuestas:
+                        for nombre in r.split(','):
+                            nombre = nombre.strip()
+                            if nombre:
+                                conteo_pie[nombre] += 1
+                img_pie_preg = _grafico_pie_respuestas(conteo_pie, f'Distribución — {pregunta.actividad_tratamiento[:40]}', label_map=label_map)
+                if img_pie_preg:
+                    elements.append(Spacer(1, 0.15 * inch))
+                    elements.append(RLImage(img_pie_preg, width=4.5 * inch, height=3.5 * inch, hAlign='CENTER'))
 
             # Gráfico adicional separado por nivel jerárquico (solo preguntas 1 a 4)
             if idx <= 4 and pregunta.tipo in ('sino', 'escala'):
