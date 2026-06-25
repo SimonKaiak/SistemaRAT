@@ -650,7 +650,7 @@ def generar_reporte_rat_pdf(request):
                 elements += _tabla_generica(respuestas, helper_styles)
 
             # Gráfico de pie para preguntas con orden 1, 2, 3, 6, 9
-            if pregunta.orden in (1, 2, 3, 6, 9) and respuestas:
+            if idx in (1, 2, 3, 7, 9) and respuestas:
                 label_map = CATEGORIAS_LABELS if pregunta.tipo == 'select_categorias' else {}
                 conteo_pie = Counter(r.strip() for r in respuestas if r and r.strip())
                 # Para listado_usuarios expandir por comas
