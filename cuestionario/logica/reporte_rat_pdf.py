@@ -651,7 +651,18 @@ def generar_reporte_rat_pdf(request):
 
             # Gráfico de pie para preguntas con orden 1, 2, 3, 6, 9
             if idx in (1, 2, 3, 6, 9) and respuestas:
-                label_map = CATEGORIAS_LABELS if pregunta.tipo == 'select_categorias' else {}
+                ACTIVIDAD_LABELS_CORTO = {
+                    'Limpieza, depuración de datos': 'Limpieza/depuración',
+                    'Combinación de datos con otra fuente': 'Combinación de datos',
+                    'Uso operacional (para llamar, enviar emails, mensajes de texto, Whatsapp)': 'Uso operacional',
+                    'Otra actividad': 'Otra actividad',
+                }
+                if pregunta.tipo == 'select_categorias':
+                    label_map = CATEGORIAS_LABELS
+                elif pregunta.tipo == 'select_actividad':
+                    label_map = ACTIVIDAD_LABELS_CORTO
+                else:
+                    label_map = {}
                 conteo_pie = Counter(r.strip() for r in respuestas if r and r.strip())
                 # Para listado_usuarios expandir por comas
                 if pregunta.tipo == 'listado_usuarios':

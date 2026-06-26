@@ -4,7 +4,7 @@ from cuestionario.models import Instrumento, RATPlantillaPregunta
 
 PREGUNTAS_RAT2 = [
     {'orden': 1,  'enunciado': 'Actividad de tratamiento',                                                                 'tipo': 'select_actividad'},
-    {'orden': 2,  'enunciado': 'Responsable o encargado',                                                                  'tipo': 'listado_usuarios'},
+    {'orden': 2,  'enunciado': 'Responsable o encargado',                                                                  'tipo': 'listado_usuario_unico'},
     {'orden': 3,  'enunciado': 'Categoría, clases o tipos de datos que se tratan',                                         'tipo': 'select_categorias'},
     {'orden': 4,  'enunciado': 'Formato del archivo de datos',                                                             'tipo': 'select_formato'},
     {'orden': 5,  'enunciado': 'Descripción del universo de los titulares de los datos personales',                        'tipo': 'texto'},
@@ -65,7 +65,7 @@ class Command(BaseCommand):
                 RATPreguntas.objects.filter(
                     instrumento_empresa=ie,
                     actividad_tratamiento__icontains=pregunta['enunciado'][:30]
-                ).update(orden=pregunta['orden'])
+                ).update(orden=pregunta['orden'], tipo=pregunta['tipo'])
         self.stdout.write(self.style.SUCCESS('✅ Órdenes corregidos en RATPreguntas existentes'))
 
         self.stdout.write('')

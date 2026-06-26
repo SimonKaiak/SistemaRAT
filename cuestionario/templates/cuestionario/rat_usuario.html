@@ -189,6 +189,21 @@
                                 {% endif %}
                                 {% endfor %}
                             </div>
+                            {% elif pregunta.tipo == 'listado_usuario_unico' %}
+                            <div style="display:flex;flex-direction:column;gap:0.4em;margin-bottom:0.8em;">
+                                {% for t in trabajadores_empresa %}
+                                {% with nombre_completo=t.nombre|add:' '|add:t.apellido_paterno %}
+                                <label onclick="seleccionarUnico(this, {{ pregunta.id_rat_pregunta }})" style="display:flex;align-items:center;gap:0.6em;cursor:pointer;padding:0.6em 0.8em;border-radius:6px;border:1px solid {% if pregunta.respuesta_actual.respuesta == nombre_completo %}rgba(79,195,247,0.5){% else %}rgba(255,255,255,0.08){% endif %};background:{% if pregunta.respuesta_actual.respuesta == nombre_completo %}rgba(79,195,247,0.12){% else %}rgba(255,255,255,0.03){% endif %};transition:all 0.2s;">
+                                    <input type="radio"
+                                        name="ru-{{ pregunta.id_rat_pregunta }}"
+                                        value="{{ nombre_completo }}"
+                                        {% if pregunta.respuesta_actual.respuesta == nombre_completo %}checked{% endif %}
+                                        style="width:16px;height:16px;accent-color:#4fc3f7;cursor:pointer;">
+                                    <span style="font-weight:{% if pregunta.respuesta_actual.respuesta == nombre_completo %}600{% else %}400{% endif %};">{{ nombre_completo }}</span>
+                                </label>
+                                {% endwith %}
+                                {% endfor %}
+                            </div>
                             {% elif pregunta.tipo == 'listado_usuarios' %}
                             <div id="texto-{{ pregunta.id_rat_pregunta }}" style="display:flex;flex-direction:column;gap:0.4em;margin-bottom:0.8em;">
                                 {% for t in trabajadores_empresa %}
@@ -302,6 +317,19 @@ function seleccionarOpcion(div, id) {
     valorSeleccionado[id] = div.dataset.valor;
 }
 
+function seleccionarUnico(label, id) {
+    const container = label.parentElement;
+    container.querySelectorAll('label').forEach(l => {
+        l.style.borderColor = 'rgba(255,255,255,0.08)';
+        l.style.background = 'rgba(255,255,255,0.03)';
+        l.querySelector('span').style.fontWeight = '400';
+    });
+    label.style.borderColor = 'rgba(79,195,247,0.5)';
+    label.style.background = 'rgba(79,195,247,0.12)';
+    label.querySelector('span').style.fontWeight = '600';
+    label.querySelector('input[type="radio"]').checked = true;
+}
+
 function guardarRespuesta(id, tipo) {
     let respuesta = '';
     if (tipo === 'texto' || tipo === 'select_categorias' || tipo === 'select_actividad' || tipo === 'select_formato') {
@@ -322,6 +350,9 @@ function guardarRespuesta(id, tipo) {
         const checks = document.querySelectorAll(`input[name="lu-${id}"]:checked`);
         const seleccionados = Array.from(checks).map(c => c.value);
         respuesta = seleccionados.join(', ');
+    } else if (tipo === 'listado_usuario_unico') {
+        const radio = document.querySelector(`input[name="ru-${id}"]:checked`);
+        respuesta = radio ? radio.value : '';
     } else {
         respuesta = valorSeleccionado[id] || '';
     }
