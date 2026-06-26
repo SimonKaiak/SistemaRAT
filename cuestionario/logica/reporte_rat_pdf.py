@@ -654,7 +654,7 @@ def generar_reporte_rat_pdf(request):
                 ACTIVIDAD_LABELS_CORTO = {
                     'Limpieza, depuración de datos': 'Limpieza/depuración',
                     'Combinación de datos con otra fuente': 'Combinación de datos',
-                    'Uso operacional (para llamar, enviar emails, mensajes de texto, Whatsapp)': 'Uso operacional',
+                    'Uso operacional (para llamar, enviar emails, mensajes de texto, Whatsapp)': 'Uso operacional\n(llamar, emails, Whatsapp)',
                     'Otra actividad': 'Otra actividad',
                 }
                 if pregunta.tipo == 'select_categorias':

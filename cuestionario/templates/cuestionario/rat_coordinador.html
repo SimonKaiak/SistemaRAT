@@ -64,7 +64,7 @@
         {% for pregunta in preguntas %}
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;">
             <div style="background:rgba(255,255,255,0.08);padding:0.9em 1.3em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5em;">
-                <h4 style="margin:0;flex:1;min-width:0;">{% if pregunta.orden %}<span style="color:#9b59b6;margin-right:0.4em;">{{ pregunta.orden }}.</span>{% endif %}{{ pregunta.actividad_tratamiento }}</h4>
+                <h4 style="margin:0;flex:1;min-width:0;">{% if pregunta.orden %}<span style="color:#ffffff;margin-right:0.4em;">{{ pregunta.orden }}.</span>{% endif %}{{ pregunta.actividad_tratamiento }}</h4>
                 <div style="display:flex;gap:0.5em;flex-shrink:0;">
                     <a href="{% url 'rat_editar_pregunta' pregunta.id_rat_pregunta %}?instrumento_id={{ instrumento_id }}" class="button" style="margin:0;background:rgba(240,192,64,0.15);border-color:rgba(240,192,64,0.4);color:#f0c040;font-weight:600;">✏️ Editar</a>
                     <a href="{% url 'rat_eliminar_pregunta' pregunta.id_rat_pregunta %}?instrumento_id={{ instrumento_id }}" class="button" style="margin:0;background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4);color:#e74c3c;">🗑 Eliminar</a>
